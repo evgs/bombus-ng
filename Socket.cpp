@@ -4,6 +4,7 @@
  *
  */
 
+#include "stdafx.h"
 #include "Socket.h"
 
 static int wsCount=0;
@@ -57,4 +58,16 @@ Socket * Socket::createSocket(const std::string &url, const int port) {
 	res->sock=s;
 
 	return res;
+}
+
+int Socket::read(char * buf, int len) {
+	return recv(sock, buf, len, 0);
+}
+
+int Socket::write(const char * buf, int len) {
+	return send(sock, buf, len, 0);
+}
+
+int Socket::write(const std::string &buf){
+	return write(buf.c_str(), buf.length());
 }

@@ -47,7 +47,7 @@ Socket * Socket::createSocket(const std::string &url, const int port) {
 	struct sockaddr_in name;
 	name.sin_family=AF_INET;
 	name.sin_addr.S_un.S_addr=*((unsigned long *)host->h_addr_list[0]);
-	name.sin_port= port>>8 | (port <<8)&0xff00; // internet byte order
+	name.sin_port= htons(port); // internet byte order
 
 	int result=connect(s, (sockaddr*)(&name), sizeof(name));
 

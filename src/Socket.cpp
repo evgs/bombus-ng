@@ -4,8 +4,8 @@
  *
  */
 
-#include "stdafx.h"
-#include "Socket.h"
+//#include "stdafx.h"
+#include <Socket.h>
 
 static int wsCount=0;
 

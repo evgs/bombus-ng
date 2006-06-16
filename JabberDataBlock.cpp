@@ -36,7 +36,7 @@ string JabberDataBlock::toXML(){
 	if (childs.empty() && text.empty()) return result+"/>";
 	result+='>';
 
-	for (JabberDataBlockIterator c=getChilds(); c!=childs.end(); c++) {
+	for (JabberDataBlockIterator c=childs.begin(); c!=childs.end(); c++) {
 		result+= c->toXML();
 	}
 

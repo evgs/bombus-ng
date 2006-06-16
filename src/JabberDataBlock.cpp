@@ -20,7 +20,7 @@ JabberDataBlockIterator JabberDataBlock::getChilds(){
 	return childs.begin();
 }
 
-void JabberDataBlock::addChild(JabberDataBlock child){
+void JabberDataBlock::addChild(JabberDataBlockRef child){
 	childs.push_back(child);
 }
 
@@ -37,7 +37,7 @@ string JabberDataBlock::toXML(){
 	result+='>';
 
 	for (JabberDataBlockIterator c=childs.begin(); c!=childs.end(); c++) {
-		result+= c->toXML();
+		result+= c->get()->toXML();
 	}
 
 	result+= text + "</" + getTagName() + '>';

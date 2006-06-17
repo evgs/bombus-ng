@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <Winsock2.h>
+#include <boost/shared_ptr.hpp>
 
 class Socket
 {
@@ -19,3 +20,5 @@ private:
 	SOCKET sock;
 
 };
+
+typedef boost::shared_ptr<Socket> SocketRef;

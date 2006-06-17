@@ -1,27 +1,43 @@
+#pragma once
 #include <string>
 #include <map>
 #include <list>
 #include <boost/smart_ptr.hpp>
+#include <libxml/xmlwriter.h>
 
 class JabberDataBlock;
-typedef smart_ptr<JabberDataBlock> JabberDataBlockRef;
-typedef list<JabberDataBlockRef>::iterator JabberDataBlockIterator;
+typedef boost::shared_ptr<JabberDataBlock> JabberDataBlockRef;
+typedef std::list<JabberDataBlockRef>::iterator JabberDataBlockIterator;
+typedef boost::shared_ptr<std::string> stringRef;
 
 class JabberDataBlock {
 public:
 	JabberDataBlock(void);
+	JabberDataBlock(const char * _tagName);
+	JabberDataBlock(const char * _tagName, const char *_text);
 	~JabberDataBlock(void);
 
 private:
-	string tagName;
-	map<string, string> attr;
-	list<JabberDataBlockRef> childs;
+	std::map<std::string, std::string> attr;
+	std::list<JabberDataBlockRef> childs;
+	std::string tagName;
+	std::string text;
+
 
 public:
-	string getTagName();
-	string getAttribute(string byName);
-	void setAttribute(string name, string value);
-	list<JabberDataBlockRef> * getChilds();
+	const std::string& getTagName() { return tagName; }
+
+	std::string getAttribute(std::string byName);
+	void setAttribute(std::string name, std::string value);
+	void setAttribute(const char *name, const char * value);
+
+	std::string getText() { return text; }
+	void setText(std::string &_text) { text=_text; }
+
+	std::list<JabberDataBlockRef> * getChilds();
 	void addChild(JabberDataBlockRef child);
-	string toXML();
-}
+	JabberDataBlock * addChild(const char *_tagName, const char *_text);
+
+	void JabberDataBlock::constructXML(xmlTextWriter * writer);
+	const char * toXML();
+};

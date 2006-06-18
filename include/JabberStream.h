@@ -7,6 +7,8 @@
 class JabberStream {
 friend int writeCallback(void * context, const char * buffer, int len);
 friend int closeCallback(void * context);
+friend int readCallback(void * context, char * buffer, int len);
+friend int icloseCallback(void * context);
 
 public:
 	JabberStream(void);
@@ -24,5 +26,10 @@ private:
     xmlTextWriterPtr writer;
 	xmlTextReaderPtr reader;
 
+	std::string streamId;
+
+	bool isRunning;
+
 private:
+	static void run(JabberStream * _stream);
 };

@@ -33,11 +33,12 @@ public:
 
 	std::string getText() { return text; }
 	void setText(std::string &_text) { text=_text; }
+	void setText(const char *_text) { text=_text; }
 
 	std::list<JabberDataBlockRef> * getChilds();
 	void addChild(JabberDataBlockRef child);
 	JabberDataBlock * addChild(const char *_tagName, const char *_text);
 
 	void JabberDataBlock::constructXML(xmlTextWriter * writer);
-	const char * toXML();
+	stringRef toXML();
 };

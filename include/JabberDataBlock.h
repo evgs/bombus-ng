@@ -28,7 +28,7 @@ public:
 	const std::string& getTagName() { return tagName; }
 
 	std::string getAttribute(std::string byName);
-	void setAttribute(std::string name, std::string value);
+	void setAttribute(std::string &name, std::string &value);
 	void setAttribute(const char *name, const char * value);
 
 	std::string getText() { return text; }

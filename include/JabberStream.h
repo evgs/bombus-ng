@@ -1,14 +1,20 @@
 #pragma once
-#include <Socket.h>
-#include <JabberDataBlock.h>
-#include <libxml/xmlwriter.h>
-#include <libxml/xmlreader.h>
+
+#include <boost/shared_ptr.hpp>
+#include "libxml/xmlwriter.h"
+#include "libxml/xmlreader.h"
+
+#include "Socket.h"
+#include "JabberDataBlock.h"
+#include "JabberListener.h"
+#include "JabberStanzaDispatcher.h"
 
 class JabberStream {
-friend int writeCallback(void * context, const char * buffer, int len);
-friend int closeCallback(void * context);
-friend int readCallback(void * context, char * buffer, int len);
-friend int icloseCallback(void * context);
+
+static int writeCallback(void * context, const char * buffer, int len);
+static int closeCallback(void * context);
+static int readCallback(void * context, char * buffer, int len);
+static int icloseCallback(void * context);
 
 public:
 	JabberStream(void);
@@ -20,6 +26,8 @@ public:
 	void sendXmlVersion();
 	void sendXmppHeader(const char * serverName);
 
+	void setJabberListener(JabberListenerRef listener) { jabberListener=listener; }
+	void setJabberStanzaDispatcher(JabberStanzaDispatcherRef dispatcher) {stanzaDispatcher=dispatcher; }
 
 private:
 	SocketRef connection;
@@ -29,6 +37,9 @@ private:
 	std::string streamId;
 
 	bool isRunning;
+
+	JabberListenerRef jabberListener;
+	JabberStanzaDispatcherRef stanzaDispatcher;
 
 private:
 	static void run(JabberStream * _stream);

@@ -25,14 +25,14 @@ private:
 
 
 public:
-	const std::string& getTagName() { return tagName; }
+	const std::string& getTagName() const{ return tagName; }
 
 	std::string getAttribute(std::string byName);
-	void setAttribute(std::string &name, std::string &value);
+	void setAttribute(const std::string &name, const std::string &value);
 	void setAttribute(const char *name, const char * value);
 
-	std::string getText() { return text; }
-	void setText(std::string &_text) { text=_text; }
+	const std::string& getText() const{ return text; }
+	void setText(const std::string &_text) { text=_text; }
 	void setText(const char *_text) { text=_text; }
 
 	std::list<JabberDataBlockRef> * getChilds();

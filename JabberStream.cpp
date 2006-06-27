@@ -6,7 +6,7 @@
 
 JabberStream::JabberStream(void){}
 
-int writeCallback(void * context, const char * buffer, int len) {
+int JabberStream::writeCallback(void * context, const char * buffer, int len) {
 	((JabberStream *) context)->connection->write(buffer, len);
 
 	char *output=new char[len+1];
@@ -17,12 +17,12 @@ int writeCallback(void * context, const char * buffer, int len) {
 	return len;
 }
 
-int closeCallback(void * context){
+int JabberStream::closeCallback(void * context){
 	printf("close out\n");
 	return 0;
 };
 
-int readCallback(void * context, char * buffer, int len) {
+int JabberStream::readCallback(void * context, char * buffer, int len) {
 	len=((JabberStream *) context)->connection->read(buffer, len);
 
 	if (len<0) {
@@ -38,7 +38,7 @@ int readCallback(void * context, char * buffer, int len) {
 	return len;
 }
 
-int icloseCallback(void * context){
+int JabberStream::icloseCallback(void * context){
 	printf("close in\n");
 	return 0;
 };
@@ -67,9 +67,15 @@ void JabberStream::run(JabberStream * _stream){
 					// stream initiated
 					if (!strcmp((char *) name,"stream:stream")) {
 						xmlChar *value=xmlTextReaderGetAttribute(reader, BAD_CAST "id");
+
 						_stream->streamId=(char *)value;
+
+						//begin conversation
+						JabberListener * listener=_stream->jabberListener.get();
+						if (listener!=NULL) listener->beginConversation( (char *)value);
+
 						xmlFree(value);
-						//todo: begin conversation
+
 						break;
 					}
 
@@ -93,7 +99,10 @@ void JabberStream::run(JabberStream * _stream){
 						stanzaStack.pop();
 						if (stanzaStack.empty()) {
 							//todo: block arrived
-							puts(element->toXML()->c_str());
+							JabberStanzaDispatcher * dispatcher=_stream->stanzaDispatcher.get();
+							if (dispatcher!=NULL) dispatcher->dispatchDataBlock(element);
+
+							//puts(element->toXML()->c_str());
 						} else {
 							stanzaStack.top()->addChild(element);
 						}
@@ -135,6 +144,7 @@ JabberStream::JabberStream(SocketRef _connection){
 	outBuf->closecallback=(xmlOutputCloseCallback) closeCallback;
 
 	writer = xmlNewTextWriter(outBuf);
+
     BOOST_ASSERT(writer);
 
 	boost::thread test( boost::bind(run, this) );

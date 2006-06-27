@@ -23,7 +23,7 @@ string JabberDataBlock::getAttribute(string byName) {
 	return attr[byName];
 }
 
-void JabberDataBlock::setAttribute(string &name, string &value) {
+void JabberDataBlock::setAttribute(const std::string & name,const std::string & value) {
 	attr[name]=value;
 }
 void JabberDataBlock::setAttribute(const char *name, const char *value) {

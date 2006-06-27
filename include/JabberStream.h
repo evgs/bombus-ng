@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/shared_ptr.hpp>
+#include <boost/smart_ptr.hpp>
 #include "libxml/xmlwriter.h"
 #include "libxml/xmlreader.h"
 
@@ -44,3 +44,5 @@ private:
 private:
 	static void run(JabberStream * _stream);
 };
+
+typedef boost::shared_ptr<JabberStream> JabberStreamRef;

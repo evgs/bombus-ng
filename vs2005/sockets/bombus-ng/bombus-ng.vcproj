@@ -197,6 +197,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\JabberStanzaDispatcher.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\JabberStream.cpp"
 				>
 			</File>
@@ -210,6 +214,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\boost\once.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\ResourceContext.cpp"
 				>
 			</File>
 			<File
@@ -243,7 +251,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\include\JabberDataBlockListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\JabberListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\JabberStanzaDispatcher.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\include\JabberStream.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\ResourceContext.h"
 				>
 			</File>
 			<File

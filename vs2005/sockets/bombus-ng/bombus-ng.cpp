@@ -110,7 +110,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	JabberStanzaDispatcherRef disp= JabberStanzaDispatcherRef(new JabberStanzaDispatcher(&rc));
 	jstream->setJabberStanzaDispatcher(disp);
 	disp->addListener( JabberDataBlockListenerRef( new Online(jstream.get() )));
-	//disp->addListener( JabberDataBlockListenerRef( new Version(jstream.get() )));
+	disp->addListener( JabberDataBlockListenerRef( new Version(jstream.get() )));
 
 	jstream->sendXmlVersion();
  

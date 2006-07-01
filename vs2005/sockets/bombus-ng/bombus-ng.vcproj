@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="E:\libs\libxml2\include;E:\libs\boost;&quot;E:\bombus-ng\include&quot;"
+				AdditionalIncludeDirectories="\libs\libxml2\include;\libs\boost;..\..\..\include"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -118,7 +118,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="E:\libs\libxml2\include;E:\libs\boost;&quot;E:\bombus-ng\include&quot;"
+				AdditionalIncludeDirectories="\libs\libxml2\include;\libs\boost;..\..\..\include"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"

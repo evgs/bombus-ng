@@ -1,8 +1,10 @@
 #include "JabberStream.h"
-#include <stdio.h>
+#include <iostream>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <stack>
+#include <utf8.hpp>
+#include <windows.h>
 
 JabberStream::JabberStream(void){}
 
@@ -12,13 +14,13 @@ int JabberStream::writeCallback(void * context, const char * buffer, int len) {
 	char *output=new char[len+1];
 	memcpy(output, buffer, len);
 	output[len]=0;
-	printf("out: %s\n", output);
+	std::cout << "out: " << output << std::endl;
 	delete output;
 	return len;
 }
 
 int JabberStream::closeCallback(void * context){
-	printf("close out\n");
+	std::cout << "close out\n";
 	return 0;
 };
 
@@ -26,15 +28,21 @@ int JabberStream::readCallback(void * context, char * buffer, int len) {
 	len=((JabberStream *) context)->connection->read(buffer, len);
 
 	if (len<0) {
-		puts ("in: EOF\n");
+		std::cout << "in: EOF\n";
 		return -1;
 	}
 
-	char *input=new char[len+1];
+	char *input=new char[2*len+1];
+	char *oem=new char[len+1];
 	memcpy(input, buffer, len);
 	input[len]=0;
-	printf("in: %s\n", input);
+
+	std::wstring uni=utf8::utf8_wchar(input);
+	WideCharToMultiByte(CP_OEMCP,0, uni.c_str(), -1, oem, len+1, NULL, NULL);
+
+	std::cout << "in: "<< oem << std::endl;
 	delete input;
+	delete oem;
 	return len;
 }
 
@@ -114,7 +122,12 @@ void JabberStream::run(JabberStream * _stream){
 						break;
 					}
 				default:
-					printf("%d %d %s %d %s\n", xmlTextReaderDepth(reader), nodeType, name, empty, value);
+					std::cout 
+						<< "##### depth=" << xmlTextReaderDepth(reader) 
+						<< " nodetype=" << nodeType 
+						<< " name=" << name 
+						<< " isempty=" << empty 
+						<< " val=" << value << std::endl;
 
 					/*if (nodeType==1) while (xmlTextReaderMoveToNextAttribute(reader)) {
 						xmlChar *name=xmlTextReaderName(reader);

@@ -3,6 +3,8 @@
 #include <Winsock2.h>
 #include <boost/shared_ptr.hpp>
 
+#include "basetypes.h"
+
 class Socket
 {
 public:
@@ -14,7 +16,8 @@ public:
 
 	int read(char * buf, int len);
 	int write(const char * buf, int len);
-	int write(const std::string &buf);
+	int write(const StringRef buf);
+	int Socket::write(std::string &buf);
 
 private:
 	SOCKET sock;

@@ -205,10 +205,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\libxml2\lib\libxml2_a.lib"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\boost\mutex.cpp"
 				>
 			</File>
@@ -237,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\XMLParser.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\boost\xtime.cpp"
 				>
 			</File>
@@ -246,6 +246,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\..\include\basetypes.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\include\JabberDataBlock.h"
 				>
@@ -271,7 +275,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\include\Socket.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\XMLEventListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\XMLParser.h"
 				>
 			</File>
 		</Filter>

@@ -5,15 +5,18 @@
 #include <boost/smart_ptr.hpp>
 #include <libxml/xmlwriter.h>
 
+#include "basetypes.h"
+
 class JabberDataBlock;
 typedef boost::shared_ptr<JabberDataBlock> JabberDataBlockRef;
 typedef std::list<JabberDataBlockRef>::iterator JabberDataBlockIterator;
-typedef boost::shared_ptr<std::string> stringRef;
+
 
 class JabberDataBlock {
 public:
 	JabberDataBlock(void);
 	JabberDataBlock(const char * _tagName);
+	JabberDataBlock(const std::string & _tagName, const std::map<std::string, std::string> &_attr);
 	JabberDataBlock(const char * _tagName, const char *_text);
 	~JabberDataBlock(void);
 
@@ -40,5 +43,5 @@ public:
 	JabberDataBlock * addChild(const char *_tagName, const char *_text);
 
 	void JabberDataBlock::constructXML(xmlTextWriter * writer);
-	stringRef toXML();
+	StringRef toXML();
 };

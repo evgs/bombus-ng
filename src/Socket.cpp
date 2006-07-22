@@ -68,6 +68,9 @@ int Socket::write(const char * buf, int len) {
 	return send(sock, buf, len, 0);
 }
 
-int Socket::write(const std::string &buf){
+int Socket::write(StringRef buf){
+	return write(buf->c_str(), buf->length());
+}
+int Socket::write(std::string &buf){
 	return write(buf.c_str(), buf.length());
 }

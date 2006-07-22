@@ -59,6 +59,9 @@ private:
 ProcessResult Online::blockArrived(JabberDataBlockRef block, const ResourceContext * rc){
 	puts("Login ok");
 	JabberDataBlock presence("presence");
+	presence.addChild("status", 
+		"please, don't send any messages here! \n"
+		"they will be dropped because it is debug version" );
 	_stream->sendStanza(presence);
 	return LAST_BLOCK_PROCESSED;
 }
@@ -86,7 +89,7 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 	JabberDataBlock * qry=reply.addChild("query",NULL);
 	qry->setAttribute("xmlns","jabber:iq:version");
 	qry->addChild("name","Bombus-ng");
-	qry->addChild("version","0.0.1");
+	qry->addChild("version","0.0.1-devel");
 	qry->addChild("os","Windows 2000");
 
 	_stream->sendStanza(reply);

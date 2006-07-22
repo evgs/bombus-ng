@@ -10,6 +10,12 @@ JabberDataBlock::JabberDataBlock(void){}
 JabberDataBlock::JabberDataBlock(const char * _tagName){
 	tagName=_tagName;
 }
+
+JabberDataBlock::JabberDataBlock(const std::string & _tagName, const std::map<std::string, std::string> &_attr){
+	tagName=_tagName;
+	attr=_attr;
+}
+
 JabberDataBlock::JabberDataBlock(const char * _tagName, const char * _text){
 	tagName=_tagName;
 	if (_text) text=_text;
@@ -40,8 +46,8 @@ JabberDataBlock * JabberDataBlock::addChild(const char *_tagName, const char *_t
 	return child.get();
 }
 
-stringRef JabberDataBlock::toXML(){
-	stringRef result=stringRef(new string("<"));
+StringRef JabberDataBlock::toXML(){
+	StringRef result=StringRef(new string("<"));
 	result->append(getTagName());
 	if (childs.empty() && attr.empty() && text.empty() ) {
 		result->append("/>");
@@ -74,26 +80,4 @@ stringRef JabberDataBlock::toXML(){
 	
 	return result;
 
-}
-
-void JabberDataBlock::constructXML(xmlTextWriterPtr writer) {
-
-	int rc=xmlTextWriterStartElement(writer, BAD_CAST tagName.c_str());
-	BOOST_ASSERT(rc>=0);
-
-	for (map<string, string>::iterator a = attr.begin(); a!=attr.end(); a++) {
-		rc = xmlTextWriterWriteAttribute(writer, 
-			BAD_CAST a->first.c_str(),
-			BAD_CAST a->second.c_str());
-		BOOST_ASSERT(rc>=0);
-	}
-
-	for (JabberDataBlockIterator c=childs.begin(); c!=childs.end(); c++) {
-		(*c)->constructXML(writer);
-	}
-
-	if (!text.empty()) xmlTextWriterWriteString(writer, BAD_CAST text.c_str());
-
-	rc = xmlTextWriterEndElement(writer);
-	BOOST_ASSERT(rc>=0);
 }

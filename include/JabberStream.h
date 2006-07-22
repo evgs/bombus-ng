@@ -1,6 +1,8 @@
 #pragma once
 
 #include <boost/smart_ptr.hpp>
+#include <map>
+#include <stack>
 #include "libxml/xmlwriter.h"
 #include "libxml/xmlreader.h"
 
@@ -8,13 +10,10 @@
 #include "JabberDataBlock.h"
 #include "JabberListener.h"
 #include "JabberStanzaDispatcher.h"
+#include "XMLEventListener.h"
+#include "XMLParser.h"
 
-class JabberStream {
-
-static int writeCallback(void * context, const char * buffer, int len);
-static int closeCallback(void * context);
-static int readCallback(void * context, char * buffer, int len);
-static int icloseCallback(void * context);
+class JabberStream : public XMLEventListener{
 
 public:
 	JabberStream(void);
@@ -29,10 +28,13 @@ public:
 	void setJabberListener(JabberListenerRef listener) { jabberListener=listener; }
 	void setJabberStanzaDispatcher(JabberStanzaDispatcherRef dispatcher) {stanzaDispatcher=dispatcher; }
 
+	virtual void tagStart(const std::string & tagname, const std::map<std::string, std::string> &attr);
+	virtual void tagEnd(const std::string & tagname);
+	virtual void plainTextEncountered(const std::string & body);
+
 private:
 	SocketRef connection;
-    xmlTextWriterPtr writer;
-	xmlTextReaderPtr reader;
+	XMLParserRef parser;
 
 	std::string streamId;
 
@@ -40,6 +42,8 @@ private:
 
 	JabberListenerRef jabberListener;
 	JabberStanzaDispatcherRef stanzaDispatcher;
+
+	std::stack<JabberDataBlockRef> stanzaStack;
 
 private:
 	static void run(JabberStream * _stream);

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "JabberDataBlock.h"
-#include <libxml/xmlwriter.h>
 #include <boost/assert.hpp>
 
 using namespace std;
@@ -11,7 +10,7 @@ JabberDataBlock::JabberDataBlock(const char * _tagName){
 	tagName=_tagName;
 }
 
-JabberDataBlock::JabberDataBlock(const std::string & _tagName, const std::map<std::string, std::string> &_attr){
+JabberDataBlock::JabberDataBlock(const std::string & _tagName, const StringMap &_attr){
 	tagName=_tagName;
 	attr=_attr;
 }
@@ -25,8 +24,16 @@ JabberDataBlock::JabberDataBlock(const char * _tagName, const char * _text){
 JabberDataBlock::~JabberDataBlock(void)
 {}
 
-string JabberDataBlock::getAttribute(string byName) {
+const std::string& JabberDataBlock::getAttribute(const std::string &byName) {
+	// TODO:
+	//StringMap::const_iterator i=attr.find(byName);
+	//return i->second;
 	return attr[byName];
+}
+
+bool JabberDataBlock::hasAttribute(const std::string & byName) {
+	StringMap::const_iterator i=attr.find(byName);
+	return (i!=attr.end());
 }
 
 void JabberDataBlock::setAttribute(const std::string & name,const std::string & value) {
@@ -54,7 +61,7 @@ StringRef JabberDataBlock::toXML(){
 		return result;
 	}
 
-	for (map<string, string>::iterator a = attr.begin(); a!=attr.end(); a++) {
+	for (StringMap::iterator a = attr.begin(); a!=attr.end(); a++) {
 	result->append(" ");
 		result->append(a->first);
 		result->append("='");

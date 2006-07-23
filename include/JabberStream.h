@@ -3,9 +3,8 @@
 #include <boost/smart_ptr.hpp>
 #include <map>
 #include <stack>
-#include "libxml/xmlwriter.h"
-#include "libxml/xmlreader.h"
 
+#include "basetypes.h"
 #include "Socket.h"
 #include "JabberDataBlock.h"
 #include "JabberListener.h"
@@ -28,7 +27,7 @@ public:
 	void setJabberListener(JabberListenerRef listener) { jabberListener=listener; }
 	void setJabberStanzaDispatcher(JabberStanzaDispatcherRef dispatcher) {stanzaDispatcher=dispatcher; }
 
-	virtual void tagStart(const std::string & tagname, const std::map<std::string, std::string> &attr);
+	virtual void tagStart(const std::string & tagname, const StringMap &attr);
 	virtual void tagEnd(const std::string & tagname);
 	virtual void plainTextEncountered(const std::string & body);
 

@@ -31,3 +31,5 @@ private:
 };
 
 typedef boost::shared_ptr<XMLParser> XMLParserRef;
+
+std::string XMLStringPrep(const std::string & data);

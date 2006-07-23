@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include <iostream>
 #include "Socket.h"
 #include <string>
 #include "JabberDataBlock.h"
@@ -80,7 +81,9 @@ private:
 	JabberStream * _stream;
 };
 ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContext * rc){
-	puts("version request");
+
+	std::cout << "version request " << block->getAttribute("from") << std::endl;
+
 	JabberDataBlock reply("iq");
 	reply.setAttribute("type","result");
 	reply.setAttribute("id", block->getAttribute("id"));
@@ -91,6 +94,30 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 	qry->addChild("name","Bombus-ng");
 	qry->addChild("version","0.0.1-devel");
 	qry->addChild("os","Windows 2000");
+
+	_stream->sendStanza(reply);
+	return BLOCK_PROCESSED;
+}
+//////////////////////////////////////////////////////////////
+class MessageFwd : public JabberDataBlockListener {
+public:
+	MessageFwd(JabberStream * stream) {
+		_stream=stream;
+	}
+	~MessageFwd(){};
+	virtual const char * getType() const{ return NULL; }
+	virtual const char * getId() const{ return NULL; }
+	virtual const char * getTagName() const { return "message"; }
+	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContext * rc);
+private:
+	JabberStream * _stream;
+};
+ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceContext * rc){
+	std::cout << "Message from " << block->getAttribute("from") << std::endl;
+	JabberDataBlock reply("message");
+	reply.setAttribute("type","chat");
+	reply.setAttribute("to", "evgs@jabber.ru/Psi_Home");
+	reply.addChild("body", NULL)->setText(XMLStringPrep( *(block->toXML()) ));
 
 	_stream->sendStanza(reply);
 	return BLOCK_PROCESSED;
@@ -114,6 +141,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	jstream->setJabberStanzaDispatcher(disp);
 	disp->addListener( JabberDataBlockListenerRef( new Online(jstream.get() )));
 	disp->addListener( JabberDataBlockListenerRef( new Version(jstream.get() )));
+	disp->addListener( JabberDataBlockListenerRef( new MessageFwd(jstream.get() )));
 
 	jstream->sendXmlVersion();
  

@@ -84,7 +84,7 @@ void XMLParser::parse(){
 
 			if (tagName.empty() ) {
 				tagName=data.substr(start, end-start);
-				continue;
+				if (hasMoreData) continue; else break;
 			}
 
 			int equalSign=data.find_first_of('=');
@@ -102,4 +102,20 @@ void XMLParser::parse(){
 		if (startTag) { eventListener->tagStart(tagName, attributes);	}
 		if (emptyTag || !startTag) { eventListener->tagEnd(tagName); }
 	}
+}
+
+std::string XMLStringPrep(const std::string & data){
+	std::string result;
+	for (std::string::const_iterator i=data.begin(); i!=data.end(); i++) {
+		char ch=*i;
+		switch (ch) {
+			case '&':   result+="&amp;" ; break;
+			case '"':   result+="&quot;" ; break;
+			case '<':   result+="&lt;" ; break;
+			case '>':   result+="&gt;" ; break;
+			case '\'':  result+="&apos;" ; break;
+			default: result+=ch;
+		}
+	}
+	return result;
 }

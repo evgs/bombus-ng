@@ -22,16 +22,14 @@ void JabberStream::run(JabberStream * _stream){
 
 }
 
-void JabberStream::tagStart(const std::string & tagname, const std::map<std::string, std::string> &attr) {
+void JabberStream::tagStart(const std::string & tagname, const StringMap &attr) {
 
 	if (tagname=="xml") return;
 	
 	if (tagname=="stream:stream") {
 		//non-sasl auth
-		//TODO: непонятное поведение компилятора.
-		std::map<std::string, std::string> attr2=attr;
-		streamId=attr2[std::string("id")];
-		//streamId=attr[std::string("id")];
+		StringMap::const_iterator i=attr.find("id");
+		streamId=i->second;
 
 		//begin conversation
 		JabberListener * listener=jabberListener.get();

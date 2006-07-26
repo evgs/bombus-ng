@@ -1,6 +1,6 @@
 #include "JabberStanzaDispatcher.h"
 
-JabberStanzaDispatcher::JabberStanzaDispatcher(ResourceContext * resourceContext) {
+JabberStanzaDispatcher::JabberStanzaDispatcher(ResourceContextRef resourceContext) {
 	rc=resourceContext; 
 }
 

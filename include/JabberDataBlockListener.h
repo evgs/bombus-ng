@@ -11,7 +11,7 @@ public:
 	virtual const char * getType() const{ return NULL; }
 	virtual const char * getId() const{ return NULL; }
 	virtual const char * getTagName() const { return ""; }
-	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContext * rc)=0;
+	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc)=0;
 };
 
 typedef boost::shared_ptr<JabberDataBlockListener> JabberDataBlockListenerRef;

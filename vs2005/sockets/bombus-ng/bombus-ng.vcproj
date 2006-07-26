@@ -181,6 +181,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\..\src\Auth.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\bombus-ng.cpp"
 				>
 			</File>
@@ -193,6 +197,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\JabberAccount.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\JabberDataBlock.cpp"
 				>
 			</File>
@@ -202,10 +210,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\JabberStream.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\libs\libxml2\lib\libxml2_a.lib"
 				>
 			</File>
 			<File
@@ -237,6 +241,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\XMLParser.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\boost\xtime.cpp"
 				>
 			</File>
@@ -246,6 +254,18 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\..\include\Auth.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\basetypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\JabberAccount.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\..\include\JabberDataBlock.h"
 				>
@@ -271,7 +291,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\include\Socket.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\XMLEventListener.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\XMLParser.h"
 				>
 			</File>
 		</Filter>

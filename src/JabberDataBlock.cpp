@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "JabberDataBlock.h"
-#include <libxml/xmlwriter.h>
 #include <boost/assert.hpp>
 
 using namespace std;
@@ -10,6 +9,12 @@ JabberDataBlock::JabberDataBlock(void){}
 JabberDataBlock::JabberDataBlock(const char * _tagName){
 	tagName=_tagName;
 }
+
+JabberDataBlock::JabberDataBlock(const std::string & _tagName, const StringMap &_attr){
+	tagName=_tagName;
+	attr=_attr;
+}
+
 JabberDataBlock::JabberDataBlock(const char * _tagName, const char * _text){
 	tagName=_tagName;
 	if (_text) text=_text;
@@ -19,8 +24,16 @@ JabberDataBlock::JabberDataBlock(const char * _tagName, const char * _text){
 JabberDataBlock::~JabberDataBlock(void)
 {}
 
-string JabberDataBlock::getAttribute(string byName) {
+const std::string& JabberDataBlock::getAttribute(const std::string &byName) {
+	// TODO:
+	//StringMap::const_iterator i=attr.find(byName);
+	//return i->second;
 	return attr[byName];
+}
+
+bool JabberDataBlock::hasAttribute(const std::string & byName) {
+	StringMap::const_iterator i=attr.find(byName);
+	return (i!=attr.end());
 }
 
 void JabberDataBlock::setAttribute(const std::string & name,const std::string & value) {
@@ -40,15 +53,15 @@ JabberDataBlock * JabberDataBlock::addChild(const char *_tagName, const char *_t
 	return child.get();
 }
 
-stringRef JabberDataBlock::toXML(){
-	stringRef result=stringRef(new string("<"));
+StringRef JabberDataBlock::toXML(){
+	StringRef result=StringRef(new string("<"));
 	result->append(getTagName());
 	if (childs.empty() && attr.empty() && text.empty() ) {
 		result->append("/>");
 		return result;
 	}
 
-	for (map<string, string>::iterator a = attr.begin(); a!=attr.end(); a++) {
+	for (StringMap::iterator a = attr.begin(); a!=attr.end(); a++) {
 	result->append(" ");
 		result->append(a->first);
 		result->append("='");
@@ -74,26 +87,4 @@ stringRef JabberDataBlock::toXML(){
 	
 	return result;
 
-}
-
-void JabberDataBlock::constructXML(xmlTextWriterPtr writer) {
-
-	int rc=xmlTextWriterStartElement(writer, BAD_CAST tagName.c_str());
-	BOOST_ASSERT(rc>=0);
-
-	for (map<string, string>::iterator a = attr.begin(); a!=attr.end(); a++) {
-		rc = xmlTextWriterWriteAttribute(writer, 
-			BAD_CAST a->first.c_str(),
-			BAD_CAST a->second.c_str());
-		BOOST_ASSERT(rc>=0);
-	}
-
-	for (JabberDataBlockIterator c=childs.begin(); c!=childs.end(); c++) {
-		(*c)->constructXML(writer);
-	}
-
-	if (!text.empty()) xmlTextWriterWriteString(writer, BAD_CAST text.c_str());
-
-	rc = xmlTextWriterEndElement(writer);
-	BOOST_ASSERT(rc>=0);
 }

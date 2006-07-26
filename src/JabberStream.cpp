@@ -1,3 +1,4 @@
+#include "JabberAccount.h"
 #include "JabberStream.h"
 #include <iostream>
 #include <boost/thread.hpp>
@@ -13,7 +14,7 @@ void JabberStream::run(JabberStream * _stream){
 
 	_stream->isRunning=true;
 
-	_stream->parser->bindStream( _stream->connection );
+	_stream->parser->bindStream( _stream->rc->connection );
 	try {
 		_stream->parser-> parse();
 	} catch (std::exception ex) {
@@ -43,11 +44,12 @@ void JabberStream::tagStart(const std::string & tagname, const StringMap &attr) 
 }
 
 void JabberStream::tagEnd(const std::string & tagname) {
+	if (stanzaStack.empty()) return;
 	JabberDataBlockRef element=stanzaStack.top();
 	stanzaStack.pop();
 	if (stanzaStack.empty()) {
 		//todo: block arrived
-		JabberStanzaDispatcher * dispatcher= stanzaDispatcher.get();
+		JabberStanzaDispatcher * dispatcher= rc->jabberStanzaDispatcher.get();
 		if (dispatcher!=NULL) dispatcher->dispatchDataBlock(element);
 
 		//puts(element->toXML()->c_str());
@@ -60,40 +62,46 @@ void JabberStream::plainTextEncountered(const std::string & body){
 	stanzaStack.top()->setText(body);
 }
 
-JabberStream::JabberStream(SocketRef _connection){
+JabberStream::JabberStream(ResourceContextRef rc){
 
 	parser=XMLParserRef(new XMLParser(this));
 
-	connection=_connection;
+	this->rc=rc;
 
 	boost::thread test( boost::bind(run, this) );
 }
 
 JabberStream::~JabberStream(void){
+
 	printf("JabberStream destructor called \n");
 }
 
 void JabberStream::sendStanza(JabberDataBlockRef stanza){
-	connection->write( stanza->toXML() );
+	rc->connection->write( stanza->toXML() );
 }
 
 void JabberStream::sendStanza(JabberDataBlock &stanza){
-	connection->write( stanza.toXML() );
+	rc->connection->write( stanza.toXML() );
 }
 
-void JabberStream::sendXmlVersion(){
-	connection->write("<?xml version='1.0'?>", 21);
+void JabberStream::sendXmlVersion(void){
+	rc->connection->write("<?xml version='1.0'?>", 21);
 }
 
-void JabberStream::sendXmppHeader(const char *serverName){
+void JabberStream::sendXmppBeginHeader(){
 	std::string header=
 		"<stream:stream "
 		"xmlns:stream='http://etherx.jabber.org/streams' "
 		"xmlns='jabber:client' "
 		"to='";
-	header+=serverName;
-	header+="' >";
+	header+=rc->account->getServer();
+	header+='\'' ;
+	if (rc->account->useSASL) header+=" version='1.0'";
+	header+=" >";
 
-	connection->write(header);
+	rc->connection->write(header);
 }
 
+void JabberStream::sendXmppEndHeader(void){
+	rc->connection->write(std::string("</stream:stream>"));
+}

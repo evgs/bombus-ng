@@ -181,6 +181,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\..\src\Auth.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\bombus-ng.cpp"
 				>
 			</File>
@@ -190,6 +194,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\boost\exceptions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\JabberAccount.cpp"
 				>
 			</File>
 			<File
@@ -247,7 +255,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\..\include\Auth.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\include\basetypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\JabberAccount.h"
 				>
 			</File>
 			<File

@@ -13,7 +13,7 @@ char XMLParser::getChar(){
 	if (inbufIdx>=prebuffered) {
 		prebuffered=inStream->read(inbuf, XML_PREBUF_SZ);
 		inbufIdx=0;
-		if (prebuffered<0) throw std::exception("Unexpected end of XML");
+		if (prebuffered<=0) throw std::exception("Unexpected end of XML");
 	}
 	return inbuf[inbufIdx++];
 }

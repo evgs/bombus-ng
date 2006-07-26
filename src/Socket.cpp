@@ -6,6 +6,7 @@
 
 //#include "stdafx.h"
 #include <Socket.h>
+#include <boost/assert.hpp>
 
 static int wsCount=0;
 
@@ -25,19 +26,17 @@ Socket * Socket::createSocket(const std::string &url, const int port) {
 	/* INIT WINSOCKS */
 	if (wsCount==0) {
 		WSADATA wsaData;
-		int err;
-		 
-		err = WSAStartup( 0x202, &wsaData );
-		if ( err != 0 ) {
-			/* Tell the user that we could not find a usable */
-			/* WinSock DLL.                                  */
-			return NULL; //todo: terminate
-		}
+		
+		int err=WSAStartup( 0x202, &wsaData );
+
+		BOOST_ASSERT(  err==0  ); 
 
 		if (wsaData.wVersion!=0x202) {
 			WSACleanup();
-			return NULL; //todo: terminate
+			BOOST_ASSERT(0);
 		}
+
+		wsCount++;
 	}
 
 	SOCKET s=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

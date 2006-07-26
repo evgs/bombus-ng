@@ -7,6 +7,7 @@
 #include <string>
 #include "JabberDataBlock.h"
 #include "JabberStream.h"
+#include "JabberAccount.h"
 #include "JabberListener.h"
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
@@ -14,8 +15,8 @@
 //////////////////////////////////////////////////////////////
 class Login : public JabberListener {
 public:
-	Login(JabberStream * stream) {
-		_stream=stream;
+	Login(ResourceContextRef rc) {
+		this->rc=rc;
 	}
 	~Login(){};
 	virtual void beginConversation(const std::string & streamId);
@@ -23,7 +24,7 @@ public:
 
 
 private:
-	JabberStream * _stream;
+	ResourceContextRef rc;
 };
 void Login::beginConversation(const std::string & streamId) {
 	puts ("begin conversation");
@@ -33,54 +34,53 @@ void Login::beginConversation(const std::string & streamId) {
 	login->setAttribute("id","auth");
 	JabberDataBlock * qry=login->addChild("query",NULL);
 	qry->setAttribute("xmlns","jabber:iq:auth");
-	qry->addChild("username","evgs");
-	qry->addChild("password",
-		//"secret"
-#include "password"
-		);
-	qry->addChild("resource","bombus-ng");
+	qry->addChild("username",rc->account->getUserName().c_str());
+	qry->addChild("password",rc->account->password.c_str());
+	qry->addChild("resource",rc->account->getResource().c_str());
 
-	_stream->sendStanza(login);
+	rc->jabberStream->sendStanza(login);
 }
-void Login::endConversation(){};
+void Login::endConversation(){
+	std::cout << "end conversation" << std::endl;
+};
 //////////////////////////////////////////////////////////////
 class Online : public JabberDataBlockListener {
 public:
-	Online(JabberStream * stream) {
-		_stream=stream;
+	Online(ResourceContextRef rc) {
+		this->rc=rc;
 	}
 	~Online(){};
 	virtual const char * getType() const{ return "result"; }
 	virtual const char * getId() const{ return "auth"; }
 	virtual const char * getTagName() const { return "iq"; }
-	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContext * rc);
+	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 private:
-	JabberStream * _stream;
+	ResourceContextRef rc;
 };
-ProcessResult Online::blockArrived(JabberDataBlockRef block, const ResourceContext * rc){
+ProcessResult Online::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 	puts("Login ok");
 	JabberDataBlock presence("presence");
 	presence.addChild("status", 
 		"please, don't send any messages here! \n"
 		"they will be dropped because it is debug version" );
-	_stream->sendStanza(presence);
+	rc->jabberStream->sendStanza(presence);
 	return LAST_BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
 class Version : public JabberDataBlockListener {
 public:
-	Version(JabberStream * stream) {
-		_stream=stream;
+	Version(ResourceContextRef rc) {
+		this->rc=rc;
 	}
 	~Version(){};
 	virtual const char * getType() const{ return "get"; }
 	virtual const char * getId() const{ return NULL; }
 	virtual const char * getTagName() const { return "iq"; }
-	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContext * rc);
+	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 private:
-	JabberStream * _stream;
+	ResourceContextRef rc;
 };
-ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContext * rc){
+ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 
 	std::cout << "version request " << block->getAttribute("from") << std::endl;
 
@@ -95,57 +95,58 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 	qry->addChild("version","0.0.1-devel");
 	qry->addChild("os","Windows 2000");
 
-	_stream->sendStanza(reply);
+	rc->jabberStream->sendStanza(reply);
 	return BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
 class MessageFwd : public JabberDataBlockListener {
 public:
-	MessageFwd(JabberStream * stream) {
-		_stream=stream;
+	MessageFwd(ResourceContextRef rc) {
+		this->rc=rc;
 	}
 	~MessageFwd(){};
 	virtual const char * getType() const{ return NULL; }
 	virtual const char * getId() const{ return NULL; }
 	virtual const char * getTagName() const { return "message"; }
-	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContext * rc);
+	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 private:
-	JabberStream * _stream;
+	ResourceContextRef rc;
 };
-ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceContext * rc){
+ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 	std::cout << "Message from " << block->getAttribute("from") << std::endl;
 	JabberDataBlock reply("message");
 	reply.setAttribute("type","chat");
 	reply.setAttribute("to", "evgs@jabber.ru/Psi_Home");
 	reply.addChild("body", NULL)->setText(XMLStringPrep( *(block->toXML()) ));
 
-	_stream->sendStanza(reply);
+	rc->jabberStream->sendStanza(reply);
 	return BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	ResourceContext rc;
+	ResourceContextRef rc=ResourceContextRef(new ResourceContext());
+	rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
+	rc->account->password=
+#include "password"
+	;
 
-	std::string url ("jabber.ru");
-	SocketRef s=SocketRef(Socket::createSocket(url, 5222));
-	BOOST_ASSERT(s);
+	rc->connection=SocketRef(Socket::createSocket(rc->account->getServer(), 5222));
+	BOOST_ASSERT(rc->connection);
 
-	JabberStreamRef jstream=JabberStreamRef(new JabberStream(s));
-	rc.jabberStream=jstream;
-	
-	jstream->setJabberListener( JabberListenerRef(new Login( jstream.get() )));
+	rc->jabberStream=JabberStreamRef(new JabberStream(rc));
+	rc->jabberStream->setJabberListener( JabberListenerRef(new Login( rc )));
 
-	JabberStanzaDispatcherRef disp= JabberStanzaDispatcherRef(new JabberStanzaDispatcher(&rc));
-	jstream->setJabberStanzaDispatcher(disp);
-	disp->addListener( JabberDataBlockListenerRef( new Online(jstream.get() )));
-	disp->addListener( JabberDataBlockListenerRef( new Version(jstream.get() )));
-	disp->addListener( JabberDataBlockListenerRef( new MessageFwd(jstream.get() )));
+	JabberStanzaDispatcherRef disp= JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
+	rc->jabberStanzaDispatcher=disp;
 
-	jstream->sendXmlVersion();
- 
-	jstream->sendXmppHeader("jabber.ru");
+	disp->addListener( JabberDataBlockListenerRef( new Online(rc) ));
+	disp->addListener( JabberDataBlockListenerRef( new Version(rc) ));
+	disp->addListener( JabberDataBlockListenerRef( new MessageFwd(rc) ));
+
+	rc->jabberStream->sendXmlVersion();
+	rc->jabberStream->sendXmppBeginHeader();
 
 
 	//jstream.sendStanza(test);
@@ -154,7 +155,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	char tmp[16];
 	gets_s(tmp,16);
 	//jstream.sendStanza(login);
+	rc->jabberStream->sendXmppEndHeader();
+	
 	gets_s(tmp,16);
+
 	return 0;
 }
 

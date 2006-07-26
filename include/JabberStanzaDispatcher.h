@@ -7,7 +7,7 @@
 
 class JabberStanzaDispatcher {
 public:
-	JabberStanzaDispatcher(ResourceContext * resourceContext);
+	JabberStanzaDispatcher(ResourceContextRef resourceContext);
 	~JabberStanzaDispatcher();
 
 	void dispatchDataBlock(JabberDataBlockRef block);
@@ -17,7 +17,7 @@ public:
 
 private:
 	std::list<JabberDataBlockListenerRef> listeners;
-	ResourceContext * rc;
+	ResourceContextRef rc;
 };
 
 typedef boost::shared_ptr <JabberStanzaDispatcher> JabberStanzaDispatcherRef;

@@ -5,6 +5,7 @@
 #include <stack>
 
 #include "basetypes.h"
+#include "ResourceContext.h"
 #include "Socket.h"
 #include "JabberDataBlock.h"
 #include "JabberListener.h"
@@ -16,23 +17,23 @@ class JabberStream : public XMLEventListener{
 
 public:
 	JabberStream(void);
-	JabberStream(SocketRef _connection);
+	JabberStream(ResourceContextRef rc);
 	~JabberStream(void);
 
 	void sendStanza(JabberDataBlockRef stanza);
 	void sendStanza(JabberDataBlock &stanza);
-	void sendXmlVersion();
-	void sendXmppHeader(const char * serverName);
+	void sendXmlVersion(void);
+	void sendXmppBeginHeader();
+	void sendXmppEndHeader(void);
 
 	void setJabberListener(JabberListenerRef listener) { jabberListener=listener; }
-	void setJabberStanzaDispatcher(JabberStanzaDispatcherRef dispatcher) {stanzaDispatcher=dispatcher; }
 
 	virtual void tagStart(const std::string & tagname, const StringMap &attr);
 	virtual void tagEnd(const std::string & tagname);
 	virtual void plainTextEncountered(const std::string & body);
 
 private:
-	SocketRef connection;
+	ResourceContextRef rc;
 	XMLParserRef parser;
 
 	std::string streamId;
@@ -40,12 +41,12 @@ private:
 	bool isRunning;
 
 	JabberListenerRef jabberListener;
-	JabberStanzaDispatcherRef stanzaDispatcher;
 
 	std::stack<JabberDataBlockRef> stanzaStack;
 
 private:
-	static void run(JabberStream * _stream);
+	static void run(JabberStream * _stream); 
+	// todo: static void run(JabberStreamRef _stream);
 };
 
 typedef boost::shared_ptr<JabberStream> JabberStreamRef;

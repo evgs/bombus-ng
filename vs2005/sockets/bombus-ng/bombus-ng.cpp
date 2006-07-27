@@ -99,12 +99,15 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	ResourceContextRef rc=ResourceContextRef(new ResourceContext());
 	rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
+	rc->account->hostNameIp="213.180.203.19";
 	rc->account->password=
 #include "password"
 	;
 	rc->account->useSASL=true;
 
-	rc->connection=ConnectionRef(Socket::createSocket(rc->account->getServer(), 5222));
+	std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
+
+	rc->connection=ConnectionRef(Socket::createSocket(host, 5222));
 	BOOST_ASSERT(rc->connection);
 
 	rc->jabberStream=JabberStreamRef(new JabberStream(rc));

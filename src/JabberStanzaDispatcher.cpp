@@ -17,7 +17,8 @@ void JabberStanzaDispatcher::dispatchDataBlock(JabberDataBlockRef block){
 		 i!=listeners.end();
 		 i++) 
 	{
-		if ( blockTagName.compare(i->get()->getTagName()) ) continue;
+		const char * tag=i->get()->getTagName();
+		if (tag!=NULL) if ( blockTagName.compare(tag) ) continue;
 
 		const char * type=i->get()->getType();
 		if (type!=NULL) if (blockType.compare(type)) continue;

@@ -12,37 +12,8 @@
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
 
-//////////////////////////////////////////////////////////////
-class Login : public JabberListener {
-public:
-	Login(ResourceContextRef rc) {
-		this->rc=rc;
-	}
-	~Login(){};
-	virtual void beginConversation(const std::string & streamId);
-	virtual void endConversation();
+#include "Auth.h"
 
-
-private:
-	ResourceContextRef rc;
-};
-void Login::beginConversation(const std::string & streamId) {
-	puts ("begin conversation");
-
-	JabberDataBlockRef login=JabberDataBlockRef(new JabberDataBlock("iq"));
-	login->setAttribute("type","set");
-	login->setAttribute("id","auth");
-	JabberDataBlock * qry=login->addChild("query",NULL);
-	qry->setAttribute("xmlns","jabber:iq:auth");
-	qry->addChild("username",rc->account->getUserName().c_str());
-	qry->addChild("password",rc->account->password.c_str());
-	qry->addChild("resource",rc->account->getResource().c_str());
-
-	rc->jabberStream->sendStanza(login);
-}
-void Login::endConversation(){
-	std::cout << "end conversation" << std::endl;
-};
 //////////////////////////////////////////////////////////////
 class Online : public JabberDataBlockListener {
 public:
@@ -131,15 +102,23 @@ int _tmain(int argc, _TCHAR* argv[])
 	rc->account->password=
 #include "password"
 	;
+	rc->account->useSASL=true;
 
-	rc->connection=SocketRef(Socket::createSocket(rc->account->getServer(), 5222));
+	rc->connection=ConnectionRef(Socket::createSocket(rc->account->getServer(), 5222));
 	BOOST_ASSERT(rc->connection);
 
 	rc->jabberStream=JabberStreamRef(new JabberStream(rc));
-	rc->jabberStream->setJabberListener( JabberListenerRef(new Login( rc )));
 
 	JabberStanzaDispatcherRef disp= JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 	rc->jabberStanzaDispatcher=disp;
+
+	if (rc->account->useSASL) {
+		rc->jabberStream->setJabberListener( JabberListenerRef(new SASLAuth( rc )));
+		disp->addListener( JabberDataBlockListenerRef( new SASLAuth(rc) ));
+	} else {
+		rc->jabberStream->setJabberListener( JabberListenerRef(new NonSASLAuth( rc )));
+	}
+
 
 	disp->addListener( JabberDataBlockListenerRef( new Online(rc) ));
 	disp->addListener( JabberDataBlockListenerRef( new Version(rc) ));
@@ -156,7 +135,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	gets_s(tmp,16);
 	//jstream.sendStanza(login);
 	rc->jabberStream->sendXmppEndHeader();
-	
+
+	gets_s(tmp,16);
+
+	std::cout << rc->connection->getStatistics().c_str() << std::endl;
+
 	gets_s(tmp,16);
 
 	return 0;

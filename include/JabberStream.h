@@ -32,9 +32,10 @@ public:
 	virtual void tagEnd(const std::string & tagname);
 	virtual void plainTextEncountered(const std::string & body);
 
+	XMLParserRef parser;
+
 private:
 	ResourceContextRef rc;
-	XMLParserRef parser;
 
 	std::string streamId;
 

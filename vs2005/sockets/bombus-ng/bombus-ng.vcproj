@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="\libs\libxml2\include;\libs\boost;..\..\..\include"
+				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;..\..\..\include"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -189,7 +189,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\CompressedSocket.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\boost\condition.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\Connection.cpp"
 				>
 			</File>
 			<File
@@ -248,6 +256,10 @@
 				RelativePath="..\..\..\src\boost\xtime.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\..\libs\zlib\x86\lib\zlibstat.lib"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -260,6 +272,14 @@
 			</File>
 			<File
 				RelativePath="..\..\..\include\basetypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\CompressedSocket.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\Connection.h"
 				>
 			</File>
 			<File

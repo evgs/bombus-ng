@@ -10,7 +10,7 @@
 class XMLParser {
 private:
 	XMLEventListener * eventListener;
-	SocketRef inStream;
+	ConnectionRef inStream;
 
 	char inbuf[XML_PREBUF_SZ];
 	int prebuffered;
@@ -21,7 +21,7 @@ public:
 	XMLParser(XMLEventListener * eventListener);
 	~XMLParser();
 
-	void bindStream(SocketRef s) {inStream=s; };
+	void bindStream(ConnectionRef s) {inStream=s; };
 
 	void parse();
 

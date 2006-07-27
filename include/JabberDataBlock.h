@@ -42,6 +42,8 @@ public:
 	std::list<JabberDataBlockRef> * getChilds();
 	void addChild(JabberDataBlockRef child);
 	JabberDataBlock * addChild(const char *_tagName, const char *_text);
+	JabberDataBlockRef getChildByName(const char * tagName);
+	bool hasChildByValue(const char * text);
 
 	StringRef toXML();
 };

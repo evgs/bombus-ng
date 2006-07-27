@@ -7,15 +7,15 @@
 //#include "stdafx.h"
 #include <Socket.h>
 #include <boost/assert.hpp>
+#include <iostream>
 
 static int wsCount=0;
 
-Socket::Socket(void)
-{
+Socket::Socket(void){	
+	bytesSent=bytesRecvd=0;
 }
 
-Socket::~Socket(void)
-{
+Socket::~Socket(void){
 	closesocket(sock);
 	wsCount--;
 	if (wsCount==0) WSACleanup();
@@ -60,16 +60,27 @@ Socket * Socket::createSocket(const std::string &url, const int port) {
 }
 
 int Socket::read(char * buf, int len) {
-	return recv(sock, buf, len, 0);
+	int rb=recv(sock, buf, len, 0);
+	bytesRecvd+=rb;
+	return rb;
 }
 
 int Socket::write(const char * buf, int len) {
-	return send(sock, buf, len, 0);
+	//for (int i=0; i<len; i++)	std::cout << buf[i];
+	//std::cout<<"("<<len<<")"<<std::endl;
+	int sb=send(sock, buf, len, 0);
+	bytesSent+=sb;
+	return sb;
 }
 
-int Socket::write(StringRef buf){
-	return write(buf->c_str(), buf->length());
-}
-int Socket::write(std::string &buf){
-	return write(buf.c_str(), buf.length());
+const std::string Socket::getStatistics(){
+	char *fmt="--- ZLib ---\n"
+	"sent=%d\n"
+	"recv=%d\n";
+
+	char buf[256];
+
+	sprintf_s(buf, 256, fmt, bytesSent, bytesRecvd);
+
+	return std::string(buf);
 }

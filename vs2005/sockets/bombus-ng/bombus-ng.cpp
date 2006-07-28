@@ -15,6 +15,29 @@
 #include "Auth.h"
 
 //////////////////////////////////////////////////////////////
+class GetRoster : public JabberDataBlockListener {
+public:
+	GetRoster(ResourceContextRef rc) {
+		this->rc=rc;
+	}
+	~GetRoster(){};
+	virtual const char * getType() const{ return "result"; }
+	virtual const char * getId() const{ return "roster"; }
+	virtual const char * getTagName() const { return "iq"; }
+	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+private:
+	ResourceContextRef rc;
+};
+ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+	puts("Roster arrived");
+	JabberDataBlock presence("presence");
+	presence.addChild("status", 
+		"please, don't send any messages here! \n"
+		"they will be dropped because it is debug version" );
+	rc->jabberStream->sendStanza(presence);
+	return LAST_BLOCK_PROCESSED;
+}
+//////////////////////////////////////////////////////////////
 class Online : public JabberDataBlockListener {
 public:
 	Online(ResourceContextRef rc) {
@@ -22,7 +45,7 @@ public:
 	}
 	~Online(){};
 	virtual const char * getType() const{ return "result"; }
-	virtual const char * getId() const{ return "auth"; }
+	virtual const char * getId() const{ return "sessionInit"; }
 	virtual const char * getTagName() const { return "iq"; }
 	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 private:
@@ -30,11 +53,14 @@ private:
 };
 ProcessResult Online::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 	puts("Login ok");
-	JabberDataBlock presence("presence");
-	presence.addChild("status", 
-		"please, don't send any messages here! \n"
-		"they will be dropped because it is debug version" );
-	rc->jabberStream->sendStanza(presence);
+	JabberDataBlock getRoster("iq");
+	getRoster.setAttribute("type","get");
+	getRoster.setAttribute("id","roster");
+
+	JabberDataBlock *qry =getRoster.addChild("query", NULL); 
+	qry->setAttribute("xmlns","jabber:iq:roster");
+
+	rc->jabberStream->sendStanza(getRoster);
 	return LAST_BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
@@ -104,6 +130,7 @@ int _tmain(int argc, _TCHAR* argv[])
 #include "password"
 	;
 	rc->account->useSASL=true;
+	rc->account->useCompression=true;
 
 	std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 
@@ -124,6 +151,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 	disp->addListener( JabberDataBlockListenerRef( new Online(rc) ));
+	disp->addListener( JabberDataBlockListenerRef( new GetRoster(rc) ));
 	disp->addListener( JabberDataBlockListenerRef( new Version(rc) ));
 	disp->addListener( JabberDataBlockListenerRef( new MessageFwd(rc) ));
 

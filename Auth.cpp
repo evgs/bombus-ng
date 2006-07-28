@@ -1,4 +1,4 @@
-#include <iostream>
+
 
 #include "Auth.h"
 #include "JabberAccount.h"
@@ -8,7 +8,7 @@
 #include "base64.h"
 
 void NonSASLAuth::beginConversation(const std::string & streamId) {
-	std::cout << "Non-SASL Login: sending password" << std::endl;
+	rc->log->msg("Non-SASL Login: sending password");
 
 	JabberDataBlockRef login=JabberDataBlockRef(new JabberDataBlock("iq"));
 	login->setAttribute("type","set");
@@ -22,22 +22,22 @@ void NonSASLAuth::beginConversation(const std::string & streamId) {
 	rc->jabberStream->sendStanza(login);
 }
 void NonSASLAuth::endConversation(){
-	std::cout << "end conversation" << std::endl;
+	rc->log->msg("end conversation");
 };
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void SASLAuth::beginConversation(const std::string &streamId){
-	std::cout << "SASL Login: <stream:stream>" << std::endl;
+	rc->log->msg("SASL Login: <stream:stream>");
 }
 
 void SASLAuth::endConversation(){
-	std::cout << "end conversation" << std::endl;
+	rc->log->msg("end conversation");
 };
 
 ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
-	std::cout << "SASL Login: stanza  " << *(block->toXML()) << std::endl;
+	//rc->log->msg("SASL Login: stanza  ", (*(block->toXML())).c_str() );
 
 	if (block->getTagName()=="stream:features") {
 		if (rc->account->useCompression) {
@@ -60,6 +60,8 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 			auth.setAttribute("xmlns","urn:ietf:params:xml:ns:xmpp-sasl");
 
 			if (mechanisms->hasChildByValue("PLAIN")) {
+				rc->log->msg("Sending PLAIN password");
+					
 				auth.setAttribute("mechanism", "PLAIN");
 
 				std::string plain(rc->account->getBareJid());
@@ -78,6 +80,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 		// resource binding session
 		JabberDataBlockRef bindsess=block->getChildByName("bind");
 		if (bindsess.get()!=NULL) {
+			rc->log->msg("Binding resource");
 			JabberDataBlock bindIq("iq");
 			bindIq.setAttribute("type", "set");
 			bindIq.setAttribute("id", "bind");
@@ -90,6 +93,8 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 	}
 
 	if (block->getTagName()=="compressed") {
+		rc->log->msg("Opening compressed stream");
+
 		// switching to compressed stream
 		ConnectionRef zsocket=ConnectionRef(new CompressedSocket(rc->connection));
 		rc->connection=zsocket;
@@ -107,6 +112,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 	if (block->getTagName()=="iq") {
 		if (block->getAttribute("id")=="bind") {
 			// TODO: get assigned jid/resource
+			rc->log->msg("Resource:","<dummy>");
 			//openung session
 			JabberDataBlock session("iq");
 			session.setAttribute("type", "set");

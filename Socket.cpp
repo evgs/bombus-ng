@@ -74,7 +74,7 @@ int Socket::write(const char * buf, int len) {
 }
 
 const std::string Socket::getStatistics(){
-	char *fmt="--- ZLib ---\n"
+	char *fmt="--- Socket ---\n"
 	"sent=%d\n"
 	"recv=%d\n";
 

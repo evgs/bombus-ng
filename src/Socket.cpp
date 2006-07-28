@@ -7,7 +7,6 @@
 //#include "stdafx.h"
 #include <Socket.h>
 #include <boost/assert.hpp>
-#include <iostream>
 
 static int wsCount=0;
 

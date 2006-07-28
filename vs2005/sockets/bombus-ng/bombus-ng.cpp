@@ -2,7 +2,6 @@
 //
 
 #include "stdafx.h"
-#include <iostream>
 #include "Socket.h"
 #include <string>
 #include "JabberDataBlock.h"
@@ -29,7 +28,7 @@ private:
 	ResourceContextRef rc;
 };
 ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-	puts("Roster arrived");
+	rc->log->msg("Roster arrived");
 	JabberDataBlock presence("presence");
 	presence.addChild("status", 
 		"please, don't send any messages here! \n"
@@ -52,7 +51,7 @@ private:
 	ResourceContextRef rc;
 };
 ProcessResult Online::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-	puts("Login ok");
+	rc->log->msg("Login ok");
 	JabberDataBlock getRoster("iq");
 	getRoster.setAttribute("type","get");
 	getRoster.setAttribute("id","roster");
@@ -79,7 +78,7 @@ private:
 };
 ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 
-	std::cout << "version request " << block->getAttribute("from") << std::endl;
+	rc->log->msg("version request", block->getAttribute("from").c_str());
 
 	JabberDataBlock reply("iq");
 	reply.setAttribute("type","result");
@@ -110,7 +109,7 @@ private:
 	ResourceContextRef rc;
 };
 ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-	std::cout << "Message from " << block->getAttribute("from") << std::endl;
+	rc->log->msg("Message from ", block->getAttribute("from").c_str()); 
 	JabberDataBlock reply("message");
 	reply.setAttribute("type","chat");
 	reply.setAttribute("to", "evgs@jabber.ru/Psi_Home");
@@ -122,8 +121,9 @@ ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceC
 //////////////////////////////////////////////////////////////
 
 int _tmain(int argc, _TCHAR* argv[])
-{
+{{
 	ResourceContextRef rc=ResourceContextRef(new ResourceContext());
+	rc->log=new Log();
 	rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
 	rc->account->hostNameIp="213.180.203.19";
 	rc->account->password=
@@ -134,6 +134,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 
+	rc->log->msg("Connect to", host.c_str());
 	rc->connection=ConnectionRef(Socket::createSocket(host, 5222));
 	BOOST_ASSERT(rc->connection);
 
@@ -155,6 +156,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	disp->addListener( JabberDataBlockListenerRef( new Version(rc) ));
 	disp->addListener( JabberDataBlockListenerRef( new MessageFwd(rc) ));
 
+	disp=JabberStanzaDispatcherRef();
+
 	rc->jabberStream->sendXmlVersion();
 	rc->jabberStream->sendXmppBeginHeader();
 
@@ -169,10 +172,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	gets_s(tmp,16);
 
-	std::cout << rc->connection->getStatistics().c_str() << std::endl;
+	rc->log->msg(
+		rc->connection->getStatistics().c_str()
+		);
 
 	gets_s(tmp,16);
-
+}
 	return 0;
 }
 

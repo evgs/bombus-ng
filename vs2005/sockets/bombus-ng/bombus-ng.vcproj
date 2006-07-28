@@ -225,6 +225,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\Log.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\boost\mutex.cpp"
 				>
 			</File>
@@ -312,6 +316,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\include\JabberStream.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\Log.h"
 				>
 			</File>
 			<File

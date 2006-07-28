@@ -1,6 +1,7 @@
 #pragma once
 
 #include <boost/smart_ptr.hpp>
+#include "Log.h"
 
 class JabberStream;
 class JabberStanzaDispatcher;
@@ -14,6 +15,7 @@ typedef boost::shared_ptr <JabberAccount> JabberAccountRef;
 
 class ResourceContext {
 public:
+	Log *log;
 	JabberAccountRef account;
 	ConnectionRef connection;
 	JabberStreamRef jabberStream;

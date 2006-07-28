@@ -1,6 +1,5 @@
 #include "JabberAccount.h"
 #include "JabberStream.h"
-#include <iostream>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <stack>
@@ -10,7 +9,7 @@
 JabberStream::JabberStream(void){}
 
 void JabberStream::run(JabberStream * _stream){
-	puts("thread strated");
+	_stream->rc->log->msg("Reader thread strated");
 
 	_stream->isRunning=true;
 

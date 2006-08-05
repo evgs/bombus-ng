@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "XMLParser.h"
 #include "XMLEventListener.h"
 

@@ -21,6 +21,7 @@ void init_TryEnterCriticalSection()
 {
     //TryEnterCriticalSection is only available on WinNT 4.0 or later; 
     //it is not available on Win9x.
+#ifndef _WIN32_WCE
 
     OSVERSIONINFO version_info = {sizeof(OSVERSIONINFO)};
     ::GetVersionEx(&version_info);
@@ -30,12 +31,17 @@ void init_TryEnterCriticalSection()
         if (HMODULE kernel_module = GetModuleHandle(TEXT("KERNEL32.DLL")))
             g_TryEnterCriticalSection = reinterpret_cast<TryEnterCriticalSection_type>(GetProcAddress(kernel_module, "TryEnterCriticalSection"));
     }
+#endif
 }
 
 inline bool has_TryEnterCriticalSection()
 {
+#ifndef _WIN32_WCE
     boost::call_once(init_TryEnterCriticalSection, once_init_TryEnterCriticalSection);
     return g_TryEnterCriticalSection != 0;
+#else
+	return false;
+#endif
 }
 
 inline HANDLE mutex_cast(void* p)

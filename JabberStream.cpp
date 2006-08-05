@@ -1,7 +1,9 @@
+#include "stdafx.h"
+
 #include "JabberAccount.h"
 #include "JabberStream.h"
-#include <boost/thread.hpp>
-#include <boost/bind.hpp>
+//#include <boost/thread.hpp>
+//#include <boost/bind.hpp>
 #include <stack>
 #include <utf8.hpp>
 #include <windows.h>
@@ -61,13 +63,23 @@ void JabberStream::plainTextEncountered(const std::string & body){
 	stanzaStack.top()->setText(body);
 }
 
+#ifdef _WIN32_WCE
+DWORD jabberStreamThread(LPVOID param) {
+#else
+DWORD WINAPI jabberStreamThread(LPVOID param) {
+#endif
+	JabberStream::run((JabberStream *)param);
+	return 1;
+}
+
 JabberStream::JabberStream(ResourceContextRef rc){
 
 	parser=XMLParserRef(new XMLParser(this));
 
 	this->rc=rc;
 
-	boost::thread test( boost::bind(run, this) );
+	CreateThread(NULL, 0, jabberStreamThread, this, 0, NULL);
+	//boost::thread test( boost::bind(run, this) );
 }
 
 JabberStream::~JabberStream(void){

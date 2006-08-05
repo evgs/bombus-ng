@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "jid.h"
 
 class JabberAccount {
 
@@ -10,25 +11,20 @@ public:
 
 	~JabberAccount();
 
-	const std::string & getUserName(void) {return userName; };
-	const std::string & getServer(void) {return server; };
-	const std::string & getResource(void) {return resource; };
-	const std::string & getJid(void) {return jid; };
-	const std::string & getBareJid(void) {return bareJid;};
+	const std::string & getUserName(void) const {return jid.getUserName(); };
+	const std::string & getServer(void) const {return jid.getServer(); };
+	const std::string & getResource(void) const {return jid.getResource(); };
+	const std::string & getJid(void) const {return jid.getJid(); };
+	const std::string & getBareJid(void) const {return jid.getBareJid(); };
 
-	void setUserName(const std::string &userName);
-	void setServer(const std::string &server);
-	void setResource(const std::string &resource);
-	void setJid(const std::string &Jid);
-	void setBareJid(const std::string &bareJid);
+	void setUserName(const std::string &userName) { jid.setUserName(userName); };
+	void setServer(const std::string &server){ jid.setServer(server); };
+	void setResource(const std::string &resource){ jid.setResource(resource); };
+	void setJid(const std::string &jid){ this->jid.setJid(jid); };
+	void setBareJid(const std::string &bareJid){ jid.setBareJid(bareJid); };
 
 private:
-	std::string userName;
-	std::string server;
-	std::string resource;
-
-	std::string jid;
-	std::string bareJid;
+	Jid jid;
 
 public:
 

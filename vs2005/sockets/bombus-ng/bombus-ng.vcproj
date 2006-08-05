@@ -197,15 +197,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\boost\condition.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\Connection.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\boost\exceptions.cpp"
 				>
 			</File>
 			<File
@@ -229,14 +221,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\boost\mutex.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\boost\once.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\ResourceContext.cpp"
 				>
 			</File>
@@ -249,19 +233,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\boost\thread.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\boost\tss_hooks.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\src\XMLParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\boost\xtime.cpp"
 				>
 			</File>
 			<File

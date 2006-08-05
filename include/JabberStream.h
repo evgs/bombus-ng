@@ -45,7 +45,7 @@ private:
 
 	std::stack<JabberDataBlockRef> stanzaStack;
 
-private:
+public:
 	static void run(JabberStream * _stream); 
 	// todo: static void run(JabberStreamRef _stream);
 };

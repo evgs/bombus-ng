@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "CompressedSocket.h"
 #include "boost/assert.hpp"
 #include <stdio.h>
@@ -47,7 +49,8 @@ const std::string CompressedSocket::getStatistics(){
 
 	char buf[256];
 
-	sprintf_s(buf, 256, fmt, ostr.total_out, ostr.total_in, istr.total_in, istr.total_out);
+	//sprintf_s(buf, 256, fmt, ostr.total_out, ostr.total_in, istr.total_in, istr.total_out);
+	sprintf(buf, fmt, ostr.total_out, ostr.total_in, istr.total_in, istr.total_out);
 
 	return std::string(buf) + (pack->getStatistics());
 }

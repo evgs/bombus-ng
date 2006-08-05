@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "base64.h"
 
 #include <stdexcept> //for std::runtime_error

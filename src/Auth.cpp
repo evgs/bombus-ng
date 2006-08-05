@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 
 #include "Auth.h"
 #include "JabberAccount.h"
@@ -40,6 +40,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 	//rc->log->msg("SASL Login: stanza  ", (*(block->toXML())).c_str() );
 
 	if (block->getTagName()=="stream:features") {
+#ifndef _WIN32_WCE
 		if (rc->account->useCompression) {
 			JabberDataBlockRef compression=block->getChildByName("compression");
 			if (compression.get()!=NULL) {
@@ -52,6 +53,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 				}
 			}
 		}
+#endif
 
 		JabberDataBlockRef mechanisms=block->getChildByName("mechanisms");
 		if (mechanisms.get()!=NULL) {
@@ -95,11 +97,13 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 	if (block->getTagName()=="compressed") {
 		rc->log->msg("Opening compressed stream");
 
+#ifndef _WIN32_WCE
 		// switching to compressed stream
 		ConnectionRef zsocket=ConnectionRef(new CompressedSocket(rc->connection));
 		rc->connection=zsocket;
 		rc->jabberStream->parser->bindStream( zsocket );
 		rc->jabberStream->sendXmppBeginHeader();
+#endif
 		return BLOCK_PROCESSED;
 	}
 

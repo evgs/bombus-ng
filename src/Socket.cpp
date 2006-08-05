@@ -1,10 +1,12 @@
+#include "stdafx.h"
+
+
 /*
  *  Started on 14.06.2006
  *
  *
  */
 
-//#include "stdafx.h"
 #include <Socket.h>
 #include <boost/assert.hpp>
 
@@ -43,6 +45,8 @@ Socket * Socket::createSocket(const std::string &url, const int port) {
 
 	struct hostent FAR* host=gethostbyname(url.c_str());
 
+	if (host==NULL) return NULL;
+
 	struct sockaddr_in name;
 	name.sin_family=AF_INET;
 	name.sin_addr.S_un.S_addr=*((unsigned long *)host->h_addr_list[0]);
@@ -79,7 +83,8 @@ const std::string Socket::getStatistics(){
 
 	char buf[256];
 
-	sprintf_s(buf, 256, fmt, bytesSent, bytesRecvd);
+	//sprintf_s(buf, 256, fmt, bytesSent, bytesRecvd);
+	sprintf(buf, fmt, bytesSent, bytesRecvd);
 
 	return std::string(buf);
 }

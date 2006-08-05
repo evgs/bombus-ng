@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "JabberStanzaDispatcher.h"
 
 JabberStanzaDispatcher::JabberStanzaDispatcher(ResourceContextRef resourceContext) {

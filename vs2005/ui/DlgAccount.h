@@ -1,3 +1,3 @@
 #pragma once
 
-INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+void DialogAccount(HINSTANCE g_hInst, HWND parent, JabberAccountRef accnt);

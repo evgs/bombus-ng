@@ -249,7 +249,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					DialogBox(g_hInst, (LPCTSTR)IDD_ABOUTBOX, hWnd, About);
 				break;
 				case IDM_JABBER_ACCOUNT:
-					DialogBox(g_hInst, (LPCTSTR)IDD_ACCNT, hWnd, DlgAccount);
+					DialogAccount(g_hInst, hWnd, rc->account);
 					break;
                 case IDM_EXIT:
                     SendMessage (hWnd, WM_CLOSE, 0, 0);				

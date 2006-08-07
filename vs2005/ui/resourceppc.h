@@ -19,8 +19,10 @@
 #define IDC_X_SSL                       1005
 #define IDC_X_SASL                      1006
 #define IDC_ZLIB                        1007
+#define IDC_X_ZLIB                      1007
 #define IDC_X_PLAIN                     1008
 #define IDC_E_HOSTIP                    1009
+#define IDC_E_RESOURCE                  1010
 #define IDC_E_PORT                      1011
 #define ID_JABBER_ONLINE                32771
 #define IDM_JABBER_ONLINE               32772

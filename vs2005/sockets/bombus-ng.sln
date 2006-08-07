@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bombus-ng", "bombus-ng\bomb
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui", "..\ui\ui.vcproj", "{33135B28-2E20-4442-983A-0CB80093CE42}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "zlib\zlib.vcproj", "{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -39,6 +41,20 @@ Global
 		{33135B28-2E20-4442-983A-0CB80093CE42}.Release|Pocket PC 2003 (ARMV4).Build.0 = Release|Pocket PC 2003 (ARMV4)
 		{33135B28-2E20-4442-983A-0CB80093CE42}.Release|Pocket PC 2003 (ARMV4).Deploy.0 = Release|Pocket PC 2003 (ARMV4)
 		{33135B28-2E20-4442-983A-0CB80093CE42}.Release|Win32.ActiveCfg = Release|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Debug|Mixed Platforms.ActiveCfg = Debug|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Debug|Mixed Platforms.Build.0 = Debug|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Debug|Mixed Platforms.Deploy.0 = Debug|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Debug|Pocket PC 2003 (ARMV4).Build.0 = Debug|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Debug|Pocket PC 2003 (ARMV4).Deploy.0 = Debug|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Debug|Win32.ActiveCfg = Debug|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Release|Mixed Platforms.ActiveCfg = Release|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Release|Mixed Platforms.Build.0 = Release|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Release|Mixed Platforms.Deploy.0 = Release|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Release|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Release|Pocket PC 2003 (ARMV4).Build.0 = Release|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Release|Pocket PC 2003 (ARMV4).Deploy.0 = Release|Pocket PC 2003 (ARMV4)
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}.Release|Win32.ActiveCfg = Release|Pocket PC 2003 (ARMV4)
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

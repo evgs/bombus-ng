@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="ui"
-	ProjectGUID="{33135B28-2E20-4442-983A-0CB80093CE42}"
+	Name="zlib"
+	ProjectGUID="{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -18,7 +18,7 @@
 			Name="Debug|Pocket PC 2003 (ARMV4)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,8 +40,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;..\..\include"
-				PreprocessorDefinitions="BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
+				PreprocessorDefinitions="NO_ERRNO_H"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
@@ -61,15 +60,9 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ws2.lib"
-				OutputFile="$(OutDir)/ui.exe"
-				LinkIncremental="2"
-				DelayLoadDLLs="$(NOINHERIT)"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/ui.pdb"
-				SubSystem="0"
+				Name="VCLibrarianTool"
+				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
+				OutputFile="$(OutDir)/zlib.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -99,7 +92,7 @@
 			Name="Release|Pocket PC 2003 (ARMV4)"
 			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1"
 			>
 			<Tool
@@ -121,9 +114,9 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="2"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
+				PreprocessorDefinitions="NO_ERRNO_H"
 				RuntimeLibrary="0"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -140,16 +133,9 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				OutputFile="$(OutDir)/ui.exe"
-				LinkIncremental="1"
-				DelayLoadDLLs="$(NOINHERIT)"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/ui.pdb"
-				SubSystem="0"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				Name="VCLibrarianTool"
+				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
+				OutputFile="$(OutDir)/zlib.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -185,87 +171,51 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\src\Auth.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\adler32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\base64.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\compress.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\CompressedSocket.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\crc32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Connection.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\deflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Contact.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\gzio.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\JabberAccount.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\infback.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\JabberDataBlock.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\inffast.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\JabberStanzaDispatcher.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\inflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\JabberStream.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\inftrees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\jid.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\trees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ResourceContext.cpp"
+				RelativePath="..\..\..\..\libs\zlib_src\uncompr.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Roster.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\Socket.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Pocket PC 2003 (ARMV4)"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Pocket PC 2003 (ARMV4)"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\ui.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\XMLParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\sockets\zlib\pocket pc 2003 (armv4)\debug\zlib.lib"
+				RelativePath="..\..\..\..\libs\zlib_src\zutil.c"
 				>
 			</File>
 		</Filter>
@@ -275,103 +225,43 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\include\Auth.h"
+				RelativePath="..\..\..\..\libs\zlib_src\crc32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\base64.h"
+				RelativePath="..\..\..\..\libs\zlib_src\deflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\basetypes.h"
+				RelativePath="..\..\..\..\libs\zlib_src\inffast.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\CompressedSocket.h"
+				RelativePath="..\..\..\..\libs\zlib_src\inffixed.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\config.h"
+				RelativePath="..\..\..\..\libs\zlib_src\inflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\Connection.h"
+				RelativePath="..\..\..\..\libs\zlib_src\inftrees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\Contact.h"
+				RelativePath="..\..\..\..\libs\zlib_src\trees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\JabberAccount.h"
+				RelativePath="..\..\..\..\libs\zlib_src\zconf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\JabberDataBlock.h"
+				RelativePath="..\..\..\..\libs\zlib_src\zlib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\JabberDataBlockListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\JabberListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\JabberLoginListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\JabberStanzaDispatcher.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\JabberStream.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\jid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\Log.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\ResourceContext.h"
-				>
-			</File>
-			<File
-				RelativePath=".\resourceppc.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\Roster.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\Socket.h"
-				>
-			</File>
-			<File
-				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ui.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\utf8.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\XMLEventListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\XMLParser.h"
+				RelativePath="..\..\..\..\libs\zlib_src\zutil.h"
 				>
 			</File>
 		</Filter>
@@ -380,18 +270,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\bombus.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\uippc.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\uippc.rc2"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\ReadMe.txt"

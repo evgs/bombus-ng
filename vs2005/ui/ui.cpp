@@ -592,7 +592,7 @@ int initJabber()
 #include "password"
 	;
 	rc->account->useSASL=true;
-	//rc->account->useCompression=true;
+	rc->account->useCompression=true;
 
 	std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 

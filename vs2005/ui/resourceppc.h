@@ -7,13 +7,21 @@
 #define IDS_JABBER                      3
 #define IDS_WINDOWS                     4
 #define IDR_MENU                        102
-#define IDS_OK                          103
 #define IDS_EXIT                        103
 #define IDS_HELP                        104
 #define IDD_ABOUTBOX                    105
+#define IDD_ACCNT                       106
 #define IDI_BOMBUS                      130
 #define IDC_STATIC_2                    202
 #define IDC_STATIC_3                    203
+#define IDC_E_JID                       1003
+#define IDC_E_PASSWORD                  1004
+#define IDC_X_SSL                       1005
+#define IDC_X_SASL                      1006
+#define IDC_ZLIB                        1007
+#define IDC_X_PLAIN                     1008
+#define IDC_E_HOSTIP                    1009
+#define IDC_E_PORT                      1011
 #define ID_JABBER_ONLINE                32771
 #define IDM_JABBER_ONLINE               32772
 #define ID_JABBER_STREAMINFO            32773
@@ -26,9 +34,9 @@
 #define IDM_JABBER_OFFLINE              32781
 #define IDM_WINDOWS_ROSTER              32782
 #define IDM_WINDOWS_LOG                 32783
-#define IDM_OK                          40000
+#define ID_JABBER_ACCOUNT               32784
+#define IDM_JABBER_ACCOUNT              32785
 #define IDM_EXIT                        40000
-#define IDM_HELP                        40001
 #define IDM_HELP_ABOUT                  40002
 #define IDC_STATIC                      -1
 
@@ -37,9 +45,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        131
-#define _APS_NEXT_COMMAND_VALUE         32784
-#define _APS_NEXT_CONTROL_VALUE         1003
+#define _APS_NEXT_RESOURCE_VALUE        132
+#define _APS_NEXT_COMMAND_VALUE         32786
+#define _APS_NEXT_CONTROL_VALUE         1013
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

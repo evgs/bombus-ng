@@ -4,6 +4,7 @@
 	Version="8,00"
 	Name="ui"
 	ProjectGUID="{33135B28-2E20-4442-983A-0CB80093CE42}"
+	RootNamespace="ui"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -205,6 +206,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DlgAccount.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\JabberAccount.cpp"
 				>
 			</File>
@@ -300,6 +305,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\Contact.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DlgAccount.h"
 				>
 			</File>
 			<File

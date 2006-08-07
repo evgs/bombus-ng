@@ -17,6 +17,8 @@
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
 
+#include "DlgAccount.h"
+
 #include "Auth.h"
 
 #define MAX_LOADSTRING 100
@@ -242,11 +244,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             wmId    = LOWORD(wParam); 
             wmEvent = HIWORD(wParam); 
             // Parse the menu selections:
-            switch (wmId)
-            {
-                case IDM_HELP_ABOUT:
-                    DialogBox(g_hInst, (LPCTSTR)IDD_ABOUTBOX, hWnd, About);
-                    break;
+            switch (wmId) {
+				case IDM_HELP_ABOUT:
+					DialogBox(g_hInst, (LPCTSTR)IDD_ABOUTBOX, hWnd, About);
+				break;
+				case IDM_JABBER_ACCOUNT:
+					DialogBox(g_hInst, (LPCTSTR)IDD_ACCNT, hWnd, DlgAccount);
+					break;
                 case IDM_EXIT:
                     SendMessage (hWnd, WM_CLOSE, 0, 0);				
                     break;
@@ -596,7 +600,7 @@ int initJabber()
 
 	std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 
-	rc->log->msg("Connect to", host.c_str());
+	rc->log->msg("Connect to ", host.c_str());
 	rc->connection=ConnectionRef(Socket::createSocket(host, 5222));
 	if (rc->connection==NULL) {
 		rc->log->msg("Failed to open connection");

@@ -23,6 +23,8 @@ public:
 	void setJid(const std::string &Jid);
 	void setBareJid(const std::string &bareJid);
 
+    bool operator==(const Jid &right) const;
+
 private:
 	std::string userName;
 	std::string server;

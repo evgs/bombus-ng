@@ -8,8 +8,8 @@
 
 class JabberDataBlock;
 typedef boost::shared_ptr<JabberDataBlock> JabberDataBlockRef;
+typedef std::list<JabberDataBlockRef> JabberDataBlockRefList;
 typedef std::list<JabberDataBlockRef>::iterator JabberDataBlockIterator;
-
 
 class JabberDataBlock {
 public:
@@ -21,7 +21,7 @@ public:
 
 private:
 	std::map<std::string, std::string> attr;
-	std::list<JabberDataBlockRef> childs;
+	JabberDataBlockRefList childs;
 	std::string tagName;
 	std::string text;
 
@@ -39,7 +39,7 @@ public:
 	void setText(const std::string &_text) { text=_text; }
 	void setText(const char *_text) { text=_text; }
 
-	std::list<JabberDataBlockRef> * getChilds();
+    JabberDataBlockRefList * getChilds() {return &childs;};
 	void addChild(JabberDataBlockRef child);
 	JabberDataBlock * addChild(const char *_tagName, const char *_text);
 	JabberDataBlockRef getChildByName(const char * tagName);

@@ -7,11 +7,13 @@ class JabberStream;
 class JabberStanzaDispatcher;
 class Connection;
 class JabberAccount;
+class Roster;
 
 typedef boost::shared_ptr <JabberStanzaDispatcher> JabberStanzaDispatcherRef;
 typedef boost::shared_ptr <JabberStream> JabberStreamRef;
 typedef boost::shared_ptr <Connection> ConnectionRef;
 typedef boost::shared_ptr <JabberAccount> JabberAccountRef;
+typedef boost::shared_ptr <Roster> RosterRef;
 
 class ResourceContext {
 public:
@@ -20,6 +22,7 @@ public:
 	ConnectionRef connection;
 	JabberStreamRef jabberStream;
 	JabberStanzaDispatcherRef jabberStanzaDispatcher;
+    RosterRef roster;
 };
 
 typedef boost::shared_ptr <ResourceContext> ResourceContextRef;

@@ -631,8 +631,7 @@ int initJabber()
 	rc->jabberStream->sendXmlVersion();
 	rc->jabberStream->sendXmppBeginHeader();
 
-
-	//jstream.sendStanza(test);
+    //jstream.sendStanza(test);
 	//printf("%s", test.toXML());
 
 	/*char tmp[16];

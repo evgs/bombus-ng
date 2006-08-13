@@ -52,3 +52,7 @@ void Jid::updateJid(void){
 	if (resource.empty()) bareJid=jid; 
 	else jid=bareJid+'/'+resource;
 };
+
+bool Jid::operator==(const Jid &right) const {
+    return this->jid==right.jid;
+};

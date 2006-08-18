@@ -20,6 +20,9 @@ ContactRef Roster::findContact(const std::string jid, bool bareJid) const {
 }
 
 ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
+
+    bool rosterPush=(block->getAttribute("type"))=="set";
+
     JabberDataBlockRef query=block->getChildByName("query");
 
     if (query.get()==NULL) return BLOCK_REJECTED;
@@ -36,8 +39,10 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
             subscr+="ask";
         }
 
+        //todo: разное поведение для roster request и roster push
         ContactRef contact=ContactRef(new Contact(jid, "", name));
         contact->subscr=subscr;
+        addContact(contact);
     }
     return BLOCK_PROCESSED;
 }

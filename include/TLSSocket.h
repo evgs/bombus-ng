@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Connection.h"
 
-namespace yaSSL {
-    class Client;
-}
+
+#include "Connection.h"
 
 class TLSSocket : public Connection 
 {
@@ -21,6 +19,7 @@ public:
 private:
 	ConnectionRef sock;
 
-    yaSSL::Client * sslClient;
+    void* ctx;
+    void* ssl;
 };
 

@@ -17,6 +17,9 @@ TLSSocket::TLSSocket(ConnectionRef sock){
     sslClient->SetCA("E:\\bombus-ng\\certs\\root.der");
     int result=sslClient->Connect(sockfd);*/
 
+    SSLeay_add_ssl_algorithms();
+    SSL_load_error_strings();
+
     SSL_METHOD* method=TLSv1_client_method();
     SSL_CTX* ctx=SSL_CTX_new(method);
 

@@ -1,6 +1,8 @@
 // ui.cpp : Defines the entry point for the application.
 //
 
+//#define JIVESOFTWARE
+
 #include "stdafx.h"
 #include "ui.h"
 #include <windows.h>
@@ -590,11 +592,17 @@ int initJabber()
 {{
 	rc=ResourceContextRef(new ResourceContext());
 	rc->log=new Log();
+#ifdef JIVESOFTWARE
+    rc->account=JabberAccountRef(new JabberAccount("bombus_mobilus@jivesoftware.com", "bombus-ng"));
+    //rc->account->hostNameIp="213.180.203.19";
+    rc->account->password="l12sx95a";
+#else
 	rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
 	//rc->account->hostNameIp="213.180.203.19";
 	rc->account->password=
 #include "password"
 	;
+#endif
 	rc->account->useSASL=true;
 	rc->account->useCompression=true;
 

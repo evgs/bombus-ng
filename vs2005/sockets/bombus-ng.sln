@@ -20,6 +20,7 @@ Global
 		{D9BBD182-7248-4C77-A514-BE171FB7284F}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
 		{D9BBD182-7248-4C77-A514-BE171FB7284F}.Debug|Mixed Platforms.Build.0 = Debug|Win32
 		{D9BBD182-7248-4C77-A514-BE171FB7284F}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{D9BBD182-7248-4C77-A514-BE171FB7284F}.Debug|Pocket PC 2003 (ARMV4).Build.0 = Debug|Win32
 		{D9BBD182-7248-4C77-A514-BE171FB7284F}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D9BBD182-7248-4C77-A514-BE171FB7284F}.Debug|Win32.Build.0 = Debug|Win32
 		{D9BBD182-7248-4C77-A514-BE171FB7284F}.Release|Mixed Platforms.ActiveCfg = Release|Win32

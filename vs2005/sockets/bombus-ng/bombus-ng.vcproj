@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;..\..\..\include"
+				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;&quot;\libs\yassl-1.4.0\include&quot;;..\..\..\include"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -217,6 +217,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\src\jid.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\Log.cpp"
 				>
 			</File>
@@ -233,7 +237,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\libs\yassl-1.4.0\taocrypt\Debug\taocrypt.lib"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\src\TLSSocket.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\XMLParser.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\libs\yassl-1.4.0\Debug\yassl.lib"
 				>
 			</File>
 			<File
@@ -304,6 +320,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\include\TLSSocket.h"
 				>
 			</File>
 			<File

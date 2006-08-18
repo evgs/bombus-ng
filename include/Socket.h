@@ -17,6 +17,8 @@ public:
 	//int write(const StringRef buf);
 	//int write(std::string &buf);
 
+    SOCKET getSocket(){ return sock; }
+
 private:
 	SOCKET sock;
 	long bytesSent;

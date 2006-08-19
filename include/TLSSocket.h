@@ -2,10 +2,6 @@
 
 #include "Connection.h"
 
-namespace yaSSL {
-    class Client;
-}
-
 class TLSSocket : public Connection 
 {
 public:
@@ -21,6 +17,7 @@ public:
 private:
 	ConnectionRef sock;
 
-    yaSSL::Client * sslClient;
+    void* ctx;
+    void* ssl;
 };
 

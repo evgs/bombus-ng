@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;&quot;\libs\yassl-1.4.0\include&quot;;..\..\..\include"
+				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;\libs\openssl\include;..\..\..\include"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -221,6 +221,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\..\libs\openssl\lib\libeay32.lib"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\src\Log.cpp"
 				>
 			</File>
@@ -233,11 +237,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stdafx.cpp"
+				RelativePath="..\..\..\..\libs\openssl\lib\ssleay32.lib"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\yassl-1.4.0\taocrypt\Debug\taocrypt.lib"
+				RelativePath=".\stdafx.cpp"
 				>
 			</File>
 			<File
@@ -246,10 +250,6 @@
 			</File>
 			<File
 				RelativePath="..\..\..\src\XMLParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\libs\yassl-1.4.0\Debug\yassl.lib"
 				>
 			</File>
 			<File

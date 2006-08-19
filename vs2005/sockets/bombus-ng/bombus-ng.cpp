@@ -132,15 +132,16 @@ int _tmain(int argc, _TCHAR* argv[])
 #include "password"
 	;
 	rc->account->useSASL=true;
+    rc->account->useEncryption=true;
 	rc->account->useCompression=true;
 
 	std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 
 	rc->log->msg("Connect to", host.c_str());
-	rc->connection=ConnectionRef(Socket::createSocket(host, 5223));
+	rc->connection=ConnectionRef(Socket::createSocket(host, 5222));
     BOOST_ASSERT(rc->connection);
-    rc->connection=ConnectionRef(new TLSSocket(rc->connection));
-    BOOST_ASSERT(rc->connection);
+    //rc->connection=ConnectionRef(new TLSSocket(rc->connection));
+    //BOOST_ASSERT(rc->connection);
 
 	rc->jabberStream=JabberStreamRef(new JabberStream(rc));
 

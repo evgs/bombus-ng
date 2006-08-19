@@ -5,6 +5,7 @@
 #include "JabberStream.h"
 #include "ResourceContext.h"
 #include "CompressedSocket.h"
+#include "TLSSocket.h"
 #include "base64.h"
 
 void NonSASLAuth::beginConversation(const std::string & streamId) {
@@ -40,6 +41,17 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 	//rc->log->msg("SASL Login: stanza  ", (*(block->toXML())).c_str() );
 
 	if (block->getTagName()=="stream:features") {
+
+#ifndef NOSTARTTLS
+        if (rc->account->useEncryption) {
+            JabberDataBlockRef starttls=block->getChildByName("starttls");
+            if (starttls.get()!=NULL) {
+                JabberDataBlock tls("starttls");
+                tls.setAttribute("xmlns","urn:ietf:params:xml:ns:xmpp-tls");
+                rc->jabberStream->sendStanza(tls);
+            }
+        }
+#endif
 #ifndef NOZLIB
 		if (rc->account->useCompression) {
 			JabberDataBlockRef compression=block->getChildByName("compression");
@@ -94,7 +106,18 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 		}
 	}
 
-	if (block->getTagName()=="compressed") {
+    if (block->getTagName()=="proceed") {
+        rc->log->msg("Starting TLS connection");
+#ifndef NOSTARTTLS
+        //starting tls layer socket
+        ConnectionRef tlssocket=ConnectionRef(new TLSSocket(rc->connection));
+        rc->connection=tlssocket;
+        rc->jabberStream->parser->bindStream(tlssocket);
+        rc->jabberStream->sendXmppBeginHeader();
+#endif
+    }
+
+    if (block->getTagName()=="compressed") {
 		rc->log->msg("Opening compressed stream");
 
 #ifndef NOZLIB

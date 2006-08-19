@@ -1,9 +1,9 @@
-
 #include "Socket.h"
 
 #include "TLSSocket.h"
 #include "stdio.h"
 
+#define NO_SYS_TYPES_H
 #include <openssl/ssl.h>
 
 TLSSocket::TLSSocket(ConnectionRef sock){
@@ -32,27 +32,28 @@ TLSSocket::TLSSocket(ConnectionRef sock){
 
     int result=SSL_connect(ssl);
 
-    printf ("SSL connection using %s\n", SSL_get_cipher (ssl));
-
-
     int err=SSL_get_error(ssl, 0);
+    int err2=SSL_get_error(ssl, err);
 
-    X509*    server_cert=  SSL_get_peer_certificate (ssl);
+    //printf ("SSL connection using %s\n", SSL_get_cipher (ssl));
 
-    printf ("Server certificate:\n");
 
+
+    X509* server_cert=  SSL_get_peer_certificate (ssl);
     char * str = X509_NAME_oneline (X509_get_subject_name (server_cert),0,0);
-    printf ("\t subject: %s\n", str);
+
+    //printf ("Server certificate:\n");
+    //printf ("\t subject: %s\n", str);
 
     OPENSSL_free (str);
 
     str = X509_NAME_oneline (X509_get_issuer_name  (server_cert),0,0);
 
-    printf ("\t issuer: %s\n", str);
+    //printf ("\t issuer: %s\n", str);
     OPENSSL_free (str);
 
-    /* We could do all sorts of certificate verification stuff here before
-    deallocating the certificate. */
+    // We could do all sorts of certificate verification stuff here before
+    //deallocating the certificate.
 
     X509_free (server_cert);
 
@@ -74,3 +75,4 @@ int TLSSocket::write(const char * buf, int len) {
 const std::string TLSSocket::getStatistics() {
     return std::string("stub");
 }
+

@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include "Connection.h"
 
 class TLSSocket : public Connection 

@@ -42,7 +42,7 @@
 				ExecutionBucket="7"
 				Optimization="0"
 				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;\libs\openssl\include;..\..\include"
-				PreprocessorDefinitions="BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
+				PreprocessorDefinitions="NOSTARTTLS;BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
@@ -230,10 +230,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\libs\openssl-0.9.8b\openssl-0.9.8b\out32_ARMV4\libeay32.lib"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\ResourceContext.cpp"
 				>
 			</File>
@@ -243,10 +239,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\Socket.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\libs\openssl-0.9.8b\openssl-0.9.8b\out32_ARMV4\ssleay32.lib"
 				>
 			</File>
 			<File
@@ -270,15 +262,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\src\TLSSocket.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ui.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\libs\wcecompat\lib\wcecompat.lib"
 				>
 			</File>
 			<File

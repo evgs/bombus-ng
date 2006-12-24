@@ -11,6 +11,7 @@
 
 #include "Log.h"
 #include "Socket.h"
+#include "CETLSSocket.h"
 #include <string>
 #include "JabberDataBlock.h"
 #include "JabberStream.h"
@@ -603,13 +604,15 @@ int initJabber()
 #include "password"
 	;
 #endif
-	rc->account->useSASL=true;
+    rc->account->useSASL=true;
+    rc->account->useEncryption=true;
 	rc->account->useCompression=true;
 
 	std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 
 	rc->log->msg("Connect to ", host.c_str());
-	rc->connection=ConnectionRef(Socket::createSocket(host, 5222));
+	//rc->connection=ConnectionRef(Socket::createSocket(host, 5222));
+    rc->connection=ConnectionRef(CeTLSSocket::createTlsSocket(host, 5222));
 	if (rc->connection==NULL) {
 		rc->log->msg("Failed to open connection");
 		return -1;

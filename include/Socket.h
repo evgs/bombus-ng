@@ -19,8 +19,9 @@ public:
 
     SOCKET getSocket(){ return sock; }
 
+protected:
+    SOCKET sock;
 private:
-	SOCKET sock;
 	long bytesSent;
 	long bytesRecvd;
 };

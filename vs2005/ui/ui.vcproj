@@ -42,7 +42,7 @@
 				ExecutionBucket="7"
 				Optimization="0"
 				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;\libs\openssl\include;..\..\include"
-				PreprocessorDefinitions="NOSTARTTLS;BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
+				PreprocessorDefinitions="BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\CeTLSSocket.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\CompressedSocket.cpp"
 				>
 			</File>
@@ -289,6 +293,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\basetypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\CETLSSocket.h"
 				>
 			</File>
 			<File

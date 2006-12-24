@@ -5,7 +5,7 @@
 #include "JabberStream.h"
 #include "ResourceContext.h"
 #include "CompressedSocket.h"
-#include "TLSSocket.h"
+#include "CETLSSocket.h"
 #include "base64.h"
 
 void NonSASLAuth::beginConversation(const std::string & streamId) {
@@ -49,6 +49,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
                 JabberDataBlock tls("starttls");
                 tls.setAttribute("xmlns","urn:ietf:params:xml:ns:xmpp-tls");
                 rc->jabberStream->sendStanza(tls);
+                return BLOCK_PROCESSED;
             }
         }
 #endif
@@ -110,9 +111,10 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
         rc->log->msg("Starting TLS connection");
 #ifndef NOSTARTTLS
         //starting tls layer socket
-        ConnectionRef tlssocket=ConnectionRef(new TLSSocket(rc->connection));
-        rc->connection=tlssocket;
-        rc->jabberStream->parser->bindStream(tlssocket);
+        /*ConnectionRef tlssocket=ConnectionRef(new TLSSocket(rc->connection));
+        rc->connection=tlssocket;**/
+        ((CeTLSSocket *)(rc->connection.get()))->switchTls();
+        //rc->jabberStream->parser->bindStream(tlssocket);
         rc->jabberStream->sendXmppBeginHeader();
 #endif
     }

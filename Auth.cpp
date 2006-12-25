@@ -7,6 +7,8 @@
 #include "CompressedSocket.h"
 #include "CETLSSocket.h"
 #include "base64.h"
+#include "crypto/md5.h"
+#include "utf8.hpp"
 
 void NonSASLAuth::beginConversation(const std::string & streamId) {
 	rc->log->msg("Non-SASL Login: sending password");
@@ -36,6 +38,8 @@ void SASLAuth::beginConversation(const std::string &streamId){
 void SASLAuth::endConversation(){
 	rc->log->msg("end conversation");
 };
+
+std::string responseMd5Digest(std::string user, std::string pass, std::string realm, std::string digestUri, std::string nonce, std::string cnonce);
 
 ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
 	//rc->log->msg("SASL Login: stanza  ", (*(block->toXML())).c_str() );
@@ -74,14 +78,26 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 			JabberDataBlock auth("auth");
 			auth.setAttribute("xmlns","urn:ietf:params:xml:ns:xmpp-sasl");
 
-			if (mechanisms->hasChildByValue("PLAIN")) {
+            //DIGEST-MD5 mechanism
+            /*if (mechanisms->hasChildByValue("DIGEST-MD5")) {
+                rc->log->msg("Init DIGEST-MD5");
+
+                auth.setAttribute("mechanism", "DIGEST-MD5");
+
+                rc->jabberStream->sendStanza(auth);
+                return BLOCK_PROCESSED;
+            }
+            */
+
+            //PLAIN mechanism
+            if (mechanisms->hasChildByValue("PLAIN")) {
 				rc->log->msg("Sending PLAIN password");
 					
 				auth.setAttribute("mechanism", "PLAIN");
 
 				std::string plain(rc->account->getBareJid());
 				plain+=(char)0x00;
-				plain+=rc->account->getUserName();
+                plain+=rc->account->getUserName();
 				plain+=(char)0x00;
 				plain+=rc->account->password;
 
@@ -106,6 +122,33 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 			return BLOCK_PROCESSED;
 		}
 	}
+
+    if (block->getTagName()=="challenge") {
+        std::string challenge= base64::base64Decode(block->getText());
+        
+        JabberDataBlock resp("response");
+        resp.setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-sasl");
+        int nonceIndex=challenge.find("nonce=");
+        // first stream - step 2. generating DIGEST-MD5 response due to challenge
+
+        if (nonceIndex>=0) {
+            nonceIndex+=7; //length("nonce=\"");
+            std::string nonce=challenge.substr(nonceIndex, challenge.find('\"', nonceIndex));
+            std::string cnonce("123456789abcd");
+
+            resp.setText(responseMd5Digest(
+                rc->account->getUserName(), 
+                rc->account->password, 
+                rc->account->getServer(),
+                std::string("xmpp/")+rc->account->getServer(),
+                nonce,
+                cnonce ));
+            //System.out.println(resp.toString());
+        }
+        // first stream - step 3. sending second empty response due to second challenge
+        //if (challenge.startsWith("rspauth")) {}
+        rc->jabberStream->sendStanza(resp);
+    }
 
     if (block->getTagName()=="proceed") {
         rc->log->msg("Starting TLS connection");
@@ -132,11 +175,17 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 		return BLOCK_PROCESSED;
 	}
 
-	if (block->getTagName()=="success") { 
-		// initiating bind session
-		rc->jabberStream->sendXmppBeginHeader();
-		return BLOCK_PROCESSED;
-	}
+
+    if (block->getTagName()=="success") { 
+        // initiating bind session
+        rc->jabberStream->sendXmppBeginHeader();
+        return BLOCK_PROCESSED;
+    }
+
+    if (block->getTagName()=="failure") { 
+        //rc->connection->
+        return LAST_BLOCK_PROCESSED;
+    }
 
 	if (block->getTagName()=="iq") {
 		if (block->getAttribute("id")=="bind") {
@@ -159,3 +208,51 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 	return BLOCK_REJECTED;
 }
 
+std::string responseMd5Digest(std::string user, std::string pass, std::string realm, std::string digestUri, std::string nonce, std::string cnonce) {
+
+/*    MD5 hUserRealmPass=new MD5();
+    hUserRealmPass.init();
+    hUserRealmPass.updateASCII(user);
+    hUserRealmPass.update((byte)':');
+    hUserRealmPass.updateASCII(realm);
+    hUserRealmPass.update((byte)':');
+    hUserRealmPass.updateASCII(pass);
+    hUserRealmPass.finish();
+
+    MD5 hA1=new MD5();
+    hA1.init();
+    hA1.update(hUserRealmPass.getDigestBits());
+    hA1.update((byte)':');
+    hA1.updateASCII(nonce);
+    hA1.update((byte)':');
+    hA1.updateASCII(cnonce);
+    hA1.finish();
+
+    MD5 hA2=new MD5();
+    hA2.init();
+    hA2.updateASCII("AUTHENTICATE:");
+    hA2.updateASCII(digestUri);
+    hA2.finish();
+
+    MD5 hResp=new MD5();
+    hResp.init();
+    hResp.updateASCII(hA1.getDigestHex());
+    hResp.update((byte)':');
+    hResp.updateASCII(nonce);
+    hResp.updateASCII(":00000001:");
+    hResp.updateASCII(cnonce);
+    hResp.updateASCII(":auth:");
+    hResp.updateASCII(hA2.getDigestHex());
+    hResp.finish();
+
+    String out = "username=\""+user+"\",realm=\""+realm+"\"," +
+        "nonce=\""+nonce+"\",nc=00000001,cnonce=\""+cnonce+"\"," +
+        "qop=auth,digest-uri=\""+digestUri+"\"," +
+        "response=\""+hResp.getDigestHex()+"\",charset=utf-8";
+    String resp = strconv.toBase64(out);
+    //System.out.println(decodeBase64(resp));
+
+    return resp;
+    */
+    return std::string("");
+}

@@ -234,11 +234,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\crypto\MD5.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\crypto\MessageDigest.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ResourceContext.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\Roster.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\crypto\SHA1.cpp"
 				>
 			</File>
 			<File
@@ -356,6 +368,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\crypto\MD5.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\crypto\MessageDigest.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\ResourceContext.h"
 				>
 			</File>
@@ -365,6 +385,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\Roster.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\crypto\SHA1.h"
 				>
 			</File>
 			<File

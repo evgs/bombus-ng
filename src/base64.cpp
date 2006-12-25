@@ -217,5 +217,19 @@ const std::string base64::base64Encode(const std::string &inbuf) {
 	base64Encode(buf, inbuf.c_str(), ilen);
 
 	buf[olen]=0;
-	return std::string(buf);
+    std::string result(buf);
+    delete buf;
+	return result;
+}
+
+const std::string base64::base64Decode(const std::string &inbuf) {
+    int ilen=inbuf.length();
+    int olen=base64DecodeGetLength(ilen);
+    char *buf=new char [olen+1];
+    base64Decode(buf, inbuf.c_str(), ilen);
+    buf[olen]=0;
+
+    std::string result(buf);
+    delete buf;
+    return result;
 }

@@ -74,7 +74,7 @@ public:
      * If special processing is needed for a particular type your
      * subclass should override the method for that type.
      */
-    virtual void update(const unsigned char aValue)=0;
+    virtual void updateByte(const unsigned char aValue)=0;
 
     /**
     * Perform the final computations and cleanup.
@@ -85,22 +85,22 @@ public:
     /**
      * Add a short value to the digest.
      */
-    void update(short aValue);
+    void updateShort(short aValue);
 
     /**
      * Add an integer value to the digest.
      */
-    void update(int aValue);
+    void updateInt(int aValue);
 
     /**
      * Add a long to the digest.
      */
-    void update(long aValue);
+    void updateLong(long aValue);
 
     /**
      * Add specific bytes to the digest.
      */
-    void update(const unsigned char* input, int len, int offset=0);
+    void updateArray(const unsigned char* input, int len, int offset=0);
 
     /**
      * Add the bytes in the String 'input' to the current digest.

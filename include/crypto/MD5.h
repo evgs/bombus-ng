@@ -33,7 +33,7 @@
  * @version 	06 Oct 1996, 1.9.1
  * @author 	Chuck McManis
  */
-class MD5 :  MessageDigest {
+class MD5 :  public MessageDigest {
     /** containss the computed message digest */
 
 private: 
@@ -41,23 +41,6 @@ private:
     unsigned long count;
     unsigned char * buffer;
     int *transformBuffer;
-
-    static const int S11 = 7;
-    static const int S12 = 12;
-    static const int S13 = 17;
-    static const int S14 = 22;
-    static const int S21 = 5;
-    static const int S22 = 9;
-    static const int S23 = 14;
-    static const int S24 = 20;
-    static const int S31 = 4;
-    static const int S32 = 11;
-    static const int S33 = 16;
-    static const int S34 = 23;
-    static const int S41 = 6;
-    static const int S42 = 10;
-    static const int S43 = 15;
-    static const int S44 = 21;
 
     /**
      * Standard constructor, creates a new MD5 instance, allocates its
@@ -110,7 +93,7 @@ public:
     /**
      * update adds the passed type to the input buffer
      */
-    void update(const unsigned char b);
+    void updateByte(const unsigned char b);
 
     /**
      * Perform the final computations, any buffered bytes are added
@@ -120,5 +103,5 @@ public:
      */
     void finish();
 
-    const char * getAlg() {	return "MD5"; }
+    const char * getAlg() const { return "MD5"; }
 };

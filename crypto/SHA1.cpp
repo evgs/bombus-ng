@@ -221,7 +221,7 @@ void SHA1::finish() {
     while (blockIndex != 56)
         update((unsigned char) 0);
     // This should cause a transform to happen.
-    MessageDigest::update(bits, 8);
+    MessageDigest::updateArray(bits, 8);
     for (i = 0; i < 20; i++) {
         digestBits[i] = (unsigned char)
             ((state[i>>2] >> ((3-(i & 3)) * 8) ) & 0xff);

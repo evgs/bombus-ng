@@ -32,6 +32,23 @@
 * @author 	Chuck McManis
 */
 
+#define S11 7
+#define S12 12
+#define S13 17
+#define S14 22
+#define S21 5
+#define S22 9
+#define S23 14
+#define S24 20
+#define S31 4
+#define S32 11
+#define S33 16
+#define S34 23
+#define S41 6
+#define S42 10
+#define S43 15
+#define S44 21
+
 
 /**
 * Standard constructor, creates a new MD5 instance, allocates its
@@ -131,7 +148,7 @@ void MD5::transform(unsigned char * buf, int offset) {
     for (int i = 0; i < 16; i++) {
         x[i] = (int)buf[i*4+offset] & 0xff;
         for (int j = 1; j < 4; j++) {
-            x[i] += ((int)buf[i*4+j+offset] & 0xff) << (j * 8);
+            x[i] += ((int)(buf[i*4+j+offset])) << (j * 8);
         }
     }
 
@@ -233,7 +250,7 @@ void MD5::init() {
 /**
 * update adds the passed type to the input buffer
 */
-void MD5::update(unsigned char b) {
+void MD5::updateByte(unsigned char b) {
     int	index;
 
     index = (int) ((count >> 3) & 0x3f);
@@ -260,10 +277,10 @@ void MD5::finish() {
 
     index = (int)(count >> 3) & 0x3f;
     padLen = (index < 56) ? (56 - index) : (120 - index);
-    update((unsigned char) 80);
+    updateByte(0x80);
     for (int padding=1; padding<padLen; padding++)
-        update((unsigned char) 0);
-    MessageDigest::update(bits, 8);
+        updateByte(0);
+    MessageDigest::updateArray(bits, 8);
 
     for (i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {

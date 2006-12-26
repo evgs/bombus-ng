@@ -42,45 +42,45 @@
 /**
 * Add a short value to the digest.
 */
-void MessageDigest::update(short aValue) {
+void MessageDigest::updateShort(short aValue) {
     unsigned char	b1, b2;
 
     b1 = (unsigned char)((aValue >> 8) & 0xff);
     b2 = (unsigned char)(aValue & 0xff);
-    update(b1);
-    update(b2);
+    updateByte(b1);
+    updateByte(b2);
 }
 
 /**
 * Add an integer value to the digest.
 */
-void MessageDigest::update(int aValue) {
+void MessageDigest::updateInt(int aValue) {
     unsigned char	b;
 
     for (int i = 3; i >= 0; i--) {
         b = (unsigned char)((aValue >> (i * 8)) & 0xff);
-        update(b);
+        updateByte(b);
     }
 }
 
 /**
 * Add a long to the digest.
 */
-void MessageDigest::update(long aValue) {
+void MessageDigest::updateLong(long aValue) {
     unsigned char b;
 
     for (int i = 7; i >= 0; i--) {
         b = (unsigned char)((aValue >> (i * 8)) & 0xff);
-        update(b);
+        updateByte(b);
     }
 }
 
 /**
 * Add specific bytes to the digest.
 */
-void MessageDigest::update(const unsigned char* input, int len, int offset) {
+void MessageDigest::updateArray(const unsigned char* input, int len, int offset) {
     for (int i = 0; i < len; i++) {
-        update(input[i+offset]);
+        updateByte(input[i+offset]);
     }
 }
 
@@ -97,7 +97,7 @@ void MessageDigest::updateW(const std::wstring &input) {
     len = input.length();
     for (i = 0; i < len; i++) {
         x = (unsigned short) input[i];
-        update(x);
+        updateShort(x);
     }
 }
 
@@ -111,7 +111,7 @@ void MessageDigest::updateASCII(const std::string &input) {
     len = input.length();
     for (i = 0; i < len; i++) {
         x = (unsigned char) (input[i] & 0xff);
-        update(x);
+        updateByte(x);
     }
 }
 

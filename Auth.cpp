@@ -39,7 +39,7 @@ void SASLAuth::endConversation(){
 	rc->log->msg("end conversation");
 };
 
-std::string responseMd5Digest(std::string user, std::string pass, std::string realm, std::string digestUri, std::string nonce, std::string cnonce);
+const std::string responseMd5Digest( const std::string &user, const std::string &pass, const std::string &realm, const std::string &digestUri, const std::string &nonce, const std::string cnonce);
 
 ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
 	//rc->log->msg("SASL Login: stanza  ", (*(block->toXML())).c_str() );
@@ -79,7 +79,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 			auth.setAttribute("xmlns","urn:ietf:params:xml:ns:xmpp-sasl");
 
             //DIGEST-MD5 mechanism
-            /*if (mechanisms->hasChildByValue("DIGEST-MD5")) {
+            if (mechanisms->hasChildByValue("DIGEST-MD5")) {
                 rc->log->msg("Init DIGEST-MD5");
 
                 auth.setAttribute("mechanism", "DIGEST-MD5");
@@ -87,7 +87,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
                 rc->jabberStream->sendStanza(auth);
                 return BLOCK_PROCESSED;
             }
-            */
+            
 
             //PLAIN mechanism
             if (mechanisms->hasChildByValue("PLAIN")) {
@@ -133,7 +133,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 
         if (nonceIndex>=0) {
             nonceIndex+=7; //length("nonce=\"");
-            std::string nonce=challenge.substr(nonceIndex, challenge.find('\"', nonceIndex));
+            std::string nonce=challenge.substr(nonceIndex, challenge.find('\"', nonceIndex)-nonceIndex);
             std::string cnonce("123456789abcd");
 
             resp.setText(responseMd5Digest(
@@ -208,51 +208,60 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 	return BLOCK_REJECTED;
 }
 
-std::string responseMd5Digest(std::string user, std::string pass, std::string realm, std::string digestUri, std::string nonce, std::string cnonce) {
+typedef boost::shared_ptr<MD5> MD5Ref;
 
-/*    MD5 hUserRealmPass=new MD5();
-    hUserRealmPass.init();
-    hUserRealmPass.updateASCII(user);
-    hUserRealmPass.update((byte)':');
-    hUserRealmPass.updateASCII(realm);
-    hUserRealmPass.update((byte)':');
-    hUserRealmPass.updateASCII(pass);
-    hUserRealmPass.finish();
+const std::string responseMd5Digest(
+    const std::string &user, 
+    const std::string &pass, 
+    const std::string &realm, 
+    const std::string &digestUri, 
+    const std::string &nonce, 
+    const std::string cnonce) 
+{
+    
 
-    MD5 hA1=new MD5();
-    hA1.init();
-    hA1.update(hUserRealmPass.getDigestBits());
-    hA1.update((byte)':');
-    hA1.updateASCII(nonce);
-    hA1.update((byte)':');
-    hA1.updateASCII(cnonce);
-    hA1.finish();
+    MD5Ref hUserRealmPass=MD5Ref(new MD5());
+    hUserRealmPass->init();
+    hUserRealmPass->updateASCII(user);
+    hUserRealmPass->updateByte(':');
+    hUserRealmPass->updateASCII(realm);
+    hUserRealmPass->updateByte(':');
+    hUserRealmPass->updateASCII(pass);
+    hUserRealmPass->finish();
 
-    MD5 hA2=new MD5();
-    hA2.init();
-    hA2.updateASCII("AUTHENTICATE:");
-    hA2.updateASCII(digestUri);
-    hA2.finish();
+    MD5Ref hA1=MD5Ref(new MD5());
+    hA1->init();
+    hA1->updateArray(hUserRealmPass->getDigestBits(), hUserRealmPass->digestBitsLen, 0);
+    hA1->updateByte(':');
+    hA1->updateASCII(nonce);
+    hA1->updateByte(':');
+    hA1->updateASCII(cnonce);
+    hA1->finish();
 
-    MD5 hResp=new MD5();
-    hResp.init();
-    hResp.updateASCII(hA1.getDigestHex());
-    hResp.update((byte)':');
-    hResp.updateASCII(nonce);
-    hResp.updateASCII(":00000001:");
-    hResp.updateASCII(cnonce);
-    hResp.updateASCII(":auth:");
-    hResp.updateASCII(hA2.getDigestHex());
-    hResp.finish();
+    MD5Ref hA2=MD5Ref(new MD5());
+    hA2->init();
+    hA2->updateASCII("AUTHENTICATE:");
+    hA2->updateASCII(digestUri);
+    hA2->finish();
 
-    String out = "username=\""+user+"\",realm=\""+realm+"\"," +
+    MD5Ref hResp=MD5Ref(new MD5());
+    hResp->init();
+    hResp->updateASCII(hA1->getDigestHex());
+    hResp->updateByte(':');
+    hResp->updateASCII(nonce);
+    hResp->updateASCII(":00000001:");
+    hResp->updateASCII(cnonce);
+    hResp->updateASCII(":auth:");
+    hResp->updateASCII(hA2->getDigestHex());
+    hResp->finish();
+
+    std::string out = "username=\""+user+"\",realm=\""+realm+"\"," +
         "nonce=\""+nonce+"\",nc=00000001,cnonce=\""+cnonce+"\"," +
         "qop=auth,digest-uri=\""+digestUri+"\"," +
-        "response=\""+hResp.getDigestHex()+"\",charset=utf-8";
-    String resp = strconv.toBase64(out);
+        "response=\""+hResp->getDigestHex()+"\",charset=utf-8";
+    std::string resp = base64::base64Encode(out);
     //System.out.println(decodeBase64(resp));
 
     return resp;
-    */
-    return std::string("");
 }
+

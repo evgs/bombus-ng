@@ -7,8 +7,13 @@
 #include "CompressedSocket.h"
 #include "CETLSSocket.h"
 #include "base64.h"
-#include "crypto/md5.h"
+#include "crypto/MD5.h"
+#include "crypto/SHA1.h"
 #include "utf8.hpp"
+
+
+typedef boost::shared_ptr<MD5> MD5Ref;
+typedef boost::shared_ptr<SHA1> SHA1Ref;
 
 void NonSASLAuth::beginConversation(const std::string & streamId) {
 	rc->log->msg("Non-SASL Login: sending password");
@@ -19,7 +24,19 @@ void NonSASLAuth::beginConversation(const std::string & streamId) {
 	JabberDataBlock * qry=login->addChild("query",NULL);
 	qry->setAttribute("xmlns","jabber:iq:auth");
 	qry->addChild("username",rc->account->getUserName().c_str());
-	qry->addChild("password",rc->account->password.c_str());
+	//qry->addChild("password",rc->account->password.c_str());
+
+    SHA1Ref digest=SHA1Ref(new SHA1());
+    digest->init();
+    digest->updateASCII(streamId);
+    digest->updateASCII(rc->account->password);
+    digest->finish();
+
+    std::string result=digest->getDigestHex();
+
+    qry->addChild("digest", result.c_str());
+
+    
 	qry->addChild("resource",rc->account->getResource().c_str());
 
 	rc->jabberStream->sendStanza(login);
@@ -208,7 +225,6 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 	return BLOCK_REJECTED;
 }
 
-typedef boost::shared_ptr<MD5> MD5Ref;
 
 const std::string responseMd5Digest(
     const std::string &user, 

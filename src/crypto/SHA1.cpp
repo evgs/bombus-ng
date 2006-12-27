@@ -193,7 +193,7 @@ void SHA1::init() {
 * all of the abstract class methods end up calling
 * this method for types other than bytes.
 */
-void SHA1::update(const unsigned char b) {
+void SHA1::updateByte(const unsigned char b) {
     int mask = (8 * (blockIndex & 3));
 
     count += 8;

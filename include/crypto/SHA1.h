@@ -30,7 +30,7 @@
  * I've run his test vectors through the code and they all pass.
  *
  */
-class SHA1 : MessageDigest {
+class SHA1 : public MessageDigest {
 private:
     int state[5];
     long count;
@@ -110,7 +110,7 @@ public:
      * all of the abstract class methods end up calling
      * this method for types other than bytes.
      */
-    virtual void update(const unsigned char b);
+    virtual void updateByte(const unsigned char b);
 
     /**
      * Complete processing on the message digest.

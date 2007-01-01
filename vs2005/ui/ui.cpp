@@ -264,7 +264,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				case IDM_JABBER_STREAMINFO:
 					rc->log->msg(
-						rc->connection->getStatistics().c_str()
+						rc->jabberStream->connection->getStatistics().c_str()
 						);
 					break;
 
@@ -506,32 +506,6 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 	return LAST_BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
-class Online : public JabberDataBlockListener {
-public:
-	Online(ResourceContextRef rc) {
-		this->rc=rc;
-	}
-	~Online(){};
-	virtual const char * getType() const{ return "result"; }
-	virtual const char * getId() const{ return "sessionInit"; }
-	virtual const char * getTagName() const { return "iq"; }
-	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
-private:
-	ResourceContextRef rc;
-};
-ProcessResult Online::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-	rc->log->msg("Login ok");
-	JabberDataBlock getRoster("iq");
-	getRoster.setAttribute("type","get");
-	getRoster.setAttribute("id","roster");
-
-	JabberDataBlock *qry =getRoster.addChild("query", NULL); 
-	qry->setAttribute("xmlns","jabber:iq:roster");
-
-	rc->jabberStream->sendStanza(getRoster);
-	return LAST_BLOCK_PROCESSED;
-}
-//////////////////////////////////////////////////////////////
 class Version : public JabberDataBlockListener {
 public:
 	Version(ResourceContextRef rc) {
@@ -587,6 +561,77 @@ ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceC
 	rc->jabberStream->sendStanza(reply);
 	return BLOCK_PROCESSED;
 }
+
+class JabberStreamEvents : public JabberListener{
+public:
+    JabberStreamEvents(ResourceContextRef rc) {this->rc=rc;}
+
+    virtual bool connect();
+    virtual void beginConversation(JabberDataBlockRef streamHeader);
+    virtual void endConversation(const std::exception &ex);
+    virtual void loginSuccess();
+    virtual void loginFailed();
+
+private:
+    ResourceContextRef rc;
+
+};
+
+void JabberStreamEvents::beginConversation(JabberDataBlockRef streamHeader){
+    if (streamHeader->getAttribute("version")=="1.0") {
+        rc->jabberStanzaDispatcher->addListener(JabberDataBlockListenerRef(new SASLAuth(rc, streamHeader)));
+    } else {
+        //JabberDataBlockListenerRef(new NonSASLAuth(rc, streamHeader));
+    }
+}
+void JabberStreamEvents::endConversation(const std::exception &ex){
+    rc->log->msg(ex.what());
+    rc->log->msg("End Conversation");
+}
+
+void JabberStreamEvents::loginSuccess(){
+    rc->log->msg("Login ok");
+
+    rc->jabberStanzaDispatcher->addListener( JabberDataBlockListenerRef( new GetRoster(rc) ));
+    rc->jabberStanzaDispatcher->addListener( JabberDataBlockListenerRef( new Version(rc) ));
+    rc->jabberStanzaDispatcher->addListener( JabberDataBlockListenerRef( new MessageFwd(rc) ));
+
+    JabberDataBlock getRoster("iq");
+    getRoster.setAttribute("type","get");
+    getRoster.setAttribute("id","roster");
+
+    JabberDataBlock *qry =getRoster.addChild("query", NULL); 
+    qry->setAttribute("xmlns","jabber:iq:roster");
+
+    rc->jabberStream->sendStanza(getRoster);
+}
+
+void JabberStreamEvents::loginFailed(){
+    rc->log->msg("Login failed");
+    rc->jabberStream->sendXmppEndHeader();
+}
+
+bool JabberStreamEvents::connect(){
+    std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
+
+    rc->log->msg("Connect to ", host.c_str());
+    if (rc->account->useEncryption) 
+        rc->jabberStream->connection=ConnectionRef( new CeTLSSocket(host, rc->account->port));
+    else
+        rc->jabberStream->connection=ConnectionRef( new Socket(host, rc->account->port));
+
+    /*if (rc->jabberStream->connection==NULL) {
+        rc->log->msg("Failed to open connection");
+        return false;
+    }
+    BOOST_ASSERT(rc->jabberStream->connection);
+    */
+
+    rc->jabberStream->sendXmlVersion();
+    rc->jabberStream->sendXmppBeginHeader();
+
+    return true;
+}
 //////////////////////////////////////////////////////////////
 
 int initJabber()
@@ -598,52 +643,20 @@ int initJabber()
     //rc->account->hostNameIp="213.180.203.19";
     rc->account->password="l12sx95a";
 #else
-	rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
+	rc->account=JabberAccountRef(new JabberAccount("evgsxxxx@jabber.ru", "bombus-ng"));
 	//rc->account->hostNameIp="213.180.203.19";
 	rc->account->password=
 #include "password"
 	;
 #endif
-    //rc->account->useSASL=true;
+    rc->account->useSASL=true;
     //rc->account->useEncryption=true;
-	//rc->account->useCompression=true;
+	rc->account->useCompression=true;
 
-	std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
+    rc->jabberStanzaDispatcher=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 
-	rc->log->msg("Connect to ", host.c_str());
-	if (rc->account->useEncryption) 
-        rc->connection=ConnectionRef(CeTLSSocket::createTlsSocket(host, rc->account->port));
-    else
-        rc->connection=ConnectionRef(Socket::createSocket(host, rc->account->port));
+    rc->jabberStream=JabberStreamRef(new JabberStream(rc, JabberListenerRef(new JabberStreamEvents(rc))));
 
-	if (rc->connection==NULL) {
-		rc->log->msg("Failed to open connection");
-		return -1;
-	}
-	BOOST_ASSERT(rc->connection);
-
-	rc->jabberStream=JabberStreamRef(new JabberStream(rc));
-
-	JabberStanzaDispatcherRef disp= JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
-	rc->jabberStanzaDispatcher=disp;
-
-	if (rc->account->useSASL) {
-		rc->jabberStream->setJabberListener( JabberListenerRef(new SASLAuth( rc )));
-		disp->addListener( JabberDataBlockListenerRef( new SASLAuth(rc) ));
-	} else {
-		rc->jabberStream->setJabberListener( JabberListenerRef(new NonSASLAuth( rc )));
-	}
-
-
-	disp->addListener( JabberDataBlockListenerRef( new Online(rc) ));
-	disp->addListener( JabberDataBlockListenerRef( new GetRoster(rc) ));
-	disp->addListener( JabberDataBlockListenerRef( new Version(rc) ));
-	disp->addListener( JabberDataBlockListenerRef( new MessageFwd(rc) ));
-
-	disp=JabberStanzaDispatcherRef();
-
-	rc->jabberStream->sendXmlVersion();
-	rc->jabberStream->sendXmppBeginHeader();
 
     //jstream.sendStanza(test);
 	//printf("%s", test.toXML());

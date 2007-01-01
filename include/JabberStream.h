@@ -17,7 +17,7 @@ class JabberStream : public XMLEventListener{
 
 public:
 	JabberStream(void);
-	JabberStream(ResourceContextRef rc);
+	JabberStream(ResourceContextRef rc, JabberListenerRef listener);
 	~JabberStream(void);
 
 	void sendStanza(JabberDataBlockRef stanza);
@@ -26,22 +26,21 @@ public:
 	void sendXmppBeginHeader();
 	void sendXmppEndHeader(void);
 
-	void setJabberListener(JabberListenerRef listener) { jabberListener=listener; }
-
 	virtual void tagStart(const std::string & tagname, const StringMap &attr);
 	virtual void tagEnd(const std::string & tagname);
 	virtual void plainTextEncountered(const std::string & body);
 
 	XMLParserRef parser;
 
+    JabberListenerRef jabberListener;
+
+
+    ConnectionRef connection;
+
 private:
 	ResourceContextRef rc;
 
-	std::string streamId;
-
 	bool isRunning;
-
-	JabberListenerRef jabberListener;
 
 	std::stack<JabberDataBlockRef> stanzaStack;
 

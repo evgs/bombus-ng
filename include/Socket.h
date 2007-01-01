@@ -5,10 +5,7 @@
 class Socket : public Connection 
 {
 public:
-	static Socket * createSocket(const std::string & url, const int port);
-
-public:
-	Socket(void);
+	Socket(const std::string & url, const int port);
 	~Socket(void);
 
 	virtual int read(char * buf, int len);
@@ -20,7 +17,14 @@ public:
     SOCKET getSocket(){ return sock; }
 
 protected:
+    Socket(){};
+    std::string url;
     SOCKET sock;
+
+    static void initWinsocks();
+
+    void throwSocketError();
+
 private:
 	long bytesSent;
 	long bytesRecvd;

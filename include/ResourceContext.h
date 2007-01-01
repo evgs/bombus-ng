@@ -19,7 +19,6 @@ class ResourceContext {
 public:
 	Log *log;
 	JabberAccountRef account;
-	ConnectionRef connection;
 	JabberStreamRef jabberStream;
 	JabberStanzaDispatcherRef jabberStanzaDispatcher;
     RosterRef roster;

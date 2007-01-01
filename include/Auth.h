@@ -4,29 +4,20 @@
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
 
-class NonSASLAuth : public JabberListener {
+class NonSASLAuth {
 public:
-	NonSASLAuth(ResourceContextRef rc) {
-		this->rc=rc;
-	}
+	NonSASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader); 
 	~NonSASLAuth(){};
-	virtual void beginConversation(const std::string & streamId);
-	virtual void endConversation();
-
 
 private:
 	ResourceContextRef rc;
 };
 
 
-class SASLAuth : public JabberListener, public JabberDataBlockListener {
+class SASLAuth : public JabberDataBlockListener {
 public:
-	SASLAuth(ResourceContextRef rc) {
-		this->rc=rc;
-	}
+	SASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader);
 	~SASLAuth(){};
-	virtual void beginConversation(const std::string & streamId);
-	virtual void endConversation();
 
 	virtual const char * getType() const{ return NULL; }
 	virtual const char * getId() const{ return NULL; }

@@ -5,6 +5,8 @@
 //#include <boost/thread.hpp>
 //#include <boost/bind.hpp>
 #include <stack>
+#include <exception>
+
 #include <utf8.hpp>
 #include <windows.h>
 
@@ -15,41 +17,53 @@ void JabberStream::run(JabberStream * _stream){
 
 	_stream->isRunning=true;
 
-	_stream->parser->bindStream( _stream->rc->connection );
 	try {
+        if (_stream->connection==NULL) {
+            _stream->jabberListener->connect();
+        }
+        _stream->parser->bindStream( _stream->connection );
 		_stream->parser-> parse();
 	} catch (std::exception ex) {
-		_stream->jabberListener->endConversation();
+        _stream->jabberListener->endConversation(ex);
 	}
-
+    _stream->rc->log->msg("Reader thread stopped");
+    _stream->rc->jabberStream=JabberStreamRef();
+    _stream->isRunning=false;
 }
 
 void JabberStream::tagStart(const std::string & tagname, const StringMap &attr) {
 
 	if (tagname=="xml") return;
 	
+    JabberDataBlockRef blk=JabberDataBlockRef( new JabberDataBlock( tagname, attr ) );
+
 	if (tagname=="stream:stream") {
-		//non-sasl auth
-		StringMap::const_iterator i=attr.find("id");
-		streamId=i->second;
 
 		//begin conversation
 		JabberListener * listener=jabberListener.get();
-		if (listener!=NULL) listener->beginConversation( streamId );
+		if (listener!=NULL) listener->beginConversation( blk );
 		
 		return;
 	}
 
 	// stanzas
-	stanzaStack.push( JabberDataBlockRef( new JabberDataBlock( tagname, attr ) ));
+	stanzaStack.push( blk);
 }
 
 void JabberStream::tagEnd(const std::string & tagname) {
-	if (stanzaStack.empty()) return;
+    if (stanzaStack.empty()) {
+        if (tagname=="stream:stream") throw std::exception("XML: Close");
+        return;
+    }
 	JabberDataBlockRef element=stanzaStack.top();
 	stanzaStack.pop();
 	if (stanzaStack.empty()) {
 		//todo: block arrived
+        
+        if (element->getTagName()!=tagname) {
+            throw std::exception("XML: Tag mismatch");
+        }
+
 		JabberStanzaDispatcher * dispatcher= rc->jabberStanzaDispatcher.get();
 		if (dispatcher!=NULL) dispatcher->dispatchDataBlock(element);
 
@@ -72,11 +86,12 @@ DWORD WINAPI jabberStreamThread(LPVOID param) {
 	return 1;
 }
 
-JabberStream::JabberStream(ResourceContextRef rc){
+JabberStream::JabberStream(ResourceContextRef rc, JabberListenerRef listener){
 
 	parser=XMLParserRef(new XMLParser(this));
 
 	this->rc=rc;
+    this->jabberListener=listener;
 
 	CreateThread(NULL, 0, jabberStreamThread, this, 0, NULL);
 	//boost::thread test( boost::bind(run, this) );
@@ -84,19 +99,19 @@ JabberStream::JabberStream(ResourceContextRef rc){
 
 JabberStream::~JabberStream(void){
 
-	printf("JabberStream destructor called \n");
+	rc->log->msg("JabberStream destructor called");
 }
 
 void JabberStream::sendStanza(JabberDataBlockRef stanza){
-	rc->connection->write( stanza->toXML() );
+	connection->write( stanza->toXML() );
 }
 
 void JabberStream::sendStanza(JabberDataBlock &stanza){
-	rc->connection->write( stanza.toXML() );
+	connection->write( stanza.toXML() );
 }
 
 void JabberStream::sendXmlVersion(void){
-	rc->connection->write("<?xml version='1.0'?>", 21);
+	connection->write("<?xml version='1.0'?>", 21);
 }
 
 void JabberStream::sendXmppBeginHeader(){
@@ -110,9 +125,9 @@ void JabberStream::sendXmppBeginHeader(){
 	if (rc->account->useSASL) header+=" version='1.0'";
 	header+=" >";
 
-	rc->connection->write(header);
+	connection->write(header);
 }
 
 void JabberStream::sendXmppEndHeader(void){
-	rc->connection->write(std::string("</stream:stream>"));
+	connection->write(std::string("</stream:stream>"));
 }

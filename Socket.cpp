@@ -12,9 +12,6 @@
 
 static int wsCount=0;
 
-Socket::Socket(void){	
-	bytesSent=bytesRecvd=0;
-}
 
 Socket::~Socket(void){
 	closesocket(sock);
@@ -22,44 +19,53 @@ Socket::~Socket(void){
 	if (wsCount==0) WSACleanup();
 }
 
+void Socket::initWinsocks(){
+    /* INIT WINSOCKS */
+    if (wsCount!=0) return; 
 
-Socket * Socket::createSocket(const std::string &url, const int port) {
-	/* INIT WINSOCKS */
-	if (wsCount==0) {
-		WSADATA wsaData;
-		
-		int err=WSAStartup( 0x202, &wsaData );
+    WSADATA wsaData;
 
-		BOOST_ASSERT(  err==0  ); 
+    int err=WSAStartup( 0x202, &wsaData );
 
-		if (wsaData.wVersion!=0x202) {
-			WSACleanup();
-			BOOST_ASSERT(0);
-		}
+    BOOST_ASSERT(  err==0  ); 
 
-		wsCount++;
-	}
+    if (wsaData.wVersion!=0x202) {
+        WSACleanup();
+        BOOST_ASSERT(0);
+    }
 
-	SOCKET s=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (s==INVALID_SOCKET) return NULL;
+    wsCount++;
+}
+
+Socket::Socket(const std::string &url, const int port) {
+    bytesSent=bytesRecvd=0;
+    initWinsocks();
+    this->url=url;
+
+	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (sock==INVALID_SOCKET) throwSocketError();
 
 	struct hostent FAR* host=gethostbyname(url.c_str());
 
-	if (host==NULL) return NULL;
+	if (host==NULL) throwSocketError();
 
 	struct sockaddr_in name;
 	name.sin_family=AF_INET;
 	name.sin_addr.S_un.S_addr=*((unsigned long *)host->h_addr_list[0]);
 	name.sin_port= htons(port); // internet byte order
 
-	int result=connect(s, (sockaddr*)(&name), sizeof(name));
+	int result=connect(sock, (sockaddr*)(&name), sizeof(name));
 
-	if (result==SOCKET_ERROR) return NULL;
+	if (result==SOCKET_ERROR) throwSocketError();
+}
 
-	Socket *res=new Socket();
-	res->sock=s;
-
-	return res;
+void Socket::throwSocketError() {
+    std::string err="Socket error ";
+    err+=WSAGetLastError();
+    err+='(';
+    err+=url;
+    err+=')';
+    throw std::exception(err.c_str());
 }
 
 int Socket::read(char * buf, int len) {

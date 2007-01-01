@@ -15,7 +15,7 @@
 typedef boost::shared_ptr<MD5> MD5Ref;
 typedef boost::shared_ptr<SHA1> SHA1Ref;
 
-void NonSASLAuth::beginConversation(const std::string & streamId) {
+NonSASLAuth::NonSASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader) {
 	rc->log->msg("Non-SASL Login: sending password");
 
 	JabberDataBlockRef login=JabberDataBlockRef(new JabberDataBlock("iq"));
@@ -28,7 +28,7 @@ void NonSASLAuth::beginConversation(const std::string & streamId) {
 
     SHA1Ref digest=SHA1Ref(new SHA1());
     digest->init();
-    digest->updateASCII(streamId);
+    digest->updateASCII(streamHeader->getAttribute("id"));
     digest->updateASCII(rc->account->password);
     digest->finish();
 
@@ -41,20 +41,14 @@ void NonSASLAuth::beginConversation(const std::string & streamId) {
 
 	rc->jabberStream->sendStanza(login);
 }
-void NonSASLAuth::endConversation(){
-	rc->log->msg("end conversation");
-};
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void SASLAuth::beginConversation(const std::string &streamId){
+SASLAuth::SASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader){
+    this->rc=rc;
 	rc->log->msg("SASL Login: <stream:stream>");
 }
-
-void SASLAuth::endConversation(){
-	rc->log->msg("end conversation");
-};
 
 const std::string responseMd5Digest( const std::string &user, const std::string &pass, const std::string &realm, const std::string &digestUri, const std::string &nonce, const std::string cnonce);
 
@@ -173,7 +167,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
         //starting tls layer socket
         /*ConnectionRef tlssocket=ConnectionRef(new TLSSocket(rc->connection));
         rc->connection=tlssocket;**/
-        ((CeTLSSocket *)(rc->connection.get()))->switchTls();
+        ((CeTLSSocket *)(rc->jabberStream->connection.get()))->switchTls();
         //rc->jabberStream->parser->bindStream(tlssocket);
         rc->jabberStream->sendXmppBeginHeader();
 #endif
@@ -184,8 +178,8 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 
 #ifndef NOZLIB
 		// switching to compressed stream
-		ConnectionRef zsocket=ConnectionRef(new CompressedSocket(rc->connection));
-		rc->connection=zsocket;
+		ConnectionRef zsocket=ConnectionRef(new CompressedSocket(rc->jabberStream->connection));
+		rc->jabberStream->connection=zsocket;
 		rc->jabberStream->parser->bindStream( zsocket );
 		rc->jabberStream->sendXmppBeginHeader();
 #endif
@@ -200,7 +194,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
     }
 
     if (block->getTagName()=="failure") { 
-        //rc->connection->
+        rc->jabberStream->jabberListener->loginFailed();
         return LAST_BLOCK_PROCESSED;
     }
 
@@ -215,11 +209,13 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 			session.addChild("session", NULL)
 				->setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-session");
 			rc->jabberStream->sendStanza(session);
-			return LAST_BLOCK_PROCESSED;
+			return BLOCK_PROCESSED;
 		}
-		/*if (block->getAttribute("id")=="sessionInit") {
-			//TODO: session established, now sending presence
-		}*/
+		if (block->getAttribute("id")=="sessionInit") {
+            //session established
+            rc->jabberStream->jabberListener->loginSuccess();
+            return LAST_BLOCK_PROCESSED;
+		}
 	}
 
 	return BLOCK_REJECTED;

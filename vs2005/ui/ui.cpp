@@ -20,6 +20,8 @@
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
 
+#include "Roster.h"
+
 #include "DlgAccount.h"
 
 #include "Auth.h"
@@ -498,6 +500,10 @@ private:
 };
 ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 	rc->log->msg("Roster arrived");
+
+    rc->roster->blockArrived(block, rc); // forwarding to dispatch roster stanza
+    rc->jabberStanzaDispatcher->addListener(rc->roster);
+
 	JabberDataBlock presence("presence");
 	presence.addChild("status", 
 		"please, don't send any messages here! \n"
@@ -643,8 +649,9 @@ int initJabber()
     //rc->account->hostNameIp="213.180.203.19";
     rc->account->password="l12sx95a";
 #else
-	rc->account=JabberAccountRef(new JabberAccount("evgsxxxx@jabber.ru", "bombus-ng"));
+	rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
 	//rc->account->hostNameIp="213.180.203.19";
+    //rc->account->port=5222;
 	rc->account->password=
 #include "password"
 	;
@@ -654,6 +661,9 @@ int initJabber()
 	rc->account->useCompression=true;
 
     rc->jabberStanzaDispatcher=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
+
+    //TODO: roster caching
+    rc->roster=RosterRef(new Roster());
 
     rc->jabberStream=JabberStreamRef(new JabberStream(rc, JabberListenerRef(new JabberStreamEvents(rc))));
 

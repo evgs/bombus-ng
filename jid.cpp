@@ -49,7 +49,7 @@ void Jid::setBareJid(const std::string &bareJid){
 
 void Jid::updateJid(void){
 	bareJid=userName+'@'+server;
-	if (resource.empty()) bareJid=jid; 
+	if (resource.empty()) jid=bareJid; 
 	else jid=bareJid+'/'+resource;
 };
 

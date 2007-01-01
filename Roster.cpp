@@ -39,7 +39,6 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
             subscr+="ask";
         }
 
-        rc->log->msg(jid);
         //todo: разное поведение для roster request и roster push
         ContactRef contact;
         if (rosterPush) {

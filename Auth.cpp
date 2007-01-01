@@ -170,6 +170,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
         ((CeTLSSocket *)(rc->jabberStream->connection.get()))->switchTls();
         //rc->jabberStream->parser->bindStream(tlssocket);
         rc->jabberStream->sendXmppBeginHeader();
+        return LAST_BLOCK_PROCESSED;
 #endif
     }
 
@@ -183,7 +184,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 		rc->jabberStream->parser->bindStream( zsocket );
 		rc->jabberStream->sendXmppBeginHeader();
 #endif
-		return BLOCK_PROCESSED;
+		return LAST_BLOCK_PROCESSED;
 	}
 
 
@@ -271,7 +272,7 @@ const std::string responseMd5Digest(
         "nonce=\""+nonce+"\",nc=00000001,cnonce=\""+cnonce+"\"," +
         "qop=auth,digest-uri=\""+digestUri+"\"," +
         "response=\""+hResp->getDigestHex()+"\",charset=utf-8";
-    std::string resp = base64::base64Encode(out);
+    std::string resp = base64::base64Encode(out);   
     //System.out.println(decodeBase64(resp));
 
     return resp;

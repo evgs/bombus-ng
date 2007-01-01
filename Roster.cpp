@@ -26,7 +26,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
     JabberDataBlockRef query=block->getChildByName("query");
 
     if (query.get()==NULL) return BLOCK_REJECTED;
-    if (!query->hasAttribute("jabber:iq:roster")) return BLOCK_REJECTED;
+    if (query->getAttribute("xmlns")!="jabber:iq:roster") return BLOCK_REJECTED;
 
     JabberDataBlockIterator i=query->getChilds()->begin();
     while (i!=query->getChilds()->end()) {
@@ -39,8 +39,14 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
             subscr+="ask";
         }
 
+        rc->log->msg(jid);
         //todo: разное поведение для roster request и roster push
-        ContactRef contact=ContactRef(new Contact(jid, "", name));
+        ContactRef contact;
+        if (rosterPush) {
+            contact=findContact(jid,true);
+        } 
+        if (contact==NULL) contact=ContactRef(new Contact(jid, "", name));
+
         contact->subscr=subscr;
         addContact(contact);
     }

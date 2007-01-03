@@ -7,7 +7,7 @@ public:
     CeTLSSocket(const std::string & url, const int port);
 
 public:
-    bool switchTls();
+    bool startTls();
 
 protected:
     CeTLSSocket(){};

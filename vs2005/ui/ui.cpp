@@ -528,6 +528,10 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 		"please, don't send any messages here! \n"
 		"they will be dropped because it is debug version" );
 	rc->jabberStream->sendStanza(presence);
+
+    /*presence.setAttribute("to","devel@conference.jabber.ru/bng");
+    rc->jabberStream->sendStanza(presence);*/
+
 	return LAST_BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
@@ -640,8 +644,11 @@ bool JabberStreamEvents::connect(){
     std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 
     rc->log->msg("Connect to ", host.c_str());
-    if (rc->account->useEncryption) 
-        rc->jabberStream->connection=ConnectionRef( new CeTLSSocket(host, rc->account->port));
+    if (rc->account->useEncryption) {
+        ConnectionRef tlsCon=ConnectionRef( new CeTLSSocket(host, rc->account->port));
+        rc->jabberStream->connection=tlsCon;
+        if (rc->account->port==5223) ((CeTLSSocket)(*tlsCon)).startTls();
+    }
     else
         rc->jabberStream->connection=ConnectionRef( new Socket(host, rc->account->port));
 

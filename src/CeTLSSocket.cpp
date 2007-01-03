@@ -58,7 +58,7 @@ CeTLSSocket::CeTLSSocket(const std::string & url, const int port){
 
 };
 
-bool CeTLSSocket::switchTls(){
+bool CeTLSSocket::startTls(){
     int ioctlresult=WSAIoctl(sock, SO_SSL_PERFORM_HANDSHAKE, (LPVOID)url.c_str(), url.length(), 0, 0, 0, 0, 0);
     return true;
 };

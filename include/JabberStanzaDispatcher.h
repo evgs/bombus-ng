@@ -5,6 +5,8 @@
 #include "JabberDataBlock.h"
 #include "JabberDataBlockListener.h"
 
+typedef std::list<JabberDataBlockListenerRef> JabberDataBlockListenersList;
+
 class JabberStanzaDispatcher {
 public:
 	JabberStanzaDispatcher(ResourceContextRef resourceContext);
@@ -16,7 +18,7 @@ public:
 	void removeListener(const std::string& id);
 
 private:
-	std::list<JabberDataBlockListenerRef> listeners;
+	JabberDataBlockListenersList listeners;
 	ResourceContextRef rc;
 };
 

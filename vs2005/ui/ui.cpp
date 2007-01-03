@@ -218,8 +218,8 @@ HWND WINAPI DoCreateListControl(HWND hwndParent) {
 		        0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
 		        hwndParent, NULL, g_hInst, NULL); 
 	
-	ListBox_AddString(hWndList, _T("STR1"));
-	ListBox_AddString(hWndList, _T("STR2"));
+	//ListBox_AddString(hWndList, _T("STR1"));
+	//ListBox_AddString(hWndList, _T("STR2"));
 	ListBox_SetTopIndex(hWndList, 0);
 
 	int count=ListBox_GetCount(hWndList);
@@ -235,6 +235,12 @@ HWND WINAPI DoCreateListControl(HWND hwndParent) {
 //  WM_DESTROY	- post a quit message and return
 //
 //
+
+// tab variables here
+int tabHeight=16;
+int editHeight=64;
+
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int wmId, wmEvent;
@@ -274,16 +280,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					listWnd=logWnd;
 					//SetWindowLong(rosterWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
 					//SetWindowLong(logWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
-					SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-					SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-
+					//SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
+					//SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
+                    ShowWindow(rosterWnd, SW_HIDE);
+                    ShowWindow(logWnd, SW_SHOW);
+                    ShowWindow(editWnd, SW_SHOW);
 					break;
 				case IDM_WINDOWS_ROSTER:
 					listWnd=rosterWnd;
 					//SetWindowLong(logWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
 					//SetWindowLong(rosterWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
-					SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-					SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
+					//SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
+					//SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
+                    ShowWindow(rosterWnd, SW_SHOW);
+                    ShowWindow(logWnd, SW_HIDE);
+                    ShowWindow(editWnd, SW_HIDE);
 					break;
 
                 default:
@@ -318,13 +329,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             memset(&s_sai, 0, sizeof (s_sai));
             s_sai.cbSize = sizeof (s_sai);
             break;
-        /*case WM_PAINT:
+        case WM_PAINT:
             hdc = BeginPaint(hWnd, &ps);
+
+            {
+
+                RECT rc = {0, 0, 100, 100};
+
+                DrawText(hdc, TEXT("This is the default system font."), -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
+                DrawText(hdc, TEXT("This is the default system font."), -1, &rc, DT_LEFT | DT_TOP);
+            }
             
             // TODO: Add any drawing code here...
             
             EndPaint(hWnd, &ps);
-            break;*/
+            break;
         case WM_DESTROY:
             CommandBar_Destroy(g_hWndMenuBar);
             PostQuitMessage(0);
@@ -336,7 +355,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				RECT rc; 
 				
 				int height=GET_Y_LPARAM(lParam);
-				int ySplit=height-64;
+				int ySplit=height-editHeight;
 				// Calculate the display rectangle, assuming the 
 				// tab control is the size of the client area. 
 				SetRect(&rc, 0, 0, 
@@ -351,12 +370,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					); */
 
 
-				DeferWindowPos(hdwp, listWnd, HWND_TOP, 0, 0, 
-					GET_X_LPARAM(lParam), ySplit, 
+				DeferWindowPos(hdwp, listWnd, HWND_TOP, 0, tabHeight, 
+					GET_X_LPARAM(lParam), ySplit-tabHeight, 
 					SWP_NOZORDER 
 					);
-				DeferWindowPos(hdwp, rosterWnd, HWND_TOP, 0, 0, 
-					GET_X_LPARAM(lParam), ySplit, 
+				DeferWindowPos(hdwp, rosterWnd, HWND_TOP, 0, tabHeight, 
+					GET_X_LPARAM(lParam), height-tabHeight, 
 					SWP_NOZORDER 
 					);
 
@@ -537,7 +556,7 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 	JabberDataBlock * qry=reply.addChild("query",NULL);
 	qry->setAttribute("xmlns","jabber:iq:version");
 	qry->addChild("name","Bombus-ng");
-	qry->addChild("version","0.0.1-devel");
+	qry->addChild("version","0.0.2-devel");
 	qry->addChild("os","Windows Mobile 2003");
 
 	rc->jabberStream->sendStanza(reply);
@@ -664,6 +683,7 @@ int initJabber()
 
     //TODO: roster caching
     rc->roster=RosterRef(new Roster());
+    rc->roster->bindWindow(rosterWnd);
 
     rc->jabberStream=JabberStreamRef(new JabberStream(rc, JabberListenerRef(new JabberStreamEvents(rc))));
 

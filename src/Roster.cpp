@@ -4,9 +4,14 @@
 #include "JabberDataBlockListener.h"
 #include "Roster.h"
 
+#include <commctrl.h>
+#include <windowsx.h>
+
+#include <utf8.hpp>
+
 
 Roster::Roster(){
-
+    rosterWnd=NULL;
 }
 
 void Roster::addContact(ContactRef contact) {
@@ -28,7 +33,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
     if (query.get()==NULL) return BLOCK_REJECTED;
     if (query->getAttribute("xmlns")!="jabber:iq:roster") return BLOCK_REJECTED;
 
-    JabberDataBlockIterator i=query->getChilds()->begin();
+    JabberDataBlockRefList::iterator i=query->getChilds()->begin();
     while (i!=query->getChilds()->end()) {
         JabberDataBlockRef item=*(i++);
         std::string jid=item->getAttribute("jid");
@@ -44,7 +49,11 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         if (rosterPush) {
             contact=findContact(jid,true);
         } 
-        if (contact==NULL) contact=ContactRef(new Contact(jid, "", name));
+        if (contact==NULL) { 
+            contact=ContactRef(new Contact(jid, "", name));
+            std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
+            ListBox_AddString(rosterWnd, rjid.c_str());
+        }
 
         contact->subscr=subscr;
         addContact(contact);

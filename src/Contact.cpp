@@ -8,4 +8,14 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     this->rosterJid=jid;
     this->nickname="";
     this->status=PRESENCE_OFFLINE;
+
+    messageList=MessageListRef(new MessageList());
+}
+bool Contact::hasUnreadMsgs() {
+    for ( MessageList::const_iterator i=messageList->begin();  
+          i!=messageList->end();
+          i++ ) {
+        if (i->get()->unread) return true;
+    }
+    return false;
 }

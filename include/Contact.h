@@ -2,6 +2,9 @@
 
 #include <string>
 #include <boost/smart_ptr.hpp>
+#include <list>
+
+#include "Message.h"
 
 class Jid;
 
@@ -20,7 +23,6 @@ enum Status {
     PRESENCE_AUTH=-1
 };
 
-
 class Contact {
 public:
     Contact(const std::string &jid, const std::string &resource, const std::string &nickname);
@@ -31,6 +33,10 @@ public:
     std::string subscr;
 
     Status status;
+
+    MessageListRef messageList;
+
+    bool hasUnreadMsgs();
     
 };
 

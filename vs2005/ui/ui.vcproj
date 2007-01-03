@@ -372,6 +372,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\Message.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\crypto\MessageDigest.h"
 				>
 			</File>

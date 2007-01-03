@@ -9,7 +9,7 @@
 class JabberDataBlock;
 typedef boost::shared_ptr<JabberDataBlock> JabberDataBlockRef;
 typedef std::list<JabberDataBlockRef> JabberDataBlockRefList;
-typedef std::list<JabberDataBlockRef>::iterator JabberDataBlockIterator;
+//typedef std::list<JabberDataBlockRef>::iterator JabberDataBlockIterator;
 
 class JabberDataBlock {
 public:

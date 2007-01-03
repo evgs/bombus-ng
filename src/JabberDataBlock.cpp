@@ -55,14 +55,14 @@ JabberDataBlock * JabberDataBlock::addChild(const char *_tagName, const char *_t
 
 
 JabberDataBlockRef JabberDataBlock::getChildByName(const char * tagName){
-	for (JabberDataBlockIterator c=childs.begin(); c!=childs.end(); c++) {
+    for (JabberDataBlockRefList::const_iterator c=childs.begin(); c!=childs.end(); c++) {
 		if ( (*c)->tagName==tagName) return *c;
 	}
 	return JabberDataBlockRef();
 }
 
 bool JabberDataBlock::hasChildByValue(const char * text){
-	for (JabberDataBlockIterator c=childs.begin(); c!=childs.end(); c++) {
+	for (JabberDataBlockRefList::const_iterator c=childs.begin(); c!=childs.end(); c++) {
 		if ( (*c)->text==text) return true;
 	}
 	return false;
@@ -91,7 +91,7 @@ StringRef JabberDataBlock::toXML(){
 
 	result->append(">");
 
-	for (JabberDataBlockIterator c=childs.begin(); c!=childs.end(); c++) {
+    for (JabberDataBlockRefList::const_iterator c=childs.begin(); c!=childs.end(); c++) {
 		result->append( *((*c)->toXML()) );
 	}
 

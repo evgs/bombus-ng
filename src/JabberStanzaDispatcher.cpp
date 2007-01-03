@@ -15,7 +15,7 @@ void JabberStanzaDispatcher::dispatchDataBlock(JabberDataBlockRef block){
 	const std::string & blockTagName=block->getTagName();
 
 
-	for (std::list <JabberDataBlockListenerRef>::iterator i = listeners.begin();
+    for (JabberDataBlockListenersList::iterator i = listeners.begin();
 		 i!=listeners.end();
 		 i++) 
 	{
@@ -43,7 +43,7 @@ void JabberStanzaDispatcher::addListener(JabberDataBlockListenerRef listener){
 }
 
 void JabberStanzaDispatcher::removeListener(const std::string& byId){
-	for (std::list <JabberDataBlockListenerRef>::iterator i = listeners.begin();
+	for (JabberDataBlockListenersList::iterator i = listeners.begin();
 		 i!=listeners.end();
 		 i++) 
 	{

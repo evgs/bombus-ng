@@ -10,6 +10,7 @@ JabberAccount::JabberAccount(){
 	plainTextPassword=false;
 	useSASL=false;
 	useEncryption=false;
+    legacySSL=false;
 	useCompression=false;
 	useProxy=false;
 	proxy="<none>";
@@ -23,7 +24,8 @@ JabberAccount::JabberAccount(const std::string &bareJid, const std::string &reso
 	plainTextPassword=false;
 	useSASL=false;
 	useEncryption=false;
-	useCompression=false;
+	legacySSL=false;
+    useCompression=false;
 	useProxy=false;
 	setBareJid(bareJid);
 	setResource(resource);

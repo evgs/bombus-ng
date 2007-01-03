@@ -167,7 +167,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
         //starting tls layer socket
         /*ConnectionRef tlssocket=ConnectionRef(new TLSSocket(rc->connection));
         rc->connection=tlssocket;**/
-        ((CeTLSSocket *)(rc->jabberStream->connection.get()))->switchTls();
+        ((CeTLSSocket *)(rc->jabberStream->connection.get()))->startTls();
         //rc->jabberStream->parser->bindStream(tlssocket);
         rc->jabberStream->sendXmppBeginHeader();
         return LAST_BLOCK_PROCESSED;

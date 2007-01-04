@@ -102,7 +102,10 @@ void XMLParser::parse(){
 			if (!hasMoreData) break;
 		}
 		if (startTag) { eventListener->tagStart(tagName, attributes);	}
-		if (emptyTag || !startTag) { eventListener->tagEnd(tagName); }
+		if (emptyTag || !startTag) { 
+            bool lastTag=eventListener->tagEnd(tagName); 
+            if (lastTag) return; // normal end 
+        }
 	}
 }
 

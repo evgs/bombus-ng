@@ -201,8 +201,12 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 
 	if (block->getTagName()=="iq") {
 		if (block->getAttribute("id")=="bind") {
-			// TODO: get assigned jid/resource
-			rc->log->msg("Resource:","<dummy>");
+			//get assigned jid/resource
+            JabberDataBlockRef bind=block->getChildByName("bind");
+            JabberDataBlockRef resource=bind->getChildByName("jid");
+            std::string res=resource->getText();
+
+			rc->log->msg("Resource: ", res.c_str());
 			//openung session
 			JabberDataBlock session("iq");
 			session.setAttribute("type", "set");

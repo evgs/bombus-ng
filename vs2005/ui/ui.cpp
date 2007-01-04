@@ -23,6 +23,7 @@
 #include "Roster.h"
 
 #include "DlgAccount.h"
+#include "ListView.h"
 
 #include "Auth.h"
 
@@ -34,8 +35,9 @@ HWND				g_hWndMenuBar;		// menu bar handle
 HWND		listWnd;
 HWND		editWnd;
 HWND		rosterWnd;
-HWND		logWnd;
 HWND		mainWnd;
+
+ListViewRef logWnd;
 
 ResourceContextRef rc;
 
@@ -137,10 +139,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         return 0;
     } 
 
-    if (!MyRegisterClass(hInstance, szWindowClass))
-    {
-    	return FALSE;
-    }
+    if (!MyRegisterClass(hInstance, szWindowClass)) 	return FALSE;
 
     mainWnd=hWnd = CreateWindow(szWindowClass, szTitle, WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
@@ -277,23 +276,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					break;
 
 				case IDM_WINDOWS_LOG:
-					listWnd=logWnd;
+					//listWnd=logWnd;
 					//SetWindowLong(rosterWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
 					//SetWindowLong(logWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
 					//SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
 					//SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
                     ShowWindow(rosterWnd, SW_HIDE);
-                    ShowWindow(logWnd, SW_SHOW);
+                    logWnd->showWindow(true);
                     ShowWindow(editWnd, SW_SHOW);
 					break;
 				case IDM_WINDOWS_ROSTER:
-					listWnd=rosterWnd;
+					//listWnd=rosterWnd;
 					//SetWindowLong(logWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
 					//SetWindowLong(rosterWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
 					//SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
 					//SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
                     ShowWindow(rosterWnd, SW_SHOW);
-                    ShowWindow(logWnd, SW_HIDE);
+                    logWnd->showWindow(false);
                     ShowWindow(editWnd, SW_HIDE);
 					break;
 
@@ -311,8 +310,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.hInstRes   = g_hInst;
 
 			editWnd=DoCreateEditControl(hWnd);
-			logWnd=DoCreateListControl(hWnd);
-			listWnd=logWnd;
+			logWnd=ListViewRef(new ListView(hWnd));
+			//listWnd=logWnd;
 			rosterWnd=DoCreateListControl(hWnd);
 			//dropdownWnd=DoCreateComboControl(hWnd);
 
@@ -370,7 +369,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					); */
 
 
-				DeferWindowPos(hdwp, listWnd, HWND_TOP, 0, tabHeight, 
+				DeferWindowPos(hdwp, logWnd->getHWnd(), HWND_TOP, 0, tabHeight, 
 					GET_X_LPARAM(lParam), ySplit-tabHeight, 
 					SWP_NOZORDER 
 					);
@@ -490,15 +489,15 @@ const wchar_t * charToWchar(const char * src, const char *src2 = NULL) {
 
 void Log::msg(const std::string &message){
 
-	ListBox_AddString( logWnd, charToWchar(message.c_str()));
+	ListBox_AddString( logWnd->getListBoxHWnd(), charToWchar(message.c_str()));
 }
 
 void Log::msg(const char * message){
-	ListBox_AddString( logWnd, charToWchar(message));
+	ListBox_AddString( logWnd->getListBoxHWnd(), charToWchar(message));
 }
 
 void Log::msg(const char * message, const char *message2){
-	ListBox_AddString( logWnd, charToWchar(message, message2));
+	ListBox_AddString( logWnd->getListBoxHWnd(), charToWchar(message, message2));
 }
 
 
@@ -597,7 +596,7 @@ public:
 
     virtual bool connect();
     virtual void beginConversation(JabberDataBlockRef streamHeader);
-    virtual void endConversation(const std::exception &ex);
+    virtual void endConversation(const std::exception *ex);
     virtual void loginSuccess();
     virtual void loginFailed();
 
@@ -613,8 +612,8 @@ void JabberStreamEvents::beginConversation(JabberDataBlockRef streamHeader){
         //JabberDataBlockListenerRef(new NonSASLAuth(rc, streamHeader));
     }
 }
-void JabberStreamEvents::endConversation(const std::exception &ex){
-    rc->log->msg(ex.what());
+void JabberStreamEvents::endConversation(const std::exception *ex){
+    if (ex!=NULL)  rc->log->msg(ex->what());
     rc->log->msg("End Conversation");
 }
 
@@ -647,7 +646,7 @@ bool JabberStreamEvents::connect(){
     if (rc->account->useEncryption) {
         ConnectionRef tlsCon=ConnectionRef( new CeTLSSocket(host, rc->account->port));
         rc->jabberStream->connection=tlsCon;
-        if (rc->account->port==5223) ((CeTLSSocket)(*tlsCon)).startTls();
+        if (rc->account->legacySSL) ((CeTLSSocket*)(tlsCon.get()))->startTls();
     }
     else
         rc->jabberStream->connection=ConnectionRef( new Socket(host, rc->account->port));

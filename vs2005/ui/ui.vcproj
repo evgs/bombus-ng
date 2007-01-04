@@ -235,6 +235,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\ListView.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\crypto\MD5.cpp"
 				>
 			</File>
@@ -362,6 +366,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\jid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\ListView.h"
 				>
 			</File>
 			<File

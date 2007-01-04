@@ -27,7 +27,7 @@ public:
 	void sendXmppEndHeader(void);
 
 	virtual void tagStart(const std::string & tagname, const StringMap &attr);
-	virtual void tagEnd(const std::string & tagname);
+	virtual bool tagEnd(const std::string & tagname);
 	virtual void plainTextEncountered(const std::string & body);
 
 	XMLParserRef parser;

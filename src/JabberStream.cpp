@@ -23,8 +23,9 @@ void JabberStream::run(JabberStream * _stream){
         }
         _stream->parser->bindStream( _stream->connection );
 		_stream->parser-> parse();
+        _stream->jabberListener->endConversation(NULL);
 	} catch (std::exception ex) {
-        _stream->jabberListener->endConversation(ex);
+        _stream->jabberListener->endConversation(&ex);
 	}
     _stream->rc->log->msg("Reader thread stopped");
     _stream->rc->jabberStream=JabberStreamRef();
@@ -50,10 +51,9 @@ void JabberStream::tagStart(const std::string & tagname, const StringMap &attr) 
 	stanzaStack.push( blk);
 }
 
-void JabberStream::tagEnd(const std::string & tagname) {
+bool JabberStream::tagEnd(const std::string & tagname) {
     if (stanzaStack.empty()) {
-        if (tagname=="stream:stream") throw std::exception("XML: Close");
-        return;
+        return (tagname=="stream:stream");
     }
 	JabberDataBlockRef element=stanzaStack.top();
 	stanzaStack.pop();
@@ -71,6 +71,7 @@ void JabberStream::tagEnd(const std::string & tagname) {
 	} else {
 		stanzaStack.top()->addChild(element);
 	}
+    return false;
 }
 
 void JabberStream::plainTextEncountered(const std::string & body){

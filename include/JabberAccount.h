@@ -36,6 +36,7 @@ public:
 	bool plainTextPassword;
 	bool useSASL;
 	bool useEncryption;
+    bool legacySSL;
 	bool useCompression;
 	bool useProxy;
 	std::string proxy;

@@ -8,9 +8,7 @@
 
 class Wnd {
 public:
-    virtual Wnd(HWND parent);
     virtual ~Wnd();
-    virtual static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
     HWND getHWnd() { return thisHWnd; }
 
@@ -19,9 +17,6 @@ public:
 protected:
     HWND parentHWnd;
     HWND thisHWnd;
-
-    static ATOM windowClass;
-    ATOM RegisterWindowClass();
 };
 
 typedef boost::shared_ptr<Wnd> WndRef;

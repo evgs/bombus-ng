@@ -291,6 +291,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Wnd.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\XMLParser.cpp"
 				>
 			</File>

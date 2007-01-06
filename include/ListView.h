@@ -7,7 +7,7 @@
 #include <string>
 #include <utf8.hpp>
 
-class ListView {
+class ListView : public Wnd{
 public:
     ListView(HWND parent, const std::string & title);
     virtual ~ListView();
@@ -15,8 +15,6 @@ public:
 
     HWND getHWnd() { return thisHWnd; }
     HWND getListBoxHWnd() {return listBoxHWnd; }
-
-    void showWindow(bool show);
 
 protected:
     HWND parentHWnd;

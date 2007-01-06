@@ -1,4 +1,4 @@
-#include "ListView.h"
+#include "TabCtrl.h"
 
 #include <commctrl.h>
 #include <windowsx.h>
@@ -6,11 +6,11 @@
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 
-ATOM ListView::RegisterWindowClass() {
+ATOM TabsCtrl::RegisterWindowClass() {
     WNDCLASS wc;
 
     wc.style         = CS_HREDRAW | CS_VREDRAW;
-    wc.lpfnWndProc   = ListView::WndProc;
+    wc.lpfnWndProc   = TabsCtrl::WndProc;
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = 0;
     wc.hInstance     = g_hInst;
@@ -18,25 +18,24 @@ ATOM ListView::RegisterWindowClass() {
     wc.hCursor       = 0;
     wc.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
     wc.lpszMenuName  = 0;
-    wc.lpszClassName = _T("BombusLV");
+    wc.lpszClassName = _T("BombusTC");
 
     return RegisterClass(&wc);
 }
 
-LRESULT CALLBACK ListView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) {
+LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) {
     PAINTSTRUCT ps;
     HDC hdc;
-    ListView *p=(ListView *) GetWindowLong(hWnd, GWL_USERDATA);
+    TabsCtrl *p=(TabsCtrl *) GetWindowLong(hWnd, GWL_USERDATA);
 
     switch (message) {
     case WM_CREATE:
         {
-            p=(ListView *) (((CREATESTRUCT *)lParam)->lpCreateParams);
+            p=(TabsCtrl *) (((CREATESTRUCT *)lParam)->lpCreateParams);
             SetWindowLong(hWnd, GWL_USERDATA, (LONG) p );
 
-            p->listBoxHWnd=CreateWindow(_T("LISTBOX"), NULL, 
-                WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL
-                | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT, 
+            p->tabScrollHWnd=CreateWindow(_T("SCROLLBAR"), NULL, 
+                /*SBS_TOPALIGN |*/ SBS_HORZ | WS_VISIBLE | WS_CHILD, 
                 0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
                 hWnd, NULL, g_hInst, NULL); 
             //dropdownWnd=DoCreateComboControl(hWnd);
@@ -52,9 +51,8 @@ LRESULT CALLBACK ListView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
             RECT rc = {0, 0, 100, 100};
 
-            LPCTSTR t=p->title.c_str();
-            DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
-            DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);
+            DrawText(hdc, TEXT("Here will be tabs"), -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
+            DrawText(hdc, TEXT("Here will be tabs"), -1, &rc, DT_LEFT | DT_TOP);
         }
 
         // TODO: Add any drawing code here...
@@ -82,7 +80,7 @@ LRESULT CALLBACK ListView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             ); */
 
 
-            DeferWindowPos(hdwp, p->getListBoxHWnd(), HWND_TOP, 0, tabHeight, 
+            DeferWindowPos(hdwp, p->tabScrollHWnd, HWND_TOP, 0, tabHeight, 
                 GET_X_LPARAM(lParam), height-tabHeight, 
                 SWP_NOZORDER 
                 );
@@ -116,26 +114,23 @@ LRESULT CALLBACK ListView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     return 0;
 }
 
-ListView::ListView( HWND parent, const std::string & title ) 
-{
+TabsCtrl::TabsCtrl( HWND parent ) {
     if (windowClass==0)
         windowClass=RegisterWindowClass();
     if (windowClass==0) throw std::exception("Can't create window class");
 
     parentHWnd=parent;
-
-    this->title=utf8::utf8_wchar(title);
-
     thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
+
 }
 
-void ListView::showWindow( bool show ) {
-    ::ShowWindow(thisHWnd, (show)? SW_SHOW: SW_HIDE );
-}
+//void TabsCtrl::showWindow( bool show ) {
+//    ::ShowWindow(thisHWnd, (show)? SW_SHOW: SW_HIDE );
+//}
 
-ListView::~ListView() { 
+TabsCtrl::~TabsCtrl() { 
     //TODO: release unused windows
 }
 
-ATOM ListView::windowClass=0;
+ATOM TabsCtrl::windowClass=0;

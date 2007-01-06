@@ -130,9 +130,6 @@ ListView::ListView( HWND parent, const std::string & title )
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
 }
 
-void ListView::showWindow( bool show ) {
-    ::ShowWindow(thisHWnd, (show)? SW_SHOW: SW_HIDE );
-}
 
 ListView::~ListView() { 
     //TODO: release unused windows

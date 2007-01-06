@@ -283,6 +283,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\TabCtrl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui.cpp"
 				>
 			</File>
@@ -413,6 +417,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\TabCtrl.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\TLSSocket.h"
 				>
 			</File>
@@ -422,6 +430,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\utf8.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\Window.h"
 				>
 			</File>
 			<File

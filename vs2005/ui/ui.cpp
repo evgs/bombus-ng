@@ -310,7 +310,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.hInstRes   = g_hInst;
 
 			editWnd=DoCreateEditControl(hWnd);
-			logWnd=ListViewRef(new ListView(hWnd));
+            logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
 			//listWnd=logWnd;
 			rosterWnd=DoCreateListControl(hWnd);
 			//dropdownWnd=DoCreateComboControl(hWnd);

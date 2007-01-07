@@ -2,9 +2,10 @@
 
 #include <map>
 #include <string>
-#include "Contact.h"
-
 #include <windows.h>
+
+#include "Contact.h"
+#include "ListView.h"
 
 typedef std::map<std::string, ContactRef> ContactRefMap;
 
@@ -25,7 +26,7 @@ public:
     virtual const char * getTagName() const { return "iq"; }
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
-    void bindWindow(HWND hWnd) { rosterWnd=hWnd; }
+    void bindWindow(ListViewRef roster){ rosterWnd=roster->getHWnd(); }
 
 private:
     HWND rosterWnd;

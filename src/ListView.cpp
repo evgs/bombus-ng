@@ -52,6 +52,7 @@ LRESULT CALLBACK ListView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
             RECT rc = {0, 0, 100, 100};
 
+            SetBkMode(hdc, TRANSPARENT);
             LPCTSTR t=p->title.c_str();
             DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
             DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);
@@ -130,9 +131,8 @@ ListView::ListView( HWND parent, const std::string & title )
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
 }
 
-
-ListView::~ListView() { 
-    //TODO: release unused windows
+const wchar_t * ListView::getWindowTitle() const{
+    return title.c_str();
 }
 
 ATOM ListView::windowClass=0;

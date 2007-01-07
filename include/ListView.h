@@ -7,18 +7,16 @@
 #include <string>
 #include <utf8.hpp>
 
+#include "Wnd.h"
+
 class ListView : public Wnd{
 public:
     ListView(HWND parent, const std::string & title);
-    virtual ~ListView();
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-    HWND getHWnd() { return thisHWnd; }
     HWND getListBoxHWnd() {return listBoxHWnd; }
-
+    virtual const wchar_t * getWindowTitle() const;
 protected:
-    HWND parentHWnd;
-    HWND thisHWnd;
     HWND listBoxHWnd;
 
     std::wstring title;

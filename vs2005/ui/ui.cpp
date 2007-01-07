@@ -4,6 +4,7 @@
 //#define JIVESOFTWARE
 
 #include "stdafx.h"
+
 #include "ui.h"
 #include <windows.h>
 #include <commctrl.h>
@@ -24,8 +25,11 @@
 
 #include "DlgAccount.h"
 #include "ListView.h"
+#include "TabCtrl.h"
 
 #include "Auth.h"
+
+#include "Sysinfo.h"
 
 #define MAX_LOADSTRING 100
 
@@ -34,11 +38,11 @@ HINSTANCE			g_hInst;			// current instance
 HWND				g_hWndMenuBar;		// menu bar handle
 HWND		listWnd;
 HWND		editWnd;
-HWND		rosterWnd;
 HWND		mainWnd;
 
 ListViewRef logWnd;
-
+ListViewRef rosterWnd;
+TabsCtrlRef tabs;
 ResourceContextRef rc;
 
 int initJabber();
@@ -281,9 +285,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					//SetWindowLong(logWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
 					//SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
 					//SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-                    ShowWindow(rosterWnd, SW_HIDE);
-                    logWnd->showWindow(true);
-                    ShowWindow(editWnd, SW_SHOW);
+
+                    //ShowWindow(rosterWnd, SW_HIDE);
+                    //logWnd->showWindow(true);
+                    //ShowWindow(editWnd, SW_SHOW);
 					break;
 				case IDM_WINDOWS_ROSTER:
 					//listWnd=rosterWnd;
@@ -291,9 +296,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					//SetWindowLong(rosterWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
 					//SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
 					//SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-                    ShowWindow(rosterWnd, SW_SHOW);
-                    logWnd->showWindow(false);
-                    ShowWindow(editWnd, SW_HIDE);
+
+                    //ShowWindow(rosterWnd, SW_SHOW);
+                    //logWnd->showWindow(false);
+                    //ShowWindow(editWnd, SW_HIDE);
 					break;
 
                 default:
@@ -310,9 +316,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.hInstRes   = g_hInst;
 
 			editWnd=DoCreateEditControl(hWnd);
+            tabs=TabsCtrlRef(new TabsCtrl(hWnd));
             logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
+            tabs->addWindow(logWnd);
+            tabs->addWindow(logWnd);
+            tabs->addWindow(logWnd);
+            rosterWnd=ListViewRef(new ListView(hWnd, std::string("Roster")));
+            tabs->addWindow(rosterWnd);
 			//listWnd=logWnd;
-			rosterWnd=DoCreateListControl(hWnd);
 			//dropdownWnd=DoCreateComboControl(hWnd);
 
             if (!SHCreateMenuBar(&mbi)) 
@@ -369,14 +380,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					); */
 
 
-				DeferWindowPos(hdwp, logWnd->getHWnd(), HWND_TOP, 0, tabHeight, 
+				DeferWindowPos(hdwp, tabs->getHWnd(), HWND_TOP, 0, tabHeight, 
 					GET_X_LPARAM(lParam), ySplit-tabHeight, 
 					SWP_NOZORDER 
 					);
-				DeferWindowPos(hdwp, rosterWnd, HWND_TOP, 0, tabHeight, 
+				/*DeferWindowPos(hdwp, rosterWnd, HWND_TOP, 0, tabHeight, 
 					GET_X_LPARAM(lParam), height-tabHeight, 
 					SWP_NOZORDER 
-					);
+					);*/
 
 				DeferWindowPos(hdwp, editWnd, NULL, 0, ySplit+1, 
 					GET_X_LPARAM(lParam), height-ySplit-1, 
@@ -548,8 +559,11 @@ private:
 	ResourceContextRef rc;
 };
 ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+    
+    rc->log->msg("version request", block->getAttribute("from").c_str());
 
-	rc->log->msg("version request", block->getAttribute("from").c_str());
+    std::string version=utf8::wchar_utf8(sysinfo::getOsVersion());
+
 
 	JabberDataBlock reply("iq");
 	reply.setAttribute("type","result");
@@ -560,7 +574,7 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 	qry->setAttribute("xmlns","jabber:iq:version");
 	qry->addChild("name","Bombus-ng");
 	qry->addChild("version","0.0.2-devel");
-	qry->addChild("os","Windows Mobile 2003");
+	qry->addChild("os",version.c_str());
 
 	rc->jabberStream->sendStanza(reply);
 	return BLOCK_PROCESSED;

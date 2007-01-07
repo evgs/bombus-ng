@@ -4,26 +4,39 @@
 
 #include <windows.h>
 
+#include "Wnd.h"
 
-
-class TabsCtrl {
+class TabsCtrl : public Wnd{
 public:
     TabsCtrl(HWND parent);
-    virtual ~TabsCtrl();
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-    HWND getHWnd() { return thisHWnd; }
-
-    //void showWindow(bool show);
+    void addWindow (const WndRef &wnd);
 
 protected:
-    HWND parentHWnd;
-    HWND thisHWnd;
-private:
     HWND tabScrollHWnd;
+
+    struct TabInfo {
+        int tabWidth;
+        int tabDispWidth;
+        int tabXPos;
+        WndRef wndChild;
+    };
+    typedef boost::shared_ptr<TabInfo> TabInfoRef;
+    typedef std::list<TabInfoRef> TabList;
+
+    TabInfoRef activeTab;
+    TabList tabs;
+
+    bool makeTabLayout;
+    void tabDoLayout(HDC hdc);
+
+private:
 
     static ATOM windowClass;
     ATOM RegisterWindowClass();
+    static void drawTab(HDC hdc, int offset, TabInfoRef tab, bool active);
+    int width;
 };
 
 typedef boost::shared_ptr<TabsCtrl> TabsCtrlRef;

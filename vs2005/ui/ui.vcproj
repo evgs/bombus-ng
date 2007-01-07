@@ -283,6 +283,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\Sysinfo.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\TabCtrl.cpp"
 				>
 			</File>
@@ -421,6 +425,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\Sysinfo.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\TabCtrl.h"
 				>
 			</File>
@@ -437,7 +445,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\Window.h"
+				RelativePath="..\..\include\Wnd.h"
 				>
 			</File>
 			<File

@@ -74,7 +74,6 @@ LRESULT CALLBACK ListView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             SetRect(&rc, 0, 0, 
                 GET_X_LPARAM(lParam), height ); 
 
-            // Size the tab control to fit the client area. 
             hdwp = BeginDeferWindowPos(1);
 
             /*DeferWindowPos(hdwp, dropdownWnd, HWND_TOP, 0, 0, 

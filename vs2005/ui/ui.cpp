@@ -317,12 +317,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
-            logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
-            tabs->addWindow(logWnd);
-            tabs->addWindow(logWnd);
-            tabs->addWindow(logWnd);
             rosterWnd=ListViewRef(new ListView(hWnd, std::string("Roster")));
             tabs->addWindow(rosterWnd);
+            logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
+            tabs->addWindow(logWnd);
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 1"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 2"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 3"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window long name"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 4"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 5"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 6"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 7"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window extra long name"))));
 			//listWnd=logWnd;
 			//dropdownWnd=DoCreateComboControl(hWnd);
 

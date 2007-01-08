@@ -26,7 +26,7 @@ public:
     virtual const char * getTagName() const { return "iq"; }
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
-    void bindWindow(ListViewRef roster){ rosterWnd=roster->getHWnd(); }
+    void bindWindow(ListViewRef roster){ rosterWnd=roster->getListBoxHWnd(); }
 
 private:
     HWND rosterWnd;

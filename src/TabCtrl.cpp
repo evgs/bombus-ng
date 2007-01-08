@@ -6,6 +6,14 @@
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 
+//////////////////////////////////////////////////////////////////////////
+// WARNING!!! ONLY FOR WM2003 and higher
+//////////////////////////////////////////////////////////////////////////
+#ifndef DT_END_ELLIPSIS
+#define DT_END_ELLIPSIS 0x00008000
+#endif
+//////////////////////////////////////////////////////////////////////////
+
 ATOM TabsCtrl::RegisterWindowClass() {
     WNDCLASS wc;
 
@@ -52,16 +60,14 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                 p->tabDoLayout(hdc);
             }
 
-            int offset=0;
-            
             for (TabList::const_iterator i=p->tabs.begin(); i!=p->tabs.end(); i++) {
-                if (i != p->activeTab) drawTab(hdc, offset, *i, false);
+                if (i != p->activeTab) drawTab(hdc, p->xOffset, *i, false);
             }
             HGDIOBJ old=SelectObject(hdc, GetStockObject(BLACK_PEN));
             MoveToEx(hdc, 0, tabHeight-1, NULL);
             LineTo(hdc,p->width, tabHeight-1);
             SelectObject(hdc, old);
-            /*if (p->activeTab.get())*/ drawTab(hdc, offset, *(p->activeTab), true);
+            /*if (p->activeTab.get())*/ drawTab(hdc, p->xOffset, *(p->activeTab), true);
 
             RECT b={p->width-32, 0,  p->width-16, tabHeight};
             DrawFrameControl(hdc, &b, DFC_SCROLL, DFCS_SCROLLLEFT);
@@ -198,7 +204,7 @@ void TabsCtrl::drawTab( HDC hdc, int offset, TabInfoRef tab, bool active ) {
 
     SetBkMode(hdc, TRANSPARENT);
     r.left+=3; r.right-=3;
-    DrawText(hdc, tab->wndChild->getWindowTitle(), -1, &r, DT_LEFT | DT_CENTER );
+    DrawText(hdc, tab->wndChild->getWindowTitle(), -1, &r, DT_LEFT | DT_SINGLELINE | DT_END_ELLIPSIS );
 }
 
 void TabsCtrl::showActiveTab() {
@@ -207,7 +213,7 @@ void TabsCtrl::showActiveTab() {
     int tabX2=tabX1+tab->tabWidth;
 
     if (tabX1 < -xOffset) xOffset=-tabX1;
-    if (tabX2 > width-xOffset) xOffset=-(tabX2-width);
+    if (tabX2 > (width-32)-xOffset) xOffset=-(tabX2-(width-32));
 
     for (TabList::const_iterator i=tabs.begin(); i!=tabs.end(); i++) {
         TabInfoRef tab=*i;

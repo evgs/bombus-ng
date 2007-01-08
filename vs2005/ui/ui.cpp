@@ -31,6 +31,8 @@
 
 #include "Sysinfo.h"
 
+#include "Image.h"
+
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -44,6 +46,8 @@ ListViewRef logWnd;
 ListViewRef rosterWnd;
 TabsCtrlRef tabs;
 ResourceContextRef rc;
+
+ImageRef skin;
 
 int initJabber();
 
@@ -315,6 +319,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.nToolBarId = IDR_MENU;
             mbi.hInstRes   = g_hInst;
 
+            skin=ImageRef(new Image(TEXT("\\Program Files\\ui\\skin.png")));
+
 			editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
             rosterWnd=ListViewRef(new ListView(hWnd, std::string("Roster")));
@@ -350,11 +356,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hdc = BeginPaint(hWnd, &ps);
 
             {
-
-                RECT rc = {0, 0, 100, 100};
-
-                DrawText(hdc, TEXT("This is the default system font."), -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
-                DrawText(hdc, TEXT("This is the default system font."), -1, &rc, DT_LEFT | DT_TOP);
+                skin->drawImage(hdc, 0,0);                
             }
             
             // TODO: Add any drawing code here...

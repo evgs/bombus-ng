@@ -91,7 +91,7 @@
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles=""
+				AdditionalFiles="skin.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0"
 			/>
 			<DebuggerTool
 			/>
@@ -123,7 +123,7 @@
 				ExecutionBucket="7"
 				Optimization="2"
 				AdditionalIncludeDirectories="\libs\boost;\libs\zlib\include;\libs\openssl\include;..\..\include"
-				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
+				PreprocessorDefinitions="BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -144,10 +144,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
+				AdditionalDependencies="Ws2.lib"
 				OutputFile="$(OutDir)/ui.exe"
 				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"
-				GenerateDebugInformation="true"
+				GenerateDebugInformation="false"
 				ProgramDatabaseFile="$(OutDir)/ui.pdb"
 				SubSystem="0"
 				OptimizeReferences="2"
@@ -212,6 +213,10 @@
 			</File>
 			<File
 				RelativePath=".\DlgAccount.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\Image.cpp"
 				>
 			</File>
 			<File

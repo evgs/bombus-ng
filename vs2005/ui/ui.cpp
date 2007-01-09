@@ -320,6 +320,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.hInstRes   = g_hInst;
 
             skin=ImageRef(new Image(TEXT("\\Program Files\\ui\\skin.png")));
+            skin->createMask();
 
 			editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));

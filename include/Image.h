@@ -9,7 +9,9 @@ public:
     ~Image();
 
     void drawImage(HDC hdc, int x, int y) const;
+    void createMask();
 protected:
     HBITMAP bmp;
+    HBITMAP mask;
 };
 typedef boost::shared_ptr<Image> ImageRef;

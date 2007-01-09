@@ -354,6 +354,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\Image.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\JabberAccount.h"
 				>
 			</File>

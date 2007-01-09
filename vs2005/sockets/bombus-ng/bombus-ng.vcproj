@@ -181,79 +181,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\src\Auth.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\base64.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\bombus-ng.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\src\CompressedSocket.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Connection.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\JabberAccount.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\JabberDataBlock.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\JabberStanzaDispatcher.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\JabberStream.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\jid.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\libs\openssl\lib\libeay32.lib"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Log.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\ResourceContext.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\Socket.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\libs\openssl\lib\ssleay32.lib"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\TLSSocket.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\src\XMLParser.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\libs\zlib\x86\lib\zlibstat.lib"
 				>
 			</File>
 		</Filter>
@@ -263,75 +195,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\include\Auth.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\base64.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\basetypes.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\CompressedSocket.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\Connection.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\JabberAccount.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\JabberDataBlock.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\JabberDataBlockListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\JabberListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\JabberStanzaDispatcher.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\JabberStream.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\Log.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\ResourceContext.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\Socket.h"
-				>
-			</File>
-			<File
 				RelativePath=".\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\TLSSocket.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\XMLEventListener.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\include\XMLParser.h"
 				>
 			</File>
 		</Filter>

@@ -2,12 +2,16 @@
 
 #include <aygshell.h>
 
+#define NORASTEROP (0x00AA0029)
+
 Image::Image( LPCTSTR path ) {
-    bmp=SHLoadImageFile(path);    
+    bmp=SHLoadImageFile(path);  
+    mask=NULL;
 }
 
 Image::~Image() {
     if (bmp) DeleteObject(bmp);
+    if (mask) DeleteObject(mask);
 }
 
 
@@ -30,13 +34,25 @@ void Image::drawImage( HDC hdc, int x, int y ) const {
 
     //char *bits=new char()
 
+    MaskBlt(hdc, x,y, bm.bmWidth, bm.bmHeight, 
+            src, 0,0, 
+            mask, 0, 0, 
+            MAKEROP4(SRCCOPY, NORASTEROP));
+    //AlphaBlend(hdc, x,y, bm.bmWidth, bm.bmHeight, src, 0,0, bm.bmWidth, bm.bmHeight, )
+    DeleteDC(src);
+}
+
+void Image::createMask() {
+    BITMAP bm;
+    GetObject(bmp, sizeof(bm), &bm);
+
     int bmaskWB=bm.bmWidth/8;
     char *bmask=new char[bmaskWB*bm.bmHeight];
 
     int maskColor=getColor(bm, 0, 0);
 
     LPCHAR p=bmask;
-    {for (int y=bm.bmHeight; y>0; y--) {
+    for (int y=bm.bmHeight; y>0; y--) {
         for (int xb=0; xb<bmaskWB; xb++) {
             char buf;
             for (char b=0; b<8; b++) {
@@ -44,19 +60,9 @@ void Image::drawImage( HDC hdc, int x, int y ) const {
             }
             *(p++)=buf;
         }
-    }}
-    HBITMAP mask=CreateBitmap( bm.bmWidth, bm.bmHeight, 1, 1, bmask);
+    }
+    mask=CreateBitmap( bm.bmWidth, bm.bmHeight, 1, 1, bmask);
 
     delete bmask;
 
-    //BitBlt(hdc, x,y, bm.bmWidth, bm.bmHeight, src, 0,0, SRCAND);
-    //BitBlt(hdc, x,y, bm.bmWidth, bm.bmHeight, src, 0,0, SRCPAINT);
-    MaskBlt(hdc, x,y, bm.bmWidth, bm.bmHeight, 
-            src, 0,0, 
-            mask, 0, 0, 
-            MAKEROP4(SRCCOPY, 0x00AA0029));
-    //AlphaBlend(hdc, x,y, bm.bmWidth, bm.bmHeight, src, 0,0, bm.bmWidth, bm.bmHeight, )
-    DeleteObject(mask);
-    DeleteDC(src);
 }
-

@@ -9,6 +9,8 @@ Image::Image( LPCTSTR path ) {
     mask=NULL;
 }
 
+Image::Image() {}
+
 Image::~Image() {
     if (bmp) DeleteObject(bmp);
     if (mask) DeleteObject(mask);
@@ -25,7 +27,7 @@ int getColor(BITMAP &bm, int x, int y) {
     }
     return 0;
 }
-
+//////////////////////////////////////////////////////////////////////////
 void Image::drawImage( HDC hdc, int x, int y ) const {
     BITMAP bm;
     GetObject(bmp, sizeof(bm), &bm);
@@ -41,7 +43,28 @@ void Image::drawImage( HDC hdc, int x, int y ) const {
     //AlphaBlend(hdc, x,y, bm.bmWidth, bm.bmHeight, src, 0,0, bm.bmWidth, bm.bmHeight, )
     DeleteDC(src);
 }
+//////////////////////////////////////////////////////////////////////////
+void ImgList::drawElement( HDC hdc, int index, int x, int y ) const {
+    //BITMAP bm;
+    //GetObject(bmp, sizeof(bm), &bm);
+    HDC src=CreateCompatibleDC(NULL);
+    SelectObject(src, bmp);
 
+    //char *bits=new char()
+
+    int xm=(index&&0x0f) * elWidth;
+    int ym=(index&&0xf0 >> 8) * elHeight;
+    
+    MaskBlt(hdc, x,y,  elWidth, elHeight, 
+        src, xm, ym, 
+        mask, xm, ym, 
+        MAKEROP4(SRCCOPY, NORASTEROP));
+    //AlphaBlend(hdc, x,y, bm.bmWidth, bm.bmHeight, src, 0,0, bm.bmWidth, bm.bmHeight, )
+    DeleteDC(src);
+
+
+}
+//////////////////////////////////////////////////////////////////////////
 void Image::createMask() {
     BITMAP bm;
     GetObject(bmp, sizeof(bm), &bm);
@@ -65,4 +88,20 @@ void Image::createMask() {
 
     delete bmask;
 
+}
+
+
+void ImgList::setGridSize( int nColumns, int nRows ) {
+    BITMAP bm;
+    GetObject(bmp, sizeof(bm), &bm);
+
+    this->nColumns=nColumns;
+    this->nRows=nRows;
+    elWidth=bm.bmWidth/nColumns;
+    elHeight=bm.bmHeight/nRows;
+}
+
+ImgList::ImgList( LPCTSTR path ) {
+    bmp=SHLoadImageFile(path);  
+    createMask();
 }

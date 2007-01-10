@@ -47,7 +47,7 @@ ListViewRef rosterWnd;
 TabsCtrlRef tabs;
 ResourceContextRef rc;
 
-ImageRef skin;
+ImgListRef skin;
 
 int initJabber();
 
@@ -319,8 +319,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.nToolBarId = IDR_MENU;
             mbi.hInstRes   = g_hInst;
 
-            skin=ImageRef(new Image(TEXT("\\Program Files\\ui\\skin.png")));
-            skin->createMask();
+            skin=ImgListRef(new ImgList(TEXT("\\Program Files\\ui\\skin.png")));
+            skin->setGridSize(8, 6);
 
 			editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
@@ -357,7 +357,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             hdc = BeginPaint(hWnd, &ps);
 
             {
-                skin->drawImage(hdc, 0,0);                
+                skin->drawElement(hdc, 0, 0,0);                
             }
             
             // TODO: Add any drawing code here...

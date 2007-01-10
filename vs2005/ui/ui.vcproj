@@ -70,7 +70,9 @@
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ui.pdb"
+				GenerateMapFile="true"
 				SubSystem="0"
+				OptimizeForWindows98="1"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -150,9 +152,11 @@
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile="$(OutDir)/ui.pdb"
+				GenerateMapFile="true"
 				SubSystem="0"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
 			/>
 			<Tool
 				Name="VCALinkTool"

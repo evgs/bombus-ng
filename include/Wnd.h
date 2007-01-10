@@ -3,6 +3,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <windows.h>
+#include "OwnerDrawRect.h"
 #include <list>
 
 
@@ -16,6 +17,7 @@ public:
     void setParent(HWND parent);
 
     virtual const wchar_t * getWindowTitle() const;
+    virtual OwnerDrawRect * getODR() const;
 
 protected:
     HWND parentHWnd;

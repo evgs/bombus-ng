@@ -128,10 +128,16 @@ ListView::ListView( HWND parent, const std::string & title )
 
     thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
+
+    wt=WndTitleRef(new WndTitle(this, 0));
 }
 
 const wchar_t * ListView::getWindowTitle() const{
     return title.c_str();
 }
+
+ListView::~ListView() {}
+
+const OwnerDrawRect * ListView::getODR() const { return wt.get(); }
 
 ATOM ListView::windowClass=0;

@@ -220,6 +220,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\IconTextElement.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Image.cpp"
 				>
 			</File>
@@ -358,6 +362,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\IconTextElement.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\Image.h"
 				>
 			</File>
@@ -411,6 +419,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\crypto\MessageDigest.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\OwnerDrawRect.h"
 				>
 			</File>
 			<File

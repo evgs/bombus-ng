@@ -24,6 +24,7 @@ public:
     void setGridSize(int nColumns, int nRows);
 
     virtual void drawElement (HDC hdc, int index, int x, int y) const;
+    int getElementWidth() const { return elWidth; }
 private:
     int nColumns;
     int nRows;

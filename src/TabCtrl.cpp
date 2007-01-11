@@ -178,7 +178,12 @@ void TabsCtrl::tabDoLayout(HDC hdc) {
     for (TabList::const_iterator i=tabs.begin(); i!=tabs.end(); i++) {
         TabInfoRef tab=*i;
         RECT r={0,0,10,10};
-        DrawText(hdc, tab->wndChild->getWindowTitle(), -1, &r, DT_CALCRECT | DT_LEFT | DT_TOP);
+        const OwnerDrawRect * odr=tab->wndChild->getODR();
+        if (odr) {
+            r.bottom=odr->getHeight();
+            r.right=odr->getWidth();
+        } else 
+            DrawText(hdc, tab->wndChild->getWindowTitle(), -1, &r, DT_CALCRECT | DT_LEFT | DT_TOP);
         tab->tabWidth=r.right+6;
         if (tab->tabWidth>maxTabWidth) tab->tabWidth=maxTabWidth;
         tab->tabXPos=x;
@@ -204,6 +209,10 @@ void TabsCtrl::drawTab( HDC hdc, int offset, TabInfoRef tab, bool active ) {
 
     SetBkMode(hdc, TRANSPARENT);
     r.left+=3; r.right-=3;
+    const OwnerDrawRect * odr=tab->wndChild->getODR();
+    if (odr) {
+        odr->draw(hdc, r);
+    } else 
     DrawText(hdc, tab->wndChild->getWindowTitle(), -1, &r, DT_LEFT | DT_SINGLELINE | DT_END_ELLIPSIS );
 }
 

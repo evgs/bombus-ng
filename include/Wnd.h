@@ -4,6 +4,7 @@
 
 #include <windows.h>
 #include "OwnerDrawRect.h"
+#include "IconTextElement.h"
 #include <list>
 
 
@@ -17,7 +18,7 @@ public:
     void setParent(HWND parent);
 
     virtual const wchar_t * getWindowTitle() const;
-    virtual OwnerDrawRect * getODR() const;
+    virtual const OwnerDrawRect * getODR() const;
 
 protected:
     HWND parentHWnd;
@@ -26,3 +27,18 @@ protected:
 
 typedef boost::shared_ptr<Wnd> WndRef;
 typedef std::list<WndRef> WndRefList;
+
+class WndTitle : public IconTextElement {
+public:
+    WndTitle(Wnd* wnd, int iconIndex);
+
+    virtual int getColor() const;
+    virtual const wchar_t * getText() const;
+    virtual int getIconIndex() const;
+
+private:
+    int iconIndex;
+    Wnd *wnd;
+};
+
+typedef boost::shared_ptr<WndTitle> WndTitleRef;

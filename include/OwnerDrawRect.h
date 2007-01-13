@@ -1,6 +1,7 @@
 #pragma once
 
 #include <windows.h>
+#include <boost/shared_ptr.hpp>
 
 class OwnerDrawRect {
 public:
@@ -12,3 +13,6 @@ public:
 
     virtual void draw(HDC hdc, RECT &rt) const=0;
 };
+
+typedef boost::shared_ptr<OwnerDrawRect> ODRRef;
+

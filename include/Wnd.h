@@ -21,6 +21,7 @@ public:
     virtual const OwnerDrawRect * getODR() const;
 
 protected:
+    RECT clientRect;
     HWND parentHWnd;
     HWND thisHWnd;
 };

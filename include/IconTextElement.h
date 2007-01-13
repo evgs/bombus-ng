@@ -3,6 +3,7 @@
 #include "OwnerDrawRect.h"
 #include "Image.h"
 #include <windows.h>
+#include <string>
 
 class IconTextElement : public OwnerDrawRect {
 public:
@@ -22,4 +23,15 @@ protected:
     virtual int getIconIndex() const=0;
     //ImgListRef il;
 
+};
+
+class IconTextElementContainer : public IconTextElement {
+public:
+    IconTextElementContainer(std::wstring &wstr, int icon);
+    virtual int getColor() const;
+    virtual const wchar_t * getText() const;
+    virtual int getIconIndex() const;
+private:
+    std::wstring wstr;
+    int iconIndex;
 };

@@ -252,6 +252,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\ListViewODR.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\crypto\MD5.cpp"
 				>
 			</File>
@@ -403,6 +407,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\ListView.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\ListViewODR.h"
 				>
 			</File>
 			<File

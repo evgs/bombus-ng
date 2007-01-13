@@ -25,6 +25,7 @@
 
 #include "DlgAccount.h"
 #include "ListView.h"
+#include "ListViewODR.h"
 #include "TabCtrl.h"
 
 #include "Auth.h"
@@ -45,11 +46,13 @@ HWND		mainWnd;
 ListViewRef logWnd;
 ListViewRef rosterWnd;
 TabsCtrlRef tabs;
+ListViewODR::ref odr;
 ResourceContextRef rc;
 
 ImgListRef skin;
 
 int initJabber();
+void Shell_NotifyIcon(bool show);
 
 // Forward declarations of functions included in this code module:
 ATOM			MyRegisterClass(HINSTANCE, LPTSTR);
@@ -73,6 +76,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	HACCEL hAccelTable;
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_UI));
 
+    Shell_NotifyIcon(true);
 	// Main message loop:
 	while (GetMessage(&msg, NULL, 0, 0)) 
 	{
@@ -82,7 +86,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 	}
-
+    Shell_NotifyIcon(false);
 	return (int) msg.wParam;
 }
 
@@ -324,10 +328,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
+
             rosterWnd=ListViewRef(new ListView(hWnd, std::string("Roster")));
             tabs->addWindow(rosterWnd);
+
             logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
             tabs->addWindow(logWnd);
+
+            odr=ListViewODR::ref(new ListViewODR(hWnd, std::string("ODR")));
+            tabs->addWindow(odr);
+
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 1"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 2"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 3"))));
@@ -417,19 +427,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             SHHandleWMSettingChange(hWnd, wParam, lParam, &s_sai);
             break;
 
-		case WM_CTLCOLORSTATIC:
-		case WM_CTLCOLORLISTBOX:
+		//case WM_CTLCOLORLISTBOX:
+        
+        
+        /*case WM_CTLCOLORSTATIC:
 		case WM_CTLCOLOREDIT: 
 			{
-				//HGDIOBJ brush= GetStockObject(GRAY_BRUSH);
-				//HGDIOBJ pen= GetStockObject(WHITE_PEN);
-				SetBkColor(hdc, 0x808080);
+                HDC hdc=(HDC) wParam;
+                HWND hwnd=(HWND) lParam;
+				SetBkColor(hdc, 0x000000);
 				SetTextColor(hdc, 0xffffff);
-				//SelectObject((HDC)wParam, brush);
-				//SelectObject((HDC)wParam, pen);
-				return (BOOL) GetStockObject(GRAY_BRUSH);
+				return (BOOL) GetStockObject(BLACK_BRUSH);
 				break;
-			}
+			}*/
 
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
@@ -508,17 +518,23 @@ const wchar_t * charToWchar(const char * src, const char *src2 = NULL) {
 	return buf;
 }
 
-void Log::msg(const std::string &message){
 
-	ListBox_AddString( logWnd->getListBoxHWnd(), charToWchar(message.c_str()));
+void addLog(const wchar_t * msg) {
+    ListBox_AddString( logWnd->getListBoxHWnd(), msg);
+    ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), 0));
+    odr->addODR(r);
+}
+
+void Log::msg(const std::string &message){
+    addLog(charToWchar(message.c_str()));
 }
 
 void Log::msg(const char * message){
-	ListBox_AddString( logWnd->getListBoxHWnd(), charToWchar(message));
+    addLog(charToWchar(message));
 }
 
 void Log::msg(const char * message, const char *message2){
-	ListBox_AddString( logWnd->getListBoxHWnd(), charToWchar(message, message2));
+    addLog(charToWchar(message, message2));
 }
 
 
@@ -737,3 +753,30 @@ int initJabber()
 	return 0;
 }
 
+
+NOTIFYICONDATA nid = {0};
+
+void Shell_NotifyIcon(bool show)
+{
+    // This code will add a Shell_NotifyIcon notificaion on PocketPC and Smartphone
+    
+    if (show) {
+        nid.cbSize = sizeof(nid);
+        nid.uID = 100;      // Per WinCE SDK docs, values from 0 to 12 are reserved and should not be used.
+        nid.uFlags = NIF_ICON;
+        nid.hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_BOMBUS));
+
+        //Add the notification to the tray
+        Shell_NotifyIcon(NIM_ADD, &nid);
+    } else 
+        //remove the notification from the tray
+        Shell_NotifyIcon(NIM_DELETE, &nid);
+
+    //Update the icon of the notification
+    /*nid.uFlags = NIF_ICON;
+    nid.hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_SAMPLEICON2));
+    Shell_NotifyIcon(NIM_MODIFY, &nid);*/
+
+
+    return;
+}

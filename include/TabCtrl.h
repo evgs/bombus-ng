@@ -39,8 +39,8 @@ private:
     static ATOM windowClass;
     ATOM RegisterWindowClass();
     static void drawTab(HDC hdc, int offset, TabInfoRef tab, bool active);
-    int width;
-    int height;
+    /*int width;
+    int height;*/
 };
 
 typedef boost::shared_ptr<TabsCtrl> TabsCtrlRef;

@@ -63,13 +63,16 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             for (TabList::const_iterator i=p->tabs.begin(); i!=p->tabs.end(); i++) {
                 if (i != p->activeTab) drawTab(hdc, p->xOffset, *i, false);
             }
+
+            int width=p->clientRect.right;
+
             HGDIOBJ old=SelectObject(hdc, GetStockObject(BLACK_PEN));
             MoveToEx(hdc, 0, tabHeight-1, NULL);
-            LineTo(hdc,p->width, tabHeight-1);
+            LineTo(hdc, width, tabHeight-1);
             SelectObject(hdc, old);
             /*if (p->activeTab.get())*/ drawTab(hdc, p->xOffset, *(p->activeTab), true);
 
-            RECT b={p->width-32, 0,  p->width-16, tabHeight};
+            RECT b={width-32, 0,  width-16, tabHeight};
             DrawFrameControl(hdc, &b, DFC_SCROLL, DFCS_SCROLLLEFT);
             b.left+=16; b.right+=16;
             DrawFrameControl(hdc, &b, DFC_SCROLL, DFCS_SCROLLRIGHT);
@@ -84,12 +87,14 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             int mouseX=GET_X_LPARAM(lParam);
             int mouseY=GET_Y_LPARAM(lParam);
 
+            int width=p->clientRect.right;
+
             if (mouseY >= tabHeight) break;
 
-            if (mouseX > p->width - 16) { 
+            if (mouseX > width - 16) { 
                 p->activeTab++; 
                 if (p->activeTab == p->tabs.end()) p->activeTab--;
-            } else if (mouseX > p->width - 32) {
+            } else if (mouseX > width - 32) {
                 if (p->activeTab != p->tabs.begin()) p->activeTab--;
             } else
             for (TabList::iterator i=p->tabs.begin(); i!=p->tabs.end(); i++) {
@@ -110,8 +115,7 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
         { 
             int height=GET_Y_LPARAM(lParam);
             int width=GET_X_LPARAM(lParam);
-            p->width=width;
-            p->height=height;
+            SetRect(&(p->clientRect), 0, 0, width, height);
 
             p->updateChildsLayout();
 
@@ -172,8 +176,8 @@ void TabsCtrl::tabDoLayout(HDC hdc) {
     int x=0;
     int nTabs=tabs.size();
     int maxTabWidth=120;
-    if (nTabs>2) maxTabWidth=80;
-    if (nTabs>6) maxTabWidth=64;
+    //if (nTabs>2) maxTabWidth=80;
+    //if (nTabs>6) maxTabWidth=64;
 
     for (TabList::const_iterator i=tabs.begin(); i!=tabs.end(); i++) {
         TabInfoRef tab=*i;
@@ -184,7 +188,7 @@ void TabsCtrl::tabDoLayout(HDC hdc) {
             r.right=odr->getWidth();
         } else 
             DrawText(hdc, tab->wndChild->getWindowTitle(), -1, &r, DT_CALCRECT | DT_LEFT | DT_TOP);
-        tab->tabWidth=r.right+6;
+        tab->tabWidth=r.right+4;
         if (tab->tabWidth>maxTabWidth) tab->tabWidth=maxTabWidth;
         tab->tabXPos=x;
         x+=tab->tabWidth;
@@ -208,7 +212,7 @@ void TabsCtrl::drawTab( HDC hdc, int offset, TabInfoRef tab, bool active ) {
     SelectObject(hdc, old);
 
     SetBkMode(hdc, TRANSPARENT);
-    r.left+=3; r.right-=3;
+    r.left+=2; r.right-=2;
     const OwnerDrawRect * odr=tab->wndChild->getODR();
     if (odr) {
         odr->draw(hdc, r);
@@ -222,7 +226,7 @@ void TabsCtrl::showActiveTab() {
     int tabX2=tabX1+tab->tabWidth;
 
     if (tabX1 < -xOffset) xOffset=-tabX1;
-    if (tabX2 > (width-32)-xOffset) xOffset=-(tabX2-(width-32));
+    if (tabX2 > (clientRect.right-32)-xOffset) xOffset=-(tabX2-(clientRect.right-32));
 
     for (TabList::const_iterator i=tabs.begin(); i!=tabs.end(); i++) {
         TabInfoRef tab=*i;
@@ -232,17 +236,17 @@ void TabsCtrl::showActiveTab() {
 
 void TabsCtrl::updateChildsLayout() {
     HDWP hdwp; 
-    RECT rc; 
-
-    // Calculate the display rectangle, assuming the 
-    // tab control is the size of the client area. 
-    SetRect(&rc, 0, 0,  width, height ); 
 
     // Size the tab control to fit the client area. 
     hdwp = BeginDeferWindowPos(tabs.size()+1);
 
     for (TabList::const_iterator i = tabs.begin(); i != tabs.end(); i++) {
-        DeferWindowPos(hdwp, (i->get())->wndChild->getHWnd(), HWND_TOP, 0, tabHeight,  width, height-tabHeight, SWP_NOZORDER);
+        DeferWindowPos(hdwp, 
+                      (i->get())->wndChild->getHWnd(), 
+                      HWND_TOP, 
+                      0, tabHeight,  
+                      clientRect.right, clientRect.bottom-tabHeight, 
+                      SWP_NOZORDER);
     }
 
     //scrollbar

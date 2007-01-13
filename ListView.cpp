@@ -66,12 +66,11 @@ LRESULT CALLBACK ListView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     case WM_SIZE: 
         { 
             HDWP hdwp; 
-            RECT rc; 
-
+            
             int height=GET_Y_LPARAM(lParam);
             // Calculate the display rectangle, assuming the 
             // tab control is the size of the client area. 
-            SetRect(&rc, 0, 0, 
+            SetRect(&(p->clientRect), 0, 0, 
                 GET_X_LPARAM(lParam), height ); 
 
             hdwp = BeginDeferWindowPos(1);

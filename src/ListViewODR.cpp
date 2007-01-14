@@ -11,7 +11,7 @@ extern int tabHeight;
 ATOM ListViewODR::RegisterWindowClass() {
     WNDCLASS wc;
 
-    wc.style         = CS_HREDRAW | CS_VREDRAW;
+    wc.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
     wc.lpfnWndProc   = ListViewODR::WndProc;
     wc.cbClsExtra    = 0;
     wc.cbWndExtra    = 0;
@@ -68,25 +68,27 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
             DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);
 
             int y=tabHeight-p->winTop;
-            int index=-1;
+            //int index=-1;
 
             for (ItemList::const_iterator i=p->odrList.begin(); i!=p->odrList.end(); i++) {
                 ODRRef odr=i->item;
                 int iHeight=odr->getHeight();
                 RECT ritem={0, y, p->clientRect.right, y+iHeight} ;
                 y+=iHeight;
-                index++;
+                //index++;
 
 
                 if (ritem.bottom<tabHeight) continue;
                 if (ritem.top>p->clientRect.bottom) continue;
-                if (index==p->cursorPos) {
+                if (i==p->cursorPos) {
                     // focused item
-                    HBRUSH cur=CreateSolidBrush(0x800000);
+                    int cursColor=(GetFocus()==hWnd)?0x800000:0x808080;
+                    HBRUSH cur=CreateSolidBrush(cursColor);
                     SetTextColor(hdc, 0xffffff);
-                    SetBkColor(hdc, 0x800000);
+                    SetBkColor(hdc, cursColor);
                     FillRect(hdc, &ritem, cur);
                     DeleteObject(cur);
+                    //DrawFocusRect(hdc, &ritem);
                 } else {
                     //usual item
                     SetTextColor(hdc, 0x000000);
@@ -141,7 +143,8 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
             SHRGINFO    shrg;
             HMENU       hmenu;
 
-            p->moveCursorTo(LOWORD(lParam), HIWORD(lParam));
+            SetFocus(hWnd);
+            if (!(p->moveCursorTo(LOWORD(lParam), HIWORD(lParam)))) break;
             InvalidateRect(p->getHWnd(), NULL, true);
 
             shrg.cbSize = sizeof(shrg);
@@ -162,6 +165,32 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
             break;
         }
 
+    case WM_SETFOCUS:
+    case WM_KILLFOCUS:
+        {
+            InvalidateRect(p->getHWnd(), NULL, true);
+            break;
+        }
+    case WM_KEYDOWN:
+        {
+            int vKey=(int)wParam;
+            int lkeyData=lParam;
+            if (lkeyData & 0x800000) break; //keyRelease 
+            switch (vKey) {
+                case VK_UP: if (p->cursorPos!=p->odrList.begin()) p->cursorPos--; break;
+                case VK_DOWN: p->cursorPos++; if (p->cursorPos==p->odrList.end()) p->cursorPos--; break;
+            }
+            p->cursorFit();
+            InvalidateRect(p->getHWnd(), NULL, true);
+
+            SCROLLINFO si;
+            si.cbSize=sizeof(SCROLLINFO);
+            si.nPos=p->winTop;
+            si.fMask=SIF_POS;
+            SetScrollInfo(p->listScrollHWND, SB_CTL, &si, TRUE);
+
+            break;
+        }
     case WM_VSCROLL:
         {
             int scrollCode=(int)LOWORD(wParam);
@@ -208,29 +237,36 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
 }
 
 
-void ListViewODR::moveCursorTo(int x, int y) {
-    int index=0;
+bool ListViewODR::moveCursorTo( int x, int y ) 
+{
     y+=winTop-tabHeight;
-    if (y<0) return;
+    if (y<0) return false;
 
     int yTop=0;
-    for (ItemList::const_iterator i=odrList.begin(); i!=odrList.end(); i++) {
+    for (ItemList::iterator i=odrList.begin(); i!=odrList.end(); i++) {
         int yBot=i->yPos;
 
         if (yTop<=y) {
             if (yBot>y) {
-                cursorPos=index;
+                cursorPos=i;
 
-                // aligning
-                if (yBot>winTop+clientRect.bottom-tabHeight) winTop=yBot-(clientRect.bottom-tabHeight);
-                if (yTop<winTop) yTop=winTop;
-                return;
+                cursorFit();
+                return true;
             }
         }
         yTop=yBot;
-        index++;
     }
-    
+    return false;
+}
+
+void ListViewODR::cursorFit() {
+    if (cursorPos==odrList.end()) return;
+
+    int yBot=cursorPos->yPos;
+    int yTop=yBot - cursorPos->item->getHeight();
+    // aligning
+    if (yBot>winTop+clientRect.bottom-tabHeight) winTop=yBot-(clientRect.bottom-tabHeight);
+    if (yTop<winTop) winTop=yTop;
 }
 
 
@@ -247,6 +283,7 @@ ListViewODR::ListViewODR( HWND parent, const std::string & title ) {
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
 
     wt=WndTitleRef(new WndTitle(this, 0));
+    cursorPos=odrList.end();
 }
 
 const wchar_t * ListViewODR::getWindowTitle() const{

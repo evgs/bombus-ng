@@ -4,6 +4,8 @@
 
 JabberAccount::JabberAccount(){
 	password="";
+
+    //useSRV=true;
 	hostNameIp="";
 	port=5222;
 
@@ -18,7 +20,9 @@ JabberAccount::JabberAccount(){
 
 JabberAccount::JabberAccount(const std::string &bareJid, const std::string &resource) {
 	password="";
-	hostNameIp="";
+
+    //useSRV=true;
+    hostNameIp="";
 	port=5222;
 
 	plainTextPassword=false;

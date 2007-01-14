@@ -51,6 +51,7 @@ ResourceContextRef rc;
 
 ImgListRef skin;
 
+int prepareAccount();
 int initJabber();
 void Shell_NotifyIcon(bool show, HWND hwnd);
 
@@ -179,6 +180,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     UpdateWindow(hWnd);
 
     Shell_NotifyIcon(true, hWnd);
+    prepareAccount();
 
     return TRUE;
 }
@@ -707,26 +709,29 @@ bool JabberStreamEvents::connect(){
     return true;
 }
 //////////////////////////////////////////////////////////////
-
-int initJabber()
-{{
-	rc=ResourceContextRef(new ResourceContext());
-	rc->log=new Log();
+int prepareAccount(){
+    rc=ResourceContextRef(new ResourceContext());
+    rc->log=new Log();
 #ifdef JIVESOFTWARE
     rc->account=JabberAccountRef(new JabberAccount("bombus_mobilus@jivesoftware.com", "bombus-ng"));
     //rc->account->hostNameIp="213.180.203.19";
     rc->account->password="l12sx95a";
 #else
-	rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
-	//rc->account->hostNameIp="213.180.203.19";
+    rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
+    //rc->account->hostNameIp="213.180.203.19";
     //rc->account->port=5222;
-	rc->account->password=
+    rc->account->password=
 #include "password"
-	;
+        ;
 #endif
     rc->account->useSASL=true;
     //rc->account->useEncryption=true;
-	//rc->account->useCompression=true;
+    rc->account->useCompression=true;
+    return 0;
+}
+//////////////////////////////////////////////////////////////
+int initJabber()
+{{
 
     rc->jabberStanzaDispatcher=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 

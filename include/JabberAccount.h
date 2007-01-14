@@ -30,6 +30,7 @@ public:
 
 	std::string password;
 
+    //bool useSRV;
 	std::string hostNameIp;
 	int port;
 

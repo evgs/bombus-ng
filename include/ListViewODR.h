@@ -27,7 +27,7 @@ protected:
     ItemList odrList;
 
     int winTop;
-    int cursorPos;
+    ItemList::iterator cursorPos;
 
     HWND listScrollHWND;
 
@@ -41,7 +41,8 @@ private:
         SCROLLWIDTH=14
     };
 
-    void moveCursorTo(int x, int y);
+    bool moveCursorTo(int x, int y);
+    void cursorFit();
 
     static ATOM windowClass;
     ATOM RegisterWindowClass();

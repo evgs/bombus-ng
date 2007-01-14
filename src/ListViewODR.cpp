@@ -18,7 +18,7 @@ ATOM ListViewODR::RegisterWindowClass() {
     wc.hInstance     = g_hInst;
     wc.hIcon         = NULL;
     wc.hCursor       = 0;
-    wc.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
+    wc.hbrBackground = NULL;//(HBRUSH)COLOR_WINDOW;
     wc.lpszMenuName  = 0;
     wc.lpszClassName = _T("BombusLVODR");
 
@@ -26,7 +26,6 @@ ATOM ListViewODR::RegisterWindowClass() {
 }
 
 LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) {
-    PAINTSTRUCT ps;
     ListViewODR *p=(ListViewODR *) GetWindowLong(hWnd, GWL_USERDATA);
 
     switch (message) {
@@ -48,31 +47,57 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
     case WM_PAINT:
 
         {
+            PAINTSTRUCT ps;
             HDC hdc;
-            hdc = BeginPaint(hWnd, &ps);
+            HDC wnd;
+            wnd = BeginPaint(hWnd, &ps);
 
+            HBITMAP buf=CreateCompatibleBitmap(wnd, p->clientRect.right, p->clientRect.bottom);
+
+            hdc=CreateCompatibleDC(NULL);
+            SelectObject(hdc, buf);
+
+            PatBlt(hdc, 0,0, p->clientRect.right, p->clientRect.bottom, WHITENESS);
             // TODO: Add any drawing code here...
 
             RECT rc = {0, 0, 100, 100};
 
-            SetBkMode(hdc, TRANSPARENT);
+            SetBkMode(hdc, OPAQUE);
             LPCTSTR t=p->title.c_str();
             DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
             DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);
 
-            int y=tabHeight;
+            int y=tabHeight-p->winTop;
+            int index=-1;
 
             for (ItemList::const_iterator i=p->odrList.begin(); i!=p->odrList.end(); i++) {
                 ODRRef odr=i->item;
                 int iHeight=odr->getHeight();
                 RECT ritem={0, y, p->clientRect.right, y+iHeight} ;
-                odr->draw(hdc, ritem);
                 y+=iHeight;
+                index++;
+
+
+                if (ritem.bottom<tabHeight) continue;
+                if (ritem.top>p->clientRect.bottom) continue;
+                if (index==p->cursorPos) {
+                    // focused item
+                    HBRUSH cur=CreateSolidBrush(0x800000);
+                    SetTextColor(hdc, 0xffffff);
+                    SetBkColor(hdc, 0x800000);
+                    FillRect(hdc, &ritem, cur);
+                    DeleteObject(cur);
+                } else {
+                    //usual item
+                    SetTextColor(hdc, 0x000000);
+                    SetBkColor(hdc, 0xffffff);
+                }
+                odr->draw(hdc, ritem);
             }
-            SCROLLINFO si;
-            si.cbSize=sizeof(SCROLLINFO);
-            si.fMask=SIF_ALL;
-            GetScrollInfo(p->listScrollHWND, SB_CTL, &si);
+
+            BitBlt(wnd, 0,0,p->clientRect.right, p->clientRect.bottom, hdc, 0,0, SRCCOPY);
+            DeleteDC(hdc);
+            DeleteObject(buf);
 
             EndPaint(hWnd, &ps);
             break;
@@ -100,12 +125,10 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
 
             SCROLLINFO si;
             si.cbSize=sizeof(SCROLLINFO);
-            si.fMask=SIF_ALL;
-            si.nMax=0;
+            si.fMask=SIF_PAGE | SIF_RANGE;
+            si.nMax=600;
             si.nMin=0;
             si.nPage=height-tabHeight;
-            si.nPos=0;
-            si.nTrackPos=0;
 
             SetScrollInfo(p->listScrollHWND, SB_CTL, &si, TRUE);
             
@@ -117,6 +140,9 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
         {
             SHRGINFO    shrg;
             HMENU       hmenu;
+
+            p->moveCursorTo(LOWORD(lParam), HIWORD(lParam));
+            InvalidateRect(p->getHWnd(), NULL, true);
 
             shrg.cbSize = sizeof(shrg);
             shrg.hwndClient = hWnd;
@@ -136,6 +162,40 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
             break;
         }
 
+    case WM_VSCROLL:
+        {
+            int scrollCode=(int)LOWORD(wParam);
+            int nPos=(int)HIWORD(wParam);
+
+            SCROLLINFO si;
+            si.cbSize=sizeof(SCROLLINFO);
+            si.fMask=SIF_ALL;
+
+            GetScrollInfo(p->listScrollHWND, SB_CTL, &si);
+
+            //TODO: flicker-free scrolling
+            switch (scrollCode) {
+                case SB_LINEDOWN:   
+                    if (si.nPos+si.nPage+tabHeight>=si.nMax) si.nPos=si.nMax-si.nPage; 
+                    else si.nPos+=tabHeight; 
+                break;
+                case SB_LINEUP:     
+                    if (si.nPos-tabHeight<0) si.nPos=0; 
+                    else si.nPos-=tabHeight; break;
+                case SB_ENDSCROLL:  break;
+                default:            si.nPos=nPos; break;
+            }
+
+
+            p->winTop=si.nPos;
+            //TODO: flicker-free scrolling
+            InvalidateRect(p->getHWnd(), NULL, true);
+
+            si.fMask=SIF_POS;
+            SetScrollInfo(p->listScrollHWND, SB_CTL, &si, TRUE);
+            return true;
+
+        }
     case WM_DESTROY:
         //TODO: Destroy all child data associated eith this window
 
@@ -146,6 +206,32 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
     }
     return 0;
 }
+
+
+void ListViewODR::moveCursorTo(int x, int y) {
+    int index=0;
+    y+=winTop-tabHeight;
+
+    int yTop=0;
+    for (ItemList::const_iterator i=odrList.begin(); i!=odrList.end(); i++) {
+        int yBot=i->yPos;
+
+        if (yTop<=y) {
+            if (yBot>y) {
+                cursorPos=index;
+
+                // aligning
+                if (yBot>winTop+clientRect.bottom-tabHeight) winTop=yBot-(clientRect.bottom-tabHeight);
+                if (yTop<winTop) yTop=winTop;
+                return;
+            }
+        }
+        yTop=yBot;
+        index++;
+    }
+    
+}
+
 
 ListViewODR::ListViewODR( HWND parent, const std::string & title ) {
     if (windowClass==0)
@@ -176,7 +262,15 @@ void ListViewODR::addODR(ODRRef odr){
 
     ItemData item={lastY, odr};
     odrList.push_back(item);
-    SetScrollRange(listScrollHWND, SB_CTL, 0, lastY, TRUE);
+
+    SCROLLINFO si;
+    si.cbSize=sizeof(SCROLLINFO);
+    si.fMask=SIF_PAGE | SIF_RANGE;
+    si.nMax=lastY;
+    si.nMin=0;
+    si.nPage=clientRect.bottom-tabHeight;
+    SetScrollInfo(listScrollHWND, SB_CTL, &si, TRUE);
+
     InvalidateRect(getHWnd(), NULL, true);
 }
 

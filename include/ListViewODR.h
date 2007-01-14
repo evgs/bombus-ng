@@ -26,6 +26,9 @@ protected:
 
     ItemList odrList;
 
+    int winTop;
+    int cursorPos;
+
     HWND listScrollHWND;
 
 
@@ -37,6 +40,9 @@ private:
     enum {
         SCROLLWIDTH=14
     };
+
+    void moveCursorTo(int x, int y);
+
     static ATOM windowClass;
     ATOM RegisterWindowClass();
 };

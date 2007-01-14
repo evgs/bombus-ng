@@ -211,6 +211,7 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
 void ListViewODR::moveCursorTo(int x, int y) {
     int index=0;
     y+=winTop-tabHeight;
+    if (y<0) return;
 
     int yTop=0;
     for (ItemList::const_iterator i=odrList.begin(); i!=odrList.end(); i++) {

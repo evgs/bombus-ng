@@ -17,6 +17,8 @@ void IconTextElement::init() {
     DrawText(tmp, getText(), -1, &r, DT_CALCRECT | DT_LEFT | DT_TOP);
     width=r.right+skin->getElementWidth()+ICON_SPACING;
     height=r.bottom;  
+    int himg=skin->getElementWidth();
+    if (height<himg) height=himg;
     DeleteDC(tmp);
 }
 

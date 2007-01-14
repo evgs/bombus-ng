@@ -52,7 +52,7 @@ ResourceContextRef rc;
 ImgListRef skin;
 
 int initJabber();
-void Shell_NotifyIcon(bool show);
+void Shell_NotifyIcon(bool show, HWND hwnd);
 
 // Forward declarations of functions included in this code module:
 ATOM			MyRegisterClass(HINSTANCE, LPTSTR);
@@ -76,7 +76,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	HACCEL hAccelTable;
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_UI));
 
-    Shell_NotifyIcon(true);
 	// Main message loop:
 	while (GetMessage(&msg, NULL, 0, 0)) 
 	{
@@ -86,7 +85,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 	}
-    Shell_NotifyIcon(false);
+    Shell_NotifyIcon(false, NULL);
 	return (int) msg.wParam;
 }
 
@@ -179,6 +178,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
+    Shell_NotifyIcon(true, hWnd);
 
     return TRUE;
 }
@@ -441,6 +441,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}*/
 
+        case WM_USER:
+            SetForegroundWindow((HWND)((ULONG) hWnd | 0x00000001));            
+            break;
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -723,7 +726,7 @@ int initJabber()
 #endif
     rc->account->useSASL=true;
     //rc->account->useEncryption=true;
-	rc->account->useCompression=true;
+	//rc->account->useCompression=true;
 
     rc->jabberStanzaDispatcher=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 
@@ -754,23 +757,26 @@ int initJabber()
 }
 
 
-NOTIFYICONDATA nid = {0};
+NOTIFYICONDATA nid={0};
 
-void Shell_NotifyIcon(bool show)
-{
+void Shell_NotifyIcon(bool show, HWND hwnd){
     // This code will add a Shell_NotifyIcon notificaion on PocketPC and Smartphone
     
     if (show) {
         nid.cbSize = sizeof(nid);
         nid.uID = 100;      // Per WinCE SDK docs, values from 0 to 12 are reserved and should not be used.
-        nid.uFlags = NIF_ICON;
+        nid.uFlags = NIF_ICON | NIF_MESSAGE;
         nid.hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_BOMBUS));
+        nid.uCallbackMessage=WM_USER;
+        nid.hWnd=hwnd;
 
         //Add the notification to the tray
         Shell_NotifyIcon(NIM_ADD, &nid);
-    } else 
+    } else {
         //remove the notification from the tray
         Shell_NotifyIcon(NIM_DELETE, &nid);
+        DeleteObject(nid.hIcon);
+    }
 
     //Update the icon of the notification
     /*nid.uFlags = NIF_ICON;

@@ -13,7 +13,7 @@ public:
     virtual const wchar_t * getWindowTitle() const;
     virtual const OwnerDrawRect * getODR() const;
 
-    void addODR(ODRRef odr);
+    void addODR(ODRRef odr, bool redraw);
 
     typedef boost::shared_ptr<ListViewODR> ref;
 protected:

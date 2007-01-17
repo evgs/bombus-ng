@@ -11,7 +11,7 @@
 
 
 Roster::Roster(){
-    rosterWnd=NULL;
+    roster=ListViewODR::ref();
 }
 
 void Roster::addContact(ContactRef contact) {
@@ -52,8 +52,8 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         if (contact==NULL) { 
             contact=ContactRef(new Contact(jid, "", name));
             std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
-            ListBox_AddString(rosterWnd, rjid.c_str());
-        }
+            roster->addODR(contact, (i==query->getChilds()->end()));
+        }   
 
         contact->subscr=subscr;
         addContact(contact);

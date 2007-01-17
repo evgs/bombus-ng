@@ -6,6 +6,8 @@
 
 #include "Message.h"
 
+#include "IconTextElement.h"
+
 class Jid;
 
 enum Status {
@@ -23,7 +25,7 @@ enum Status {
     PRESENCE_AUTH=-1
 };
 
-class Contact {
+class Contact : public IconTextElement {
 public:
     Contact(const std::string &jid, const std::string &resource, const std::string &nickname);
 
@@ -37,7 +39,15 @@ public:
     MessageListRef messageList;
 
     bool hasUnreadMsgs();
-    
+
+    //////////////////////////////////////////////////////////////////////////
+
+    virtual int getColor() const;
+    virtual int getIconIndex() const;
+    virtual const wchar_t * getText() const;
+
+private:
+    std::wstring wjid;
 };
 
 typedef boost::shared_ptr<Contact> ContactRef;

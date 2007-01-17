@@ -44,9 +44,9 @@ HWND		editWnd;
 HWND		mainWnd;
 
 ListViewRef logWnd;
-ListViewRef rosterWnd;
 TabsCtrlRef tabs;
 ListViewODR::ref odr;
+ListViewODR::ref rosterWnd;
 ResourceContextRef rc;
 
 ImgListRef skin;
@@ -331,7 +331,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
 
-            rosterWnd=ListViewRef(new ListView(hWnd, std::string("Roster")));
+            rosterWnd=ListViewODR::ref(new ListViewODR(hWnd, std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
             logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
@@ -527,7 +527,7 @@ const wchar_t * charToWchar(const char * src, const char *src2 = NULL) {
 void addLog(const wchar_t * msg) {
     ListBox_AddString( logWnd->getListBoxHWnd(), msg);
     ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), 0));
-    odr->addODR(r);
+    odr->addODR(r, true);
 }
 
 void Log::msg(const std::string &message){

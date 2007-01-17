@@ -2,10 +2,15 @@
 
 #include <aygshell.h>
 
+#include <string>
+
 #define NORASTEROP (0x00AA0029)
 
+extern std::wstring appRootPath;
+
 Image::Image( LPCTSTR path ) {
-    bmp=SHLoadImageFile(path);  
+    std::wstring bmpPath=appRootPath+path;
+    bmp=SHLoadImageFile(bmpPath.c_str());  
     mask=NULL;
 }
 
@@ -102,6 +107,7 @@ void ImgList::setGridSize( int nColumns, int nRows ) {
 }
 
 ImgList::ImgList( LPCTSTR path ) {
-    bmp=SHLoadImageFile(path);  
+    std::wstring bmpPath=appRootPath+path;
+    bmp=SHLoadImageFile(bmpPath.c_str());  
     createMask();
 }

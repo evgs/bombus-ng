@@ -51,6 +51,8 @@ ResourceContextRef rc;
 
 ImgListRef skin;
 
+std::wstring appRootPath;
+
 int prepareAccount();
 int initJabber();
 void Shell_NotifyIcon(bool show, HWND hwnd);
@@ -150,6 +152,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         SetForegroundWindow((HWND)((ULONG) hWnd | 0x00000001));
         return 0;
     } 
+
+    wchar_t appName[1024];
+    GetModuleFileName(hInstance, appName, sizeof(appName));
+    appRootPath=appName;
+    int namePos=appRootPath.find_last_of(_T("\\"))+1;
+    appRootPath.erase(namePos, appRootPath.length()-namePos);
 
     if (!MyRegisterClass(hInstance, szWindowClass)) 	return FALSE;
 
@@ -325,7 +333,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.nToolBarId = IDR_MENU;
             mbi.hInstRes   = g_hInst;
 
-            skin=ImgListRef(new ImgList(TEXT("\\Program Files\\ui\\skin.png")));
+            skin=ImgListRef(new ImgList(TEXT("skin.png")));
             skin->setGridSize(8, 6);
 
 			editWnd=DoCreateEditControl(hWnd);

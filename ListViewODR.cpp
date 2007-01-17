@@ -57,15 +57,10 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
             hdc=CreateCompatibleDC(NULL);
             SelectObject(hdc, buf);
 
-            PatBlt(hdc, 0,0, p->clientRect.right, p->clientRect.bottom, WHITENESS);
+            PatBlt(hdc, 0,tabHeight, p->clientRect.right, p->clientRect.bottom-tabHeight, WHITENESS);
             // TODO: Add any drawing code here...
 
-            RECT rc = {0, 0, 100, 100};
-
             SetBkMode(hdc, OPAQUE);
-            LPCTSTR t=p->title.c_str();
-            DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
-            DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);
 
             int y=tabHeight-p->winTop;
             //int index=-1;
@@ -96,6 +91,20 @@ LRESULT CALLBACK ListViewODR::WndProc( HWND hWnd, UINT message, WPARAM wParam, L
                 }
                 odr->draw(hdc, ritem);
             }
+
+            RECT rc = {0, 0, 100, 100};
+
+            int titleBgnd=0x808080;
+            HBRUSH tb=CreateSolidBrush(titleBgnd);
+            SetBkColor(hdc, titleBgnd);
+            SetTextColor(hdc, 0x000000);
+
+            LPCTSTR t=p->title.c_str();
+            DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
+            rc.right=p->clientRect.right;
+            FillRect(hdc, &rc, tb);
+            DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);
+            DeleteObject(tb);
 
             BitBlt(wnd, 0,0,p->clientRect.right, p->clientRect.bottom, hdc, 0,0, SRCCOPY);
             DeleteDC(hdc);
@@ -294,7 +303,8 @@ ListViewODR::~ListViewODR() {}
 
 const OwnerDrawRect * ListViewODR::getODR() const { return wt.get(); }
 
-void ListViewODR::addODR(ODRRef odr){
+void ListViewODR::addODR( ODRRef odr, bool redraw ) 
+{
     int lastY=(odrList.empty())? 0: odrList.back().yPos;
     lastY+=odr->getHeight();
 
@@ -307,6 +317,8 @@ void ListViewODR::addODR(ODRRef odr){
     si.nMax=lastY;
     si.nMin=0;
     si.nPage=clientRect.bottom-tabHeight;
+
+    if (!redraw) return;
     SetScrollInfo(listScrollHWND, SB_CTL, &si, TRUE);
 
     InvalidateRect(getHWnd(), NULL, true);

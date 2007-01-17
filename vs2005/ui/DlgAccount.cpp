@@ -15,6 +15,21 @@
 static JabberAccountRef dlgAccountParam;
 
 
+void GetDlgItemText(HWND hDlg, int itemId, std::string &dest) {
+    wchar_t buf[1024];
+    ::GetDlgItemText(hDlg, itemId, buf, sizeof(buf));
+    dest=utf8::wchar_utf8(buf);
+}
+std::string GetDlgItemText(HWND hDlg, int itemId) {
+    wchar_t buf[1024];
+    ::GetDlgItemText(hDlg, itemId, buf, sizeof(buf));
+    return utf8::wchar_utf8(buf);
+}
+
+void SetDlgItemText(HWND hDlg, int itemId, const std::string &data) {
+    ::SetDlgItemText(hDlg, itemId, utf8::utf8_wchar(data).c_str());
+}
+
 INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -28,10 +43,10 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 			shidi.hDlg = hDlg;
 			SHInitDialog(&shidi);
 
-            SetDlgItemText(hDlg, IDC_E_JID, utf8::utf8_wchar(dlgAccountParam->getBareJid()).c_str());
-            SetDlgItemText(hDlg, IDC_E_PASSWORD, utf8::utf8_wchar(dlgAccountParam->password).c_str());
-            SetDlgItemText(hDlg, IDC_E_RESOURCE, utf8::utf8_wchar(dlgAccountParam->getResource()).c_str());
-            SetDlgItemText(hDlg, IDC_E_HOSTIP, utf8::utf8_wchar(dlgAccountParam->hostNameIp).c_str());
+            SetDlgItemText(hDlg, IDC_E_JID, dlgAccountParam->getBareJid());
+            SetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
+            SetDlgItemText(hDlg, IDC_E_RESOURCE, dlgAccountParam->getResource());
+            SetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);
             SetDlgItemInt(hDlg, IDC_E_PORT, dlgAccountParam->port, false);
             CheckDlgButton(hDlg, IDC_X_SSL, (dlgAccountParam->useEncryption)?BST_CHECKED:BST_UNCHECKED);
             CheckDlgButton(hDlg, IDC_X_PLAIN, (dlgAccountParam->plainTextPassword)?BST_CHECKED:BST_UNCHECKED);
@@ -43,6 +58,18 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK)
 		{
+            dlgAccountParam->setBareJid(GetDlgItemText(hDlg, IDC_E_JID));
+            GetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
+            dlgAccountParam->setResource(GetDlgItemText(hDlg, IDC_E_RESOURCE));
+            GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);
+
+            dlgAccountParam->port=GetDlgItemInt(hDlg, IDC_E_PORT, NULL, false);
+
+            dlgAccountParam->useEncryption=IsDlgButtonChecked(hDlg, IDC_X_SSL)==BST_CHECKED;
+            dlgAccountParam->plainTextPassword=IsDlgButtonChecked(hDlg, IDC_X_PLAIN)==BST_CHECKED;
+            dlgAccountParam->useSASL=IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_CHECKED;
+            dlgAccountParam->useCompression=IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED;
+
 			EndDialog(hDlg, LOWORD(wParam));
 			return TRUE;
 		}

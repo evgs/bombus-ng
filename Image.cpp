@@ -57,8 +57,8 @@ void ImgList::drawElement( HDC hdc, int index, int x, int y ) const {
 
     //char *bits=new char()
 
-    int xm=(index&&0x0f) * elWidth;
-    int ym=(index&&0xf0 >> 8) * elHeight;
+    int xm=(index&0x0f) * elWidth;
+    int ym=(index&0xf0 >> 8) * elHeight;
     
     MaskBlt(hdc, x,y,  elWidth, elHeight, 
         src, xm, ym, 

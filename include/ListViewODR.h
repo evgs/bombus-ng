@@ -29,7 +29,7 @@ protected:
     int winTop;
     ItemList::iterator cursorPos;
 
-    HWND listScrollHWND;
+    //HWND listScrollHWND;
 
 
 

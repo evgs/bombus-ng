@@ -67,7 +67,8 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             if (p->odrlist.get()) {
                 ODRSetIterator::ref i=p->odrlist->getEnum();
                 while (i->hasMoreElements()) {
-                    ODRRef odr=i->next();
+                    bool focused=i->equals(p->cursorPos);
+                    ODRRef odr=i->get(); i->next();
                     int iHeight=odr->getHeight();
                     RECT ritem={0, y, p->clientRect.right, y+iHeight} ;
                     y+=iHeight;
@@ -75,7 +76,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
 
                     if (ritem.bottom < 0) continue;
                     if (ritem.top > p->clientRect.bottom) continue;
-                    if (i->equals(p->cursorPos)) {
+                    if (focused) {
                         // focused item
                         int cursColor=(GetFocus()==hWnd)?0x800000:0x808080;
                         HBRUSH cur=CreateSolidBrush(cursColor);
@@ -119,7 +120,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
 
     case WM_SIZE: 
         { 
-            HDWP hdwp; 
+            //HDWP hdwp; 
 
             int height=GET_Y_LPARAM(lParam);
             int width=GET_X_LPARAM(lParam);
@@ -149,7 +150,6 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
     case WM_LBUTTONDOWN:
         {
             SHRGINFO    shrg;
-            HMENU       hmenu;
 
             SetFocus(hWnd);
             if (!(p->moveCursorTo(LOWORD(lParam), HIWORD(lParam)))) break;
@@ -162,7 +162,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             shrg.dwFlags = SHRG_RETURNCMD /*| SHRG_NOANIMATION*/;
 
             if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
-                /*hmenu = GetSubMenu(g_hMainMenu, 0);
+                /*HMENU hmenu = GetSubMenu(g_hMainMenu, 0);
                 TrackPopupMenuEx(hmenu,
                 TPM_LEFTALIGN,
                 LOWORD(lParam),
@@ -185,8 +185,15 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             int lkeyData=lParam;
             if (lkeyData & 0x800000) break; //keyRelease 
             switch (vKey) {
-    case VK_UP: if (!(p->cursorPos->isFirstElement())) p->cursorPos->previous(); break;
-    case VK_DOWN: if (p->cursorPos->hasMoreElements()) p->cursorPos->next(); break;
+            case VK_UP: 
+                if (!(p->cursorPos->isFirstElement())) p->cursorPos->previous(); 
+                else if (p->wrapList) p->cursorPos->setLast();
+                break;
+
+            case VK_DOWN: 
+                if (!(p->cursorPos->isLastElement())) p->cursorPos->next(); 
+                else if (p->wrapList) p->cursorPos->setFirst();
+                break;
             }
             p->cursorFit();
             InvalidateRect(p->getHWnd(), NULL, true);
@@ -224,7 +231,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
 
 
             if (si.nPos<0) si.nPos=0; 
-            if (si.nPos+si.nPage >= si.nMax) si.nPos=si.nMax-si.nPage; 
+            if (si.nPos+(int)si.nPage >= si.nMax) si.nPos=si.nMax-si.nPage; 
 
             p->winTop= si.nPos;
 
@@ -254,8 +261,9 @@ bool VirtualListView::moveCursorTo( int x, int y )
     if (y<0) return false;
 
     int yTop=0;
-    for (ODRSetIterator::ref i = odrlist->getEnum(); i->hasMoreElements(); ) {
-        int yBot=yTop+i->next()->getHeight();
+    ODRSetIterator::ref i = odrlist->getEnum();
+    while ( i->hasMoreElements() ) {
+        int yBot=yTop+i->get()->getHeight();
 
         if (yTop<=y) {
             if (yBot>y) {
@@ -265,6 +273,7 @@ bool VirtualListView::moveCursorTo( int x, int y )
                 return true;
             }
         }
+        i->next();
         yTop=yBot;
     }
     return false;
@@ -276,8 +285,6 @@ void VirtualListView::cursorFit() {
     ODRSetIterator::ref i = odrlist->getEnum();
     int yTop=0;
     while ( i->hasMoreElements() ) {
-        i->next();
-
         int yBot=yTop+ i->get()->getHeight();
 
         if (i->equals(cursorPos)) {
@@ -286,21 +293,26 @@ void VirtualListView::cursorFit() {
             break;
         }
         yTop=yBot;
+        i->next();
     }
 }
 
 
-VirtualListView::VirtualListView( HWND parent, const std::string & title ) {
+VirtualListView::VirtualListView() {
     if (windowClass==0)
         windowClass=RegisterWindowClass();
     if (windowClass==0) throw std::exception("Can't create window class");
+    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_VISIBLE | WS_VSCROLL,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL/*parent*/, NULL, g_hInst, (LPVOID)this);
+    wrapList=true;
+}
+
+VirtualListView::VirtualListView( HWND parent, const std::string & title ) {
 
     parentHWnd=parent;
+    SetParent(thisHWnd, parent);
 
     this->title=utf8::utf8_wchar(title);
-
-    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_VISIBLE | WS_VSCROLL,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
 
     wt=WndTitleRef(new WndTitle(this, 0));
     cursorPos=odrlist->getEnum();
@@ -314,12 +326,12 @@ VirtualListView::~VirtualListView() {}
 
 const OwnerDrawRect * VirtualListView::getODR() const { return wt.get(); }
 
-void VirtualListView::addODR( bool redraw ) {
+void VirtualListView::notifyListUpdate( bool redraw ) {
 
     int lastY=0;
     ODRSetIterator::ref i = odrlist->getEnum();
     while ( i->hasMoreElements() ) {
-        lastY=+ i->next()->getHeight();
+        lastY+= i->get()->getHeight(); i->next();
     }
 
     SCROLLINFO si;
@@ -346,26 +358,39 @@ bool ODRSetIterator::operator==( ODRSetIterator &right ) { return get()==right.g
 //////////////////////////////////////////////////////////////////////////
 ODRSet::~ODRSet() {}
 
+ODRSet::ODRSet() { }
 //////////////////////////////////////////////////////////////////////////
-ODRListIterator::ODRListIterator( ODRList::ref odrlref ) {
+ODRListIterator::ODRListIterator( ODRList * odrlref ) {
     this->odrlref=odrlref;
+    iterator=0;//this->odrlref->odrlist.begin();
 }
 
 bool ODRListIterator::isFirstElement() {
-    return iterator==((ODRList)(*odrlref)).odrlist.begin();
+    return iterator==0;//((ODRList)(*odrlref)).odrlist.begin();
 }
 
-ODRRef ODRListIterator::get() { return *iterator; }
+ODRRef ODRListIterator::get() { return odrlref->odrVector[iterator]; }
 
-ODRRef ODRListIterator::next() { return *(iterator++); }
+void ODRListIterator::next() { iterator++; }
 
-ODRRef ODRListIterator::previous() { return *(iterator--); }
+void ODRListIterator::previous() { --iterator; }
 
 bool ODRListIterator::hasMoreElements() { 
-    return iterator!=((ODRList)(*odrlref)).odrlist.end();
+    return iterator!=odrlref->odrVector.size();//end();
 }
 
+bool ODRListIterator::isLastElement() {
+    int sz=odrlref->odrVector.size();
+    return (sz==0) || iterator==sz-1;
+}
+
+void ODRListIterator::setFirst() { iterator=0; }
+void ODRListIterator::setLast() { 
+    int sz=odrlref->odrVector.size();
+    iterator=(sz==0)? 0 : sz-1; 
+}
 //////////////////////////////////////////////////////////////////////////
 ODRSetIterator::ref ODRList::getEnum() {
-    return ODRSetIterator::ref(new ODRListIterator( ref(this) ));
+    return ODRListIterator::ref(new ODRListIterator( this ));
 }
+ODRList::ODRList() {}

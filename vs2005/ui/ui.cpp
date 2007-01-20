@@ -198,7 +198,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 HWND WINAPI DoCreateEditControl(HWND hwndParent) {
 
 	HWND hWndEdit; 
-	TCITEM tie; 
+	//TCITEM tie; 
 
 	hWndEdit=CreateWindow(_T("EDIT"), _T("LOG"), 
 		WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL
@@ -208,30 +208,10 @@ HWND WINAPI DoCreateEditControl(HWND hwndParent) {
 	return hWndEdit;
 }
 ////////////////////////////////////////////////////////////////////////////////
-HWND WINAPI DoCreateComboControl(HWND hwndParent) {
-
-	HWND hWndCombo; 
-	TCITEM tie; 
-
-	/*hWndCombo=CreateWindow(_T("COMBOBOX"), _T("LOG"), 
-		WS_BORDER| WS_CHILD | WS_VISIBLE 
-		| CBS_DROPDOWNLIST | CBS_HASSTRINGS, 
-		0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
-		hwndParent, NULL, g_hInst, NULL); 
-	ComboBox_AddString(hWndCombo, _T("TEST1"));
-	ComboBox_AddString(hWndCombo, _T("TEST2"));
-	ComboBox_SetCurSel(hWndCombo, 0);
-	//SendMessage(hWndCombo,CB_SETMINVISIBLE, 10, 0);
-	ComboBox_SetItemHeight(hWndCombo, 0, 64);
-	*/
-	
-	return hWndCombo;
-}
-////////////////////////////////////////////////////////////////////////////////
 HWND WINAPI DoCreateListControl(HWND hwndParent) {
 
     HWND hWndList; 
-    TCITEM tie; 
+    //TCITEM tie; 
 
 	hWndList=CreateWindow(_T("LISTBOX"), NULL, 
 				WS_BORDER| WS_CHILD | /*WS_VISIBLE |*/ WS_VSCROLL

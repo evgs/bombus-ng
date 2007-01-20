@@ -36,30 +36,6 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 
-class ODRList : public ODRSet {
-public:
-    ODRList();
-    virtual ODRSetIterator::ref getEnum();
-    std::vector<ODRRef> odrVector;    
-    typedef boost::shared_ptr<ODRList> ref;
-};
-//////////////////////////////////////////////////////////////////////////
-class ODRListIterator : public ODRSetIterator {
-public:
-    ODRListIterator(ODRList * odrlref);
-    virtual bool isFirstElement();
-    virtual bool isLastElement();
-    virtual void setFirst();
-    virtual void setLast();
-    virtual ODRRef get();
-    virtual void next();
-    virtual void previous();
-    virtual bool hasMoreElements();
-private:
-    ODRList * odrlref;
-    int iterator;
-};
-//////////////////////////////////////////////////////////////////////////
 
 class VirtualListView : public Wnd {
 public:

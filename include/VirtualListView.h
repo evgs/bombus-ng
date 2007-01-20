@@ -3,6 +3,8 @@
 #include "Wnd.h"
 #include "OwnerDrawRect.h"
 
+#include <vector>
+
 //////////////////////////////////////////////////////////////////////////
 class ODRSetIterator {
 public:
@@ -10,9 +12,12 @@ public:
 
     virtual ~ODRSetIterator();
     virtual bool isFirstElement()=0;
+    virtual bool isLastElement()=0;
+    virtual void setFirst()=0;
+    virtual void setLast()=0;
     virtual ODRRef get()=0;
-    virtual ODRRef next()=0;
-    virtual ODRRef previous()=0;
+    virtual void next()=0;
+    virtual void previous()=0;
     virtual bool hasMoreElements()=0;
 
     bool equals(ref iter2);
@@ -21,9 +26,11 @@ public:
 
 class ODRSet {
 public:
+    ODRSet();
     virtual ~ODRSet();
     virtual ODRSetIterator::ref getEnum()=0;
     typedef boost::shared_ptr<ODRSet> ref;
+protected:
 };
 
 
@@ -31,26 +38,32 @@ public:
 
 class ODRList : public ODRSet {
 public:
+    ODRList();
     virtual ODRSetIterator::ref getEnum();
-    std::list<ODRRef> odrlist;    
+    std::vector<ODRRef> odrVector;    
     typedef boost::shared_ptr<ODRList> ref;
 };
 //////////////////////////////////////////////////////////////////////////
 class ODRListIterator : public ODRSetIterator {
 public:
-    ODRListIterator(ODRList::ref odrlref);
+    ODRListIterator(ODRList * odrlref);
     virtual bool isFirstElement();
+    virtual bool isLastElement();
+    virtual void setFirst();
+    virtual void setLast();
     virtual ODRRef get();
-    virtual ODRRef next();
-    virtual ODRRef previous();
+    virtual void next();
+    virtual void previous();
     virtual bool hasMoreElements();
 private:
-    ODRList::ref odrlref;
-    std::list<ODRRef>::iterator iterator;
+    ODRList * odrlref;
+    int iterator;
 };
+//////////////////////////////////////////////////////////////////////////
 
 class VirtualListView : public Wnd {
 public:
+    VirtualListView();
     VirtualListView(HWND parent, const std::string & title);
     virtual ~VirtualListView();
 
@@ -59,7 +72,7 @@ public:
     virtual const wchar_t * getWindowTitle() const;
     virtual const OwnerDrawRect * getODR() const;
 
-    void addODR( bool redraw);
+    void notifyListUpdate( bool redraw);
 
     typedef boost::shared_ptr<VirtualListView> ref;
 protected:
@@ -83,6 +96,7 @@ private:
         SCROLLWIDTH=14
     };
 
+    bool wrapList;
     bool moveCursorTo(int x, int y);
     void cursorFit();
 

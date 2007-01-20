@@ -208,25 +208,6 @@ HWND WINAPI DoCreateEditControl(HWND hwndParent) {
 	return hWndEdit;
 }
 ////////////////////////////////////////////////////////////////////////////////
-HWND WINAPI DoCreateListControl(HWND hwndParent) {
-
-    HWND hWndList; 
-    //TCITEM tie; 
-
-	hWndList=CreateWindow(_T("LISTBOX"), NULL, 
-				WS_BORDER| WS_CHILD | /*WS_VISIBLE |*/ WS_VSCROLL
-				| LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT, 
-		        0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
-		        hwndParent, NULL, g_hInst, NULL); 
-	
-	//ListBox_AddString(hWndList, _T("STR1"));
-	//ListBox_AddString(hWndList, _T("STR2"));
-	ListBox_SetTopIndex(hWndList, 0);
-
-	int count=ListBox_GetCount(hWndList);
-	return hWndList;
-}
-////////////////////////////////////////////////////////////////////////////////
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
 //  PURPOSE:  Processes messages for the main window.

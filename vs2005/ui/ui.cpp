@@ -51,7 +51,7 @@ ResourceContextRef rc;
 
 ImgListRef skin;
 
-std::wstring bombusRootPath;
+std::wstring appRootPath;
 
 int prepareAccount();
 int initJabber();
@@ -155,9 +155,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     wchar_t appName[1024];
     GetModuleFileName(hInstance, appName, sizeof(appName));
-    bombusRootPath=appName;
-    int namePos=bombusRootPath.find_last_of(_T("\\"))+1;
-    bombusRootPath.erase(namePos, bombusRootPath.length()-namePos);
+    appRootPath=appName;
+    int namePos=appRootPath.find_last_of(_T("\\"))+1;
+    appRootPath.erase(namePos, appRootPath.length()-namePos);
 
     if (!MyRegisterClass(hInstance, szWindowClass)) 	return FALSE;
 

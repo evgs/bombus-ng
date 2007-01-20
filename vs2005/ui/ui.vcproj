@@ -312,6 +312,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\VirtualListView.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Wnd.cpp"
 				>
 			</File>
@@ -475,6 +479,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\utf8.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\VirtualListView.h"
 				>
 			</File>
 			<File

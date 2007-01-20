@@ -1,7 +1,8 @@
 #pragma once
 
-#include <windows.h>
 #include <boost/shared_ptr.hpp>
+#include <windows.h>
+#include <list>
 
 class OwnerDrawRect {
 public:

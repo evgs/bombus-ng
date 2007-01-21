@@ -70,6 +70,8 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             dlgAccountParam->useSASL=IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_CHECKED;
             dlgAccountParam->useCompression=IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED;
 
+            dlgAccountParam->saveAccount(TEXT("defAccount.bin"));
+
 			EndDialog(hDlg, LOWORD(wParam));
 			return TRUE;
 		}

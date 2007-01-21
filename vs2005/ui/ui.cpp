@@ -55,6 +55,7 @@ std::wstring appRootPath;
 
 int prepareAccount();
 int initJabber();
+void streamShutdown();
 void Shell_NotifyIcon(bool show, HWND hwnd);
 
 // Forward declarations of functions included in this code module:
@@ -251,6 +252,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				case IDM_JABBER_ONLINE:
 					initJabber();
 					break;
+
+                case IDM_JABBER_OFFLINE:
+                    streamShutdown();
 
 				case IDM_JABBER_STREAMINFO:
 					rc->log->msg(
@@ -495,7 +499,7 @@ const wchar_t * charToWchar(const char * src, const char *src2 = NULL) {
 
 void addLog(const wchar_t * msg) {
     ListBox_AddString( logWnd->getListBoxHWnd(), msg);
-    ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), 0));
+    ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), -1));
     odr->addODR(r, true);
 }
 
@@ -560,7 +564,7 @@ private:
 };
 ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     
-    rc->log->msg("version request", block->getAttribute("from").c_str());
+    rc->log->msg("version request ", block->getAttribute("from").c_str());
 
     std::string version=utf8::wchar_utf8(sysinfo::getOsVersion());
 
@@ -681,27 +685,20 @@ bool JabberStreamEvents::connect(){
 int prepareAccount(){
     rc=ResourceContextRef(new ResourceContext());
     rc->log=new Log();
-#ifdef JIVESOFTWARE
-    rc->account=JabberAccountRef(new JabberAccount("bombus_mobilus@jivesoftware.com", "bombus-ng"));
+    //rc->account=JabberAccountRef(new JabberAccount("bombus_mobilus@jivesoftware.com", "bombus-ng"));
     //rc->account->hostNameIp="213.180.203.19";
-    rc->account->password="l12sx95a";
-#else
-    rc->account=JabberAccountRef(new JabberAccount("evgs@jabber.ru", "bombus-ng"));
-    //rc->account->hostNameIp="213.180.203.19";
-    //rc->account->port=5222;
-    rc->account->password=
-#include "password"
-        ;
-#endif
-    rc->account->useSASL=true;
+    //rc->account->password="l12sx95a";
+
+    rc->account=JabberAccountRef(new JabberAccount(TEXT("defAccount.bin")));
+
+    //rc->account->useSASL=true;
     //rc->account->useEncryption=true;
-    rc->account->useCompression=true;
+    //rc->account->useCompression=true;
     return 0;
 }
 //////////////////////////////////////////////////////////////
 int initJabber()
-{{
-
+{
     rc->jabberStanzaDispatcher=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 
     //TODO: roster caching
@@ -710,24 +707,11 @@ int initJabber()
 
     rc->jabberStream=JabberStreamRef(new JabberStream(rc, JabberListenerRef(new JabberStreamEvents(rc))));
 
-
-    //jstream.sendStanza(test);
-	//printf("%s", test.toXML());
-
-	/*char tmp[16];
-	gets_s(tmp,16);
-	//jstream.sendStanza(login);
-	rc->jabberStream->sendXmppEndHeader();
-
-	gets_s(tmp,16);
-
-	rc->log->msg(
-		rc->connection->getStatistics().c_str()
-		);
-
-	gets_s(tmp,16);*/
-}
 	return 0;
+}
+//////////////////////////////////////////////////////////////////////////
+void streamShutdown(){
+    rc->jabberStream->sendXmppEndHeader();
 }
 
 

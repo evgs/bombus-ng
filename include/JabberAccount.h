@@ -2,14 +2,16 @@
 
 #include <string>
 #include "jid.h"
+#include "Serialize.h"
 
 class JabberAccount {
 
 public:
 	JabberAccount();
 	JabberAccount(const std::string &jid, const std::string &resource);
+    JabberAccount(LPCTSTR filename);
 
-	~JabberAccount();
+    virtual ~JabberAccount();
 
 	const std::string & getUserName(void) const {return jid.getUserName(); };
 	const std::string & getServer(void) const {return jid.getServer(); };
@@ -23,8 +25,14 @@ public:
 	void setJid(const std::string &jid){ this->jid.setJid(jid); };
 	void setBareJid(const std::string &bareJid){ jid.setBareJid(bareJid); };
 
+    void saveAccount(LPCTSTR fileName);
+
+    void serialize(Serialize &s, bool read);
+
 private:
 	Jid jid;
+
+    int version;
 
 public:
 
@@ -43,5 +51,5 @@ public:
 	std::string proxy;
 
 private:
-	void updateJid(void);
+    void init();
 };

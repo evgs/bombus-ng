@@ -47,7 +47,7 @@ NonSASLAuth::NonSASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader)
 
 SASLAuth::SASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader){
     this->rc=rc;
-	rc->log->msg("SASL Login: <stream:stream>");
+	//rc->log->msg("SASL Login: <stream:stream>");
 }
 
 const std::string responseMd5Digest( const std::string &user, const std::string &pass, const std::string &realm, const std::string &digestUri, const std::string &nonce, const std::string cnonce);

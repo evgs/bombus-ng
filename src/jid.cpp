@@ -31,7 +31,7 @@ void Jid::setJid(const std::string &jid){
 	int at=jid.find('@');
 	int slash=jid.find('/');
 	userName=jid.substr(0,at);
-	server=jid.substr(at+1,slash);
+	server=jid.substr(at+1,slash-at-1);
 	resource=jid.substr(slash+1);
 
 	updateJid();

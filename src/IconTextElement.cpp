@@ -24,8 +24,11 @@ void IconTextElement::init() {
 
 void IconTextElement::draw(HDC hdc, RECT &rt) const {
     SetBkMode(hdc, TRANSPARENT);
-    skin->drawElement(hdc, getIconIndex(), rt.left, rt.top);
-    rt.left+=skin->getElementWidth()+ICON_SPACING;
+    int iconIdx=getIconIndex();
+    if (iconIdx>=0) {
+        skin->drawElement(hdc, getIconIndex(), rt.left, rt.top);
+        rt.left+=skin->getElementWidth()+ICON_SPACING;
+    }
     DrawText(hdc, getText(), -1, &rt, DT_LEFT | DT_TOP | DT_END_ELLIPSIS);
 }
 

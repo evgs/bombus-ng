@@ -43,13 +43,17 @@ CeTLSSocket::CeTLSSocket(const std::string & url, const int port){
     ioctlresult=WSAIoctl(sock, SO_SSL_SET_FLAGS, &dw, sizeof(DWORD), 0, 0, 0, 0, 0);
     if (ioctlresult==SOCKET_ERROR) throwSocketError();
 
-    struct hostent FAR* host=gethostbyname(url.c_str());
+    long inaddr=inet_addr(url.c_str());
+    if (inaddr==INADDR_NONE) {
+        struct hostent FAR* host=gethostbyname(url.c_str());
 
-    if (host==NULL) throwSocketError();
+        if (host==NULL) throwSocketError();
+        inaddr=*((unsigned long *)host->h_addr_list[0]);
+    }
 
     struct sockaddr_in name;
     name.sin_family=AF_INET;
-    name.sin_addr.S_un.S_addr=*((unsigned long *)host->h_addr_list[0]);
+    name.sin_addr.S_un.S_addr=inaddr;
     name.sin_port= htons(port); // internet byte order
 
     int result=connect(sock, (sockaddr*)(&name), sizeof(name));

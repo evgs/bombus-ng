@@ -546,7 +546,7 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 	JabberDataBlock * qry=reply.addChild("query",NULL);
 	qry->setAttribute("xmlns","jabber:iq:version");
 	qry->addChild("name","Bombus-ng");
-	qry->addChild("version","0.0.2-devel");
+	qry->addChild("version","0.0.3-devel");
 	qry->addChild("os",version.c_str());
 
 	rc->jabberStream->sendStanza(reply);
@@ -574,7 +574,7 @@ ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceC
 	reply.setAttribute("to", "evgs@jabber.ru/Psi_Home");
 	reply.addChild("body", NULL)->setText(XMLStringPrep( *orig ));
 
-	rc->jabberStream->sendStanza(reply);
+	//rc->jabberStream->sendStanza(reply);
     chatSample->addMessage(*orig);
 
 	return BLOCK_PROCESSED;

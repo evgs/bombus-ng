@@ -204,6 +204,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\ChatView.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\CompressedSocket.cpp"
 				>
 			</File>
@@ -245,10 +249,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\jid.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\ListView.cpp"
 				>
 			</File>
 			<File
@@ -354,6 +354,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\ChatView.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\CompressedSocket.h"
 				>
 			</File>
@@ -411,10 +415,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\jid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\ListView.h"
 				>
 			</File>
 			<File

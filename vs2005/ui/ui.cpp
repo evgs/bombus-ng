@@ -24,8 +24,8 @@
 #include "Roster.h"
 
 #include "DlgAccount.h"
-#include "ListView.h"
 #include "ListViewODR.h"
+#include "ChatView.h"
 #include "TabCtrl.h"
 
 #include "Auth.h"
@@ -34,19 +34,20 @@
 
 #include "Image.h"
 
+#include "utf8.hpp"
+
 #define MAX_LOADSTRING 100
 
 // Global Variables:
 HINSTANCE			g_hInst;			// current instance
 HWND				g_hWndMenuBar;		// menu bar handle
-HWND		listWnd;
-HWND		editWnd;
 HWND		mainWnd;
 
-ListViewRef logWnd;
+//ListViewRef logWnd;
 TabsCtrlRef tabs;
-ListViewODR::ref odr;
+ListViewODR::ref odrLog;
 ListViewODR::ref rosterWnd;
+ChatView::ref chatSample;
 ResourceContextRef rc;
 
 ImgListRef skin;
@@ -196,19 +197,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 
 ////////////////////////////////////////////////////////////////////////////////
-HWND WINAPI DoCreateEditControl(HWND hwndParent) {
-
-	HWND hWndEdit; 
-	//TCITEM tie; 
-
-	hWndEdit=CreateWindow(_T("EDIT"), _T("LOG"), 
-		WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL
-		| ES_MULTILINE , 
-		0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
-		hwndParent, NULL, g_hInst, NULL); 
-	return hWndEdit;
-}
-////////////////////////////////////////////////////////////////////////////////
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
 //
 //  PURPOSE:  Processes messages for the main window.
@@ -221,7 +209,7 @@ HWND WINAPI DoCreateEditControl(HWND hwndParent) {
 
 // tab variables here
 int tabHeight=16;
-int editHeight=64;
+//int editHeight=64;
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -301,19 +289,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             skin=ImgListRef(new ImgList(TEXT("skin.png")));
             skin->setGridSize(8, 6);
 
-			editWnd=DoCreateEditControl(hWnd);
+			//editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
 
             rosterWnd=ListViewODR::ref(new ListViewODR(hWnd, std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
-            logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
-            tabs->addWindow(logWnd);
+            chatSample=ChatView::ref(new ChatView(hWnd, std::string("SampleChat")));
+            tabs->addWindow(chatSample);
+            //logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
+            //tabs->addWindow(logWnd);
 
-            odr=ListViewODR::ref(new ListViewODR(hWnd, std::string("ODR")));
-            tabs->addWindow(odr);
+            odrLog=ListViewODR::ref(new ListViewODR(hWnd, std::string("Log")));
+            tabs->addWindow(odrLog);
 
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 1"))));
+            /*tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 1"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 2"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 3"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window long name"))));
@@ -321,7 +311,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 5"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 6"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 7"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window extra long name"))));
+            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window extra long name"))));*/
 			//listWnd=logWnd;
 			//dropdownWnd=DoCreateComboControl(hWnd);
 
@@ -341,9 +331,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_PAINT:
             hdc = BeginPaint(hWnd, &ps);
 
-            {
+            /*{
                 skin->drawElement(hdc, 0, 0,0);                
-            }
+            }*/
             
             // TODO: Add any drawing code here...
             
@@ -357,37 +347,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_SIZE: 
 			{ 
 				HDWP hdwp; 
-				RECT rc; 
 				
 				int height=GET_Y_LPARAM(lParam);
-				int ySplit=height-editHeight;
-				// Calculate the display rectangle, assuming the 
-				// tab control is the size of the client area. 
-				SetRect(&rc, 0, 0, 
-					GET_X_LPARAM(lParam), ySplit ); 
 								
 				// Size the tab control to fit the client area. 
-				hdwp = BeginDeferWindowPos(3);
-
-				/*DeferWindowPos(hdwp, dropdownWnd, HWND_TOP, 0, 0, 
-					GET_X_LPARAM(lParam), 20, 
-					SWP_NOZORDER 
-					); */
-
+				hdwp = BeginDeferWindowPos(1);
 
 				DeferWindowPos(hdwp, tabs->getHWnd(), HWND_TOP, 0, tabHeight, 
-					GET_X_LPARAM(lParam), ySplit-tabHeight, 
-					SWP_NOZORDER 
-					);
-				/*DeferWindowPos(hdwp, rosterWnd, HWND_TOP, 0, tabHeight, 
 					GET_X_LPARAM(lParam), height-tabHeight, 
 					SWP_NOZORDER 
-					);*/
-
-				DeferWindowPos(hdwp, editWnd, NULL, 0, ySplit+1, 
-					GET_X_LPARAM(lParam), height-ySplit-1, 
-					SWP_NOZORDER 
-					); 
+					);
 				
 				EndDeferWindowPos(hdwp); 
 				
@@ -498,9 +467,9 @@ const wchar_t * charToWchar(const char * src, const char *src2 = NULL) {
 
 
 void addLog(const wchar_t * msg) {
-    ListBox_AddString( logWnd->getListBoxHWnd(), msg);
+    //ListBox_AddString( logWnd->getListBoxHWnd(), msg);
     ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), -1));
-    odr->addODR(r, true);
+    odrLog->addODR(r, true);
 }
 
 void Log::msg(const std::string &message){
@@ -598,13 +567,16 @@ private:
 	ResourceContextRef rc;
 };
 ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+    StringRef orig=block->toXML();
 	rc->log->msg("Message from ", block->getAttribute("from").c_str()); 
 	JabberDataBlock reply("message");
 	reply.setAttribute("type","chat");
 	reply.setAttribute("to", "evgs@jabber.ru/Psi_Home");
-	reply.addChild("body", NULL)->setText(XMLStringPrep( *(block->toXML()) ));
+	reply.addChild("body", NULL)->setText(XMLStringPrep( *orig ));
 
 	rc->jabberStream->sendStanza(reply);
+    chatSample->addMessage(*orig);
+
 	return BLOCK_PROCESSED;
 }
 

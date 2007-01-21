@@ -136,10 +136,12 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             );
             EndDeferWindowPos(hdwp); */
 
+            p->cursorFit();
             SCROLLINFO si;
             si.cbSize=sizeof(SCROLLINFO);
-            si.fMask=SIF_PAGE;
+            si.fMask=SIF_PAGE |SIF_POS;
             si.nPage=height;
+            si.nPos=p->winTop;
 
             SetScrollInfo(p->thisHWnd, SB_VERT, &si, TRUE);
 

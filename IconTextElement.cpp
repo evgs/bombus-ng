@@ -28,7 +28,7 @@ void IconTextElement::draw(HDC hdc, RECT &rt) const {
     if (iconIdx>=0) {
         skin->drawElement(hdc, getIconIndex(), rt.left, rt.top);
         rt.left+=skin->getElementWidth()+ICON_SPACING;
-    }
+    } else rt.left+=1;
     DrawText(hdc, getText(), -1, &rt, DT_LEFT | DT_TOP | DT_END_ELLIPSIS);
 }
 

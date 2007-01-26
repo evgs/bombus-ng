@@ -40,6 +40,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\..\..\zlib\include"
 				PreprocessorDefinitions="NO_ERRNO_H"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
@@ -114,6 +115,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="2"
+				AdditionalIncludeDirectories="..\..\..\zlib\inclide"
 				PreprocessorDefinitions="NO_ERRNO_H"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -171,51 +173,55 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\adler32.c"
+				RelativePath="..\..\..\zlib\src\adler32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\compress.c"
+				RelativePath="..\..\..\zlib\src\compress.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\crc32.c"
+				RelativePath="..\..\..\zlib\src\crc32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\deflate.c"
+				RelativePath="..\..\..\zlib\src\deflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\gzio.c"
+				RelativePath="..\..\..\zlib\src\example.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\infback.c"
+				RelativePath="..\..\..\zlib\src\gzio.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\inffast.c"
+				RelativePath="..\..\..\zlib\src\infback.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\inflate.c"
+				RelativePath="..\..\..\zlib\src\inffast.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\inftrees.c"
+				RelativePath="..\..\..\zlib\src\inflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\trees.c"
+				RelativePath="..\..\..\zlib\src\inftrees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\uncompr.c"
+				RelativePath="..\..\..\zlib\src\trees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\zutil.c"
+				RelativePath="..\..\..\zlib\src\uncompr.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\zlib\src\zutil.c"
 				>
 			</File>
 		</Filter>
@@ -225,43 +231,43 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\crc32.h"
+				RelativePath="..\..\..\zlib\src\crc32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\deflate.h"
+				RelativePath="..\..\..\zlib\src\deflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\inffast.h"
+				RelativePath="..\..\..\zlib\src\inffast.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\inffixed.h"
+				RelativePath="..\..\..\zlib\src\inffixed.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\inflate.h"
+				RelativePath="..\..\..\zlib\src\inflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\inftrees.h"
+				RelativePath="..\..\..\zlib\src\inftrees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\trees.h"
+				RelativePath="..\..\..\zlib\src\trees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\zconf.h"
+				RelativePath="..\..\..\zlib\include\zconf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\zlib.h"
+				RelativePath="..\..\..\zlib\include\zlib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\libs\zlib_src\zutil.h"
+				RelativePath="..\..\..\zlib\src\zutil.h"
 				>
 			</File>
 		</Filter>

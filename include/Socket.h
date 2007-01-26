@@ -21,6 +21,8 @@ protected:
     std::string url;
     SOCKET sock;
 
+    long resolveUrl();
+
     static void initWinsocks();
 
     void throwSocketError();

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 
 #include "jid.h"
 #include "JabberDataBlockListener.h"

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 
 #include "JabberDataBlock.h"
 #include <boost/assert.hpp>

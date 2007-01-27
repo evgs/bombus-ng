@@ -1,7 +1,8 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include <windows.h>
 #include <commctrl.h>
 #include <windowsx.h>
+#include <aygshell.h>
 
 #include "ResourceContext.h"
 #include "JabberAccount.h"

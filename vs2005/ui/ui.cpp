@@ -3,12 +3,13 @@
 
 //#define JIVESOFTWARE
 
-#include "stdafx.h"
+//#include "stdafx.h"
 
 #include "ui.h"
 #include <windows.h>
 #include <commctrl.h>
 #include <windowsx.h>
+#include <aygshell.h>
 
 #include "Log.h"
 #include "Socket.h"

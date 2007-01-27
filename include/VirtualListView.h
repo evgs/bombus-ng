@@ -48,7 +48,11 @@ public:
     virtual const wchar_t * getWindowTitle() const;
     virtual const OwnerDrawRect * getODR() const;
 
+    void bindODRList(ODRSet::ref odr);
+
     void notifyListUpdate( bool redraw);
+
+    virtual void eventOk();
 
     typedef boost::shared_ptr<VirtualListView> ref;
 protected:

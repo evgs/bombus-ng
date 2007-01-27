@@ -13,7 +13,7 @@ ListViewODR::ListViewODR( HWND parent, const std::string & title ) {
 
     wt=WndTitleRef(new WndTitle(this, 0));
 
-    odrlist=ODRSet::ref(new ODRList());
+    bindODRList(ODRSet::ref(new ODRList()));
     cursorPos=odrlist->getEnum();
 }
 
@@ -26,6 +26,12 @@ void ListViewODR::addODR( ODRRef odr, bool redraw )
     notifyListUpdate(redraw);
 }
 
+void ListViewODR::eventOk() {
+    if (!cursorPos) return;
+    if (!cursorPos->hasMoreElements()) return;
+
+    //cursorPos->get()->eventOk();
+}
 
 //////////////////////////////////////////////////////////////////////////
 

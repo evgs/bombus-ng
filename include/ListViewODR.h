@@ -10,6 +10,8 @@ public:
 
     void addODR(ODRRef odr, bool redraw);
 
+    virtual void eventOk();
+
     typedef boost::shared_ptr<ListViewODR> ref;
 protected:
 private:

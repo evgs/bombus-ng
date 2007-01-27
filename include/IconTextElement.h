@@ -12,6 +12,8 @@ public:
     virtual int getColor() const =0;
 
     virtual void draw(HDC hdc, RECT &rt) const;
+
+    //virtual void eventOk()=0;
 protected:
     enum {
         ICON_SPACING=4

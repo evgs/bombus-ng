@@ -27,11 +27,14 @@ enum Status {
 
 class Contact : public IconTextElement {
 public:
+    typedef boost::shared_ptr<Contact> ref;
     Contact(const std::string &jid, const std::string &resource, const std::string &nickname);
 
     Jid jid;
     std::string nickname;
     std::string rosterJid;
+    std::string group;
+
     std::string subscr;
 
     Status status;
@@ -39,6 +42,7 @@ public:
     MessageListRef messageList;
 
     bool hasUnreadMsgs();
+    static bool compare(Contact::ref left, Contact::ref right);
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -50,4 +54,3 @@ private:
     std::wstring wjid;
 };
 
-typedef boost::shared_ptr<Contact> ContactRef;

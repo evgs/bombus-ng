@@ -26,3 +26,8 @@ int Contact::getColor() const{ return 0; }
 int Contact::getIconIndex() const{ return status; }
 
 const wchar_t * Contact::getText() const{ return wjid.c_str(); }
+//////////////////////////////////////////////////////////////////////////
+bool Contact::compare( Contact::ref left, Contact::ref right ) {
+    if (left->status < right->status) return true;
+    return (left->wjid < right->wjid);
+}

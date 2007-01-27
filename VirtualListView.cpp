@@ -87,7 +87,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
                         //DrawFocusRect(hdc, &ritem);
                     } else {
                         //usual item
-                        SetTextColor(hdc, 0x000000);
+                        SetTextColor(hdc, odr->getColor());
                         SetBkColor(hdc, 0xffffff);
                     }
                     odr->draw(hdc, ritem);
@@ -174,6 +174,13 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             }
             break;
         }
+    case WM_LBUTTONDBLCLK:
+        {
+            if (!(p->moveCursorTo(LOWORD(lParam), HIWORD(lParam)))) break;
+            InvalidateRect(p->getHWnd(), NULL, true);
+            p->eventOk();
+            break;
+        }
 
     case WM_SETFOCUS:
     case WM_KILLFOCUS:
@@ -245,6 +252,11 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             return true;
 
         }
+
+    case WM_USER+1:
+        p->notifyListUpdate(true);
+        break;
+
     case WM_DESTROY:
         //TODO: Destroy all child data associated eith this window
 
@@ -282,7 +294,8 @@ bool VirtualListView::moveCursorTo( int x, int y )
 }
 
 void VirtualListView::cursorFit() {
-    if (!cursorPos.get()) return;
+    if (!cursorPos) return;
+    if (!cursorPos->hasMoreElements()) return;
 
     ODRSetIterator::ref i = odrlist->getEnum();
     int yTop=0;
@@ -349,12 +362,23 @@ void VirtualListView::notifyListUpdate( bool redraw ) {
     InvalidateRect(getHWnd(), NULL, true);
 }
 
+void VirtualListView::bindODRList( ODRSet::ref odr ) {
+    odrlist=odr;
+}
+
+void VirtualListView::eventOk() { }
+
+
 ATOM VirtualListView::windowClass=0;
 
 //////////////////////////////////////////////////////////////////////////
 
 ODRSetIterator::~ODRSetIterator() {}
-bool ODRSetIterator::equals( ref iter2 ) { return get()==iter2->get(); }
+bool ODRSetIterator::equals( ref iter2 ) { 
+    if (!hasMoreElements()) return false;
+    if (!iter2->hasMoreElements()) return false;
+    return get()==iter2->get(); 
+}
 bool ODRSetIterator::operator==( ODRSetIterator &right ) { return get()==right.get(); }
 
 //////////////////////////////////////////////////////////////////////////

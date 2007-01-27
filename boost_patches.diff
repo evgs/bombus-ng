@@ -1,0 +1,12 @@
+--- E:\libs\boost\boost\config\compiler\visualc.hpp.bak Sat Jan 27 23:14:38 2007
++++ E:\libs\boost\boost\config\compiler\visualc.hpp     Sat Jan 27 23:10:35 2007
+@@ -130,7 +130,7 @@
+ #     define BOOST_COMPILER_VERSION evc4.0
+ #     error unknown CE compiler
+ #   else
+-#     error unknown CE compiler
++//#     error unknown CE compiler
+ #define BOOST_COMPILER_VERSION _MSC_VER
+ #   endif
+ # else
+

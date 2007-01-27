@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 #include "Connection.h"
 
 int Connection::write(StringRef buf){

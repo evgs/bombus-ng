@@ -1,4 +1,4 @@
-#include "stdafx.h"
+//#include "stdafx.h"
 
 #include "Auth.h"
 #include "JabberAccount.h"

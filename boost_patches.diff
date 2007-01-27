@@ -1,3 +1,5 @@
+This hack enables compatibility for target platform Windows CE when using VS2005 compiler
+
 --- E:\libs\boost\boost\config\compiler\visualc.hpp.bak Sat Jan 27 23:14:38 2007
 +++ E:\libs\boost\boost\config\compiler\visualc.hpp     Sat Jan 27 23:10:35 2007
 @@ -130,7 +130,7 @@

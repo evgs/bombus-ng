@@ -526,8 +526,12 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 	rc->log->msg("Roster arrived");
 
     rc->roster->blockArrived(block, rc); // forwarding to dispatch roster stanza
-    rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(new MTForwarder(rc)));
-    rc->jabberStanzaDispatcher2->addListener(rc->roster);
+    
+    //rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(new MTForwarder(rc)));
+    //rc->jabberStanzaDispatcher2->addListener(rc->roster);
+
+    rc->jabberStanzaDispatcherRT->addListener(rc->roster);
+
 
 	JabberDataBlock presence("presence");
 	presence.addChild("status", 

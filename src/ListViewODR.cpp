@@ -51,7 +51,7 @@ void ODRListIterator::next() { iterator++; }
 void ODRListIterator::previous() { --iterator; }
 
 bool ODRListIterator::hasMoreElements() { 
-    return iterator!=odrlref->odrVector.size();//end();
+    return iterator < /* != */ odrlref->odrVector.size();//end();
 }
 
 bool ODRListIterator::isLastElement() {

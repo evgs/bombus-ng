@@ -54,11 +54,17 @@ JabberDataBlock * JabberDataBlock::addChild(const char *_tagName, const char *_t
 }
 
 
-JabberDataBlockRef JabberDataBlock::getChildByName(const char * tagName){
+JabberDataBlockRef JabberDataBlock::getChildByName(const char * tagName) const{
     for (JabberDataBlockRefList::const_iterator c=childs.begin(); c!=childs.end(); c++) {
 		if ( (*c)->tagName==tagName) return *c;
 	}
 	return JabberDataBlockRef();
+}
+
+const std::string JabberDataBlock::getChildText( const char * tagName ) const{
+    JabberDataBlockRef child=getChildByName(tagName);
+    if (child) return child->getText();
+    return "";
 }
 
 bool JabberDataBlock::hasChildByValue(const char * text){
@@ -103,3 +109,4 @@ StringRef JabberDataBlock::toXML(){
 	return result;
 
 }
+

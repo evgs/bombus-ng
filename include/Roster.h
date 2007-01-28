@@ -24,6 +24,7 @@ public:
 protected:
     virtual const wchar_t * getText() const;
     virtual int getIconIndex() const;
+
 private:
     std::wstring wstr;
     std::string groupName;
@@ -47,8 +48,8 @@ private:
 public:
     Roster();
 
-    void addContact(Contact::ref contact);
-    Contact::ref findContact (const std::string &jid, bool bareJid=true) const;
+    //void addContact(Contact::ref contact);
+    Contact::ref findContact (const std::string &jid) const;
 
     RosterGroup::ref findGroup(const std::string &name);
     RosterGroup::ref createGroup(const std::string &name);
@@ -56,11 +57,12 @@ public:
 
     virtual const char * getType() const{ return NULL; /* result/set */ }
     virtual const char * getId() const{ return NULL; }
-    virtual const char * getTagName() const { return "iq"; }
+    virtual const char * getTagName() const { return NULL/*"iq"*/; }
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
     void bindWindow(ListViewODR::ref roster){ this->roster=roster; }
 
+    void processPresence(JabberDataBlockRef block);
 private:
     ListViewODR::ref roster;
 

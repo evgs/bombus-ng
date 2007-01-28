@@ -8,9 +8,10 @@
 
 #include "IconTextElement.h"
 
+#include "Presence.h"
 class Jid;
 
-enum Status {
+/*enum Status {
     PRESENCE_ONLINE=0,
     PRESENCE_CHAT=1,
     PRESENCE_AWAY=2,
@@ -23,7 +24,7 @@ enum Status {
     PRESENCE_ERROR=9,
     PRESENCE_TRASH=10,
     PRESENCE_AUTH=-1
-};
+};*/
 
 class Contact : public IconTextElement {
 public:
@@ -37,7 +38,7 @@ public:
 
     std::string subscr;
 
-    Status status;
+    presence::PresenceIndex status;
 
     MessageListRef messageList;
 

@@ -442,6 +442,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\Presence.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\ResourceContext.h"
 				>
 			</File>

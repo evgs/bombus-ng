@@ -6,8 +6,8 @@ class Jid {
 
 public:
 	Jid();
-	Jid(const std::string &bareJid);
-	Jid(const std::string &jid, const std::string &resource);
+	Jid(const std::string &jid);
+	Jid(const std::string &bareJid, const std::string &resource);
 
 	~Jid();
 
@@ -24,6 +24,7 @@ public:
 	void setBareJid(const std::string &bareJid);
 
     bool operator==(const Jid &right) const;
+    bool isTransport() { return userName.length()==0; }
 
 private:
 	std::string userName;

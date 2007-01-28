@@ -5,6 +5,8 @@
 #include <aygshell.h>
 #include "utf8.hpp"
 
+#include "ListViewODR.h"
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 
@@ -69,7 +71,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
                 while (i->hasMoreElements()) {
                     bool focused=false;
                     try {
-                        focused=i->equals(p->cursorPos);
+                        //focused=i->equals(p->cursorPos);
                     } catch (std::exception ex) {}
 
                     ODRRef odr=i->get(); i->next();
@@ -258,9 +260,16 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
         }
 
     case WM_USER+1:
-        p->bindODRList(ODRSet::ref((ODRSet *)lParam)); //ÀÕÒÓÍÃ ¹3
-        p->notifyListUpdate(true);
-        break;
+        {
+            //TODO: create interconnecting message object to avoid pointers
+            ODRList::ref r=ODRList::ref((ODRList *)lParam);
+            r->selfRef=r;
+            p->bindODRList(r); //ÀÕÒÓÍÃ ¹5
+
+            //p->bindODRList(ODRSet::ref((ODRSet *)lParam)); //ÀÕÒÓÍÃ ¹3
+            p->notifyListUpdate(true);
+            break;
+        }
 
     case WM_DESTROY:
         //TODO: Destroy all child data associated eith this window
@@ -299,6 +308,7 @@ bool VirtualListView::moveCursorTo( int x, int y )
 }
 
 void VirtualListView::cursorFit() {
+    return; /**/
     if (!cursorPos) return;
     if (!cursorPos->hasMoreElements()) return;
 

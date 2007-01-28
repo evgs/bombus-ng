@@ -13,8 +13,10 @@ ListViewODR::ListViewODR( HWND parent, const std::string & title ) {
 
     wt=WndTitleRef(new WndTitle(this, 0));
 
-    bindODRList(ODRSet::ref(new ODRList()));
-    cursorPos=odrlist->getEnum();
+    ODRList::ref r=ODRList::ref(new ODRList());
+    r->selfRef=r;
+    bindODRList(r);
+    cursorPos=r->getEnum();
 }
 
 ListViewODR::~ListViewODR() {}
@@ -35,7 +37,7 @@ void ListViewODR::eventOk() {
 
 //////////////////////////////////////////////////////////////////////////
 
-ODRListIterator::ODRListIterator( ODRList * odrlref ) {
+ODRListIterator::ODRListIterator( ODRList::ref odrlref ) {
     this->odrlref=odrlref;
     iterator=0;//this->odrlref->odrlist.begin();
 }
@@ -44,27 +46,27 @@ bool ODRListIterator::isFirstElement() {
     return iterator==0;//((ODRList)(*odrlref)).odrlist.begin();
 }
 
-ODRRef ODRListIterator::get() { return odrlref->odrVector[iterator]; }
+ODRRef ODRListIterator::get() { return odrlref.lock()->odrVector[iterator]; }
 
 void ODRListIterator::next() { iterator++; }
 
 void ODRListIterator::previous() { --iterator; }
 
 bool ODRListIterator::hasMoreElements() { 
-    return iterator < /* != */ odrlref->odrVector.size();//end();
+    return iterator < /* != */ odrlref.lock()->odrVector.size();//end();
 }
 
 bool ODRListIterator::isLastElement() {
-    int sz=odrlref->odrVector.size();
+    int sz=odrlref.lock()->odrVector.size();
     return (sz==0) || iterator==sz-1;
 }
 
 void ODRListIterator::setFirst() { iterator=0; }
 void ODRListIterator::setLast() { 
-    int sz=odrlref->odrVector.size();
+    int sz=odrlref.lock()->odrVector.size();
     iterator=(sz==0)? 0 : sz-1; 
 }
 ODRSetIterator::ref ODRList::getEnum() {
-    return ODRListIterator::ref(new ODRListIterator( this ));
+    return ODRListIterator::ref(new ODRListIterator( selfRef.lock() ));
 }
 ODRList::ODRList() {}

@@ -64,7 +64,7 @@ bool JabberStream::tagEnd(const std::string & tagname) {
             throw std::exception("XML: Tag mismatch");
         }
 
-		JabberStanzaDispatcher * dispatcher= rc->jabberStanzaDispatcher.get();
+		JabberStanzaDispatcher * dispatcher= rc->jabberStanzaDispatcherRT.get();
 		if (dispatcher!=NULL) dispatcher->dispatchDataBlock(element);
 
 		//puts(element->toXML()->c_str());

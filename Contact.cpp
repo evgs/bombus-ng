@@ -8,7 +8,7 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     this->jid=Jid(jid, resource);
     this->rosterJid=jid;
     this->nickname=nickname;
-    this->status=PRESENCE_OFFLINE;
+    this->status=presence::OFFLINE;
 
     wjid=utf8::utf8_wchar( (nickname.empty())? jid:nickname);
     init();
@@ -29,5 +29,6 @@ const wchar_t * Contact::getText() const{ return wjid.c_str(); }
 //////////////////////////////////////////////////////////////////////////
 bool Contact::compare( Contact::ref left, Contact::ref right ) {
     if (left->status < right->status) return true;
+    if (left->status > right->status) return false;
     return (left->wjid < right->wjid);
 }

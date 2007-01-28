@@ -9,9 +9,9 @@ Jid::Jid(const std::string &bareJid, const std::string &resource){
 	this->resource=resource;
 	setBareJid(bareJid);
 }
-Jid::Jid(const std::string &bareJid){
+Jid::Jid(const std::string &jid){
 	//resource="";
-	setBareJid(bareJid);
+	setJid(jid);
 }
 void Jid::setUserName(const std::string &userName) {
 	this->userName=userName;
@@ -30,9 +30,12 @@ void Jid::setJid(const std::string &jid){
 
 	int at=jid.find('@');
 	int slash=jid.find('/');
+    if (slash<0) {
+        slash=jid.length();
+        resource="";
+    } else resource=jid.substr(slash+1);
 	userName=jid.substr(0,at);
 	server=jid.substr(at+1,slash-at-1);
-	resource=jid.substr(slash+1);
 
 	updateJid();
 };
@@ -42,7 +45,7 @@ void Jid::setBareJid(const std::string &bareJid){
 	int at=bareJid.find('@');
 	int slash=bareJid.find('/');
 	userName=bareJid.substr(0,at);
-	server=bareJid.substr(at+1,slash);
+	server=bareJid.substr(at+1,slash-at-1);
 
 	updateJid();
 };

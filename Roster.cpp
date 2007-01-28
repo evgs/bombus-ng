@@ -12,25 +12,36 @@
 #include <algorithm>
 
 #include "Image.h"
+#include "Presence.h"
 
 Roster::Roster(){
     roster=ListViewODR::ref();
 }
 
-void Roster::addContact(Contact::ref contact) {
-    //jidMap[contact->jid.getJid()]=contact;
+/*void Roster::addContact(Contact::ref contact) {
+    bareJidMap[contact->jid.getBareJid()]=contact;
     contacts.push_back(contact);
-}
+}*/
 
-Contact::ref Roster::findContact(const std::string &jid, bool bareJid) const {
+Contact::ref Roster::findContact(const std::string &jid) const {
+    Jid right(jid);
     for (ContactList::const_iterator i=contacts.begin(); i!=contacts.end(); i++) {
         Contact::ref r=*i;
-        if (r->jid==jid) return r;
+        if (r->jid==right) return r;
     }
     return Contact::ref();
 }
 
 ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
+
+    const std::string & blockTagName=block->getTagName();
+
+    if (blockTagName=="presence") {
+        processPresence(block);
+        return BLOCK_PROCESSED;
+    }
+
+    if (blockTagName!="iq") return BLOCK_REJECTED;
 
     bool rosterPush=(block->getAttribute("type"))=="set";
 
@@ -57,7 +68,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         //todo: ðàçíîå ïîâåäåíèå äëÿ roster request è roster push
         Contact::ref contact;
         if (rosterPush) {
-            contact=findContact(jid,true);
+            contact=findContact(jid);
         } 
         if (contact==NULL) { 
             contact=Contact::ref(new Contact(jid, "", name));
@@ -72,20 +83,76 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         contact->subscr=subscr;
         contact->group=group;
 
-        addContact(contact);
+        bareJidMap[contact->jid.getBareJid()]=contact;
+        contacts.push_back(contact);
+        //todo: subscription=remove
     }
     makeViewList();
     return BLOCK_PROCESSED;
 }
 
+//////////////////////////////////////////////////////////////////////////
+void Roster::processPresence( JabberDataBlockRef block ) {
+    std::string from=block->getAttribute("from");
+    std::string type=block->getAttribute("type");
+
+    presence::PresenceIndex typeIndex=presence::OFFLINE;
+    presence::PresenceIndex type2=presence::NOCHANGE; //no change
+    if (type=="unavailable") { 
+        typeIndex=presence::OFFLINE;
+    } else if (type=="subscribe") { 
+        //TODO:
+    } else if (type=="subscribed") {
+        //TODO:
+    } else if (type=="unsubscribe") {
+        //TODO:
+    } else if (type=="unsubscribed") {
+        //TODO:
+    } else if (type=="error") {
+        typeIndex=presence::OFFLINE;
+        type2=presence::PRESENCE_ERROR;
+        //todo: extract error text here
+    } else {
+        typeIndex=presence::ONLINE;
+        type=block->getChildText("show");
+        if (type=="chat") typeIndex=presence::CHAT;
+        if (type=="away") typeIndex=presence::AWAY;
+        if (type=="xa") typeIndex=presence::XA;
+        if (type=="dnd") typeIndex=presence::DND;
+    }
+
+    std::string priority=block->getChildText("priority");
+    std::string status=block->getChildText("status");
+
+    Contact::ref contact=findContact(from);
+    if (!contact) {
+        Jid jid(from);
+        //first attempt - search for contact without resource
+        contact=findContact(jid.getBareJid());
+        if (contact) {
+            // store resource
+            contact->jid.setResource(jid.getResource());
+        } else { 
+            //todo: second attempt - clone contact from bareJidMap
+            //todo: third attempt - based on NOT-IN-LIST policy
+            return;
+        }
+    }
+
+    contact->status=typeIndex;
+    makeViewList();
+}
+//////////////////////////////////////////////////////////////////////////
 void Roster::makeViewList() {
     std::stable_sort(contacts.begin(), contacts.end(), Contact::compare);
 
-    ODRSet::ref odrlist=ODRSet::ref(new ODRList());
+    //ODRSet::ref odrlist=ODRSet::ref(new ODRList());
+    //ODRList *list=(ODRList *)(odrlist.get());
+    
+    ODRList *list=new ODRList(); //ÀÕÒÓÍÃ ¹1
 
     for (GroupList::const_iterator gi=groups.begin(); gi!=groups.end(); gi++) {
         RosterGroup::ref group=*gi;
-        ODRList *list=(ODRList *)(odrlist.get());
         list->odrVector.push_back(group);
 
         if (!group->isExpanded()) continue;
@@ -96,8 +163,8 @@ void Roster::makeViewList() {
         }
     }
 
-    roster->bindODRList(odrlist);
-    PostMessage(roster->getHWnd(), WM_USER+1, 0, 0);
+    //roster->bindODRList(odrlist);
+    PostMessage(roster->getHWnd(), WM_USER+1, 0, (LPARAM)list); //ÀÕÒÓÍÃ ¹2
     //roster->notifyListUpdate(false);
 }
 //////////////////////////////////////////////////////////////////////////

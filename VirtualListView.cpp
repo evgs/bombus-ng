@@ -67,7 +67,11 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             if (p->odrlist.get()) {
                 ODRSetIterator::ref i=p->odrlist->getEnum();
                 while (i->hasMoreElements()) {
-                    bool focused=i->equals(p->cursorPos);
+                    bool focused=false;
+                    try {
+                        focused=i->equals(p->cursorPos);
+                    } catch (std::exception ex) {}
+
                     ODRRef odr=i->get(); i->next();
                     int iHeight=odr->getHeight();
                     RECT ritem={0, y, p->clientRect.right, y+iHeight} ;
@@ -254,6 +258,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
         }
 
     case WM_USER+1:
+        p->bindODRList(ODRSet::ref((ODRSet *)lParam)); //ÀÕÒÓÍÃ ¹3
         p->notifyListUpdate(true);
         break;
 

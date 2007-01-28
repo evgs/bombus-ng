@@ -20,7 +20,8 @@ public:
 	Log *log;
 	JabberAccountRef account;
 	JabberStreamRef jabberStream;
-	JabberStanzaDispatcherRef jabberStanzaDispatcher;
+	JabberStanzaDispatcherRef jabberStanzaDispatcherRT;
+    JabberStanzaDispatcherRef jabberStanzaDispatcher2;
     RosterRef roster;
 };
 

@@ -3,6 +3,8 @@
 #include "VirtualListView.h"
 #include <list>
 
+#include <boost/weak_ptr.hpp>
+
 class ListViewODR : public VirtualListView {
 public:
     ListViewODR(HWND parent, const std::string & title);
@@ -23,12 +25,16 @@ public:
     ODRList();
     virtual ODRSetIterator::ref getEnum();
     std::vector<ODRRef> odrVector;    
+
     typedef boost::shared_ptr<ODRList> ref;
+    typedef boost::weak_ptr<ODRList> wref;
+
+    wref selfRef;
 };
 //////////////////////////////////////////////////////////////////////////
 class ODRListIterator : public ODRSetIterator {
 public:
-    ODRListIterator(ODRList * odrlref);
+    ODRListIterator(ODRList::ref odrlref);
     virtual bool isFirstElement();
     virtual bool isLastElement();
     virtual void setFirst();
@@ -38,7 +44,7 @@ public:
     virtual void previous();
     virtual bool hasMoreElements();
 private:
-    ODRList * odrlref;
+    ODRList::wref odrlref;
     int iterator;
 };
 //////////////////////////////////////////////////////////////////////////

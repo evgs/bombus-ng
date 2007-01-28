@@ -17,7 +17,7 @@ private:
 class SASLAuth : public JabberDataBlockListener {
 public:
 	SASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader);
-	~SASLAuth(){};
+	~SASLAuth();
 
 	virtual const char * getType() const{ return NULL; }
 	virtual const char * getId() const{ return NULL; }

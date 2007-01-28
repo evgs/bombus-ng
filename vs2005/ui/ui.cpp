@@ -389,6 +389,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_USER:
             SetForegroundWindow((HWND)((ULONG) hWnd | 0x00000001));            
             break;
+        case WM_USER+2:
+            {
+                JabberDataBlockRef *rf=(JabberDataBlockRef *)lParam; //ÀÕÒÓÍÃ
+                if (rf==NULL) break; 
+                if (rc->jabberStanzaDispatcher2) rc->jabberStanzaDispatcher2->dispatchDataBlock(*rf);
+                delete rf;
+            }
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -487,6 +494,20 @@ void Log::msg(const char * message, const char *message2){
 
 
 /**********************************************************************************/
+class MTForwarder: public JabberDataBlockListener {
+public:
+    MTForwarder(ResourceContextRef rc) {  /*this->rc=rc;*/  };
+    ~MTForwarder(){};
+    virtual const char * getTagName() const { return NULL; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+};
+ProcessResult MTForwarder::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
+    JabberDataBlockRef *p=new JabberDataBlockRef(block); //ÀÕÒÓÍÃ
+    //rc->jabberStanzaDispatcher2->dispatchDataBlock(block);
+    PostMessage(mainWnd, WM_USER+2, 0, (LPARAM)p);
+
+    return BLOCK_PROCESSED;
+}
 //////////////////////////////////////////////////////////////
 class GetRoster : public JabberDataBlockListener {
 public:
@@ -505,7 +526,8 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 	rc->log->msg("Roster arrived");
 
     rc->roster->blockArrived(block, rc); // forwarding to dispatch roster stanza
-    rc->jabberStanzaDispatcher->addListener(rc->roster);
+    rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(new MTForwarder(rc)));
+    rc->jabberStanzaDispatcher2->addListener(rc->roster);
 
 	JabberDataBlock presence("presence");
 	presence.addChild("status", 
@@ -598,7 +620,7 @@ private:
 
 void JabberStreamEvents::beginConversation(JabberDataBlockRef streamHeader){
     if (streamHeader->getAttribute("version")=="1.0") {
-        rc->jabberStanzaDispatcher->addListener(JabberDataBlockListenerRef(new SASLAuth(rc, streamHeader)));
+        rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(new SASLAuth(rc, streamHeader)));
     } else {
         //JabberDataBlockListenerRef(new NonSASLAuth(rc, streamHeader));
     }
@@ -611,9 +633,9 @@ void JabberStreamEvents::endConversation(const std::exception *ex){
 void JabberStreamEvents::loginSuccess(){
     rc->log->msg("Login ok");
 
-    rc->jabberStanzaDispatcher->addListener( JabberDataBlockListenerRef( new GetRoster(rc) ));
-    rc->jabberStanzaDispatcher->addListener( JabberDataBlockListenerRef( new Version(rc) ));
-    rc->jabberStanzaDispatcher->addListener( JabberDataBlockListenerRef( new MessageFwd(rc) ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster(rc) ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version(rc) ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageFwd(rc) ));
 
     JabberDataBlock getRoster("iq");
     getRoster.setAttribute("type","get");
@@ -672,7 +694,8 @@ int prepareAccount(){
 //////////////////////////////////////////////////////////////
 int initJabber()
 {
-    rc->jabberStanzaDispatcher=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
+    rc->jabberStanzaDispatcherRT=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
+    rc->jabberStanzaDispatcher2=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 
     //TODO: roster caching
     rc->roster=RosterRef(new Roster());

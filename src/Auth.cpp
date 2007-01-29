@@ -16,48 +16,94 @@ typedef boost::shared_ptr<MD5> MD5Ref;
 typedef boost::shared_ptr<SHA1> SHA1Ref;
 
 NonSASLAuth::NonSASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader) {
-	rc->log->msg("Non-SASL Login: sending password");
+    this->rc=rc;
+    streamId=streamHeader->getAttribute("id");
 
-	JabberDataBlockRef login=JabberDataBlockRef(new JabberDataBlock("iq"));
-	login->setAttribute("type","set");
-	login->setAttribute("id","sessionInit");
-	JabberDataBlock * qry=login->addChild("query",NULL);
-	qry->setAttribute("xmlns","jabber:iq:auth");
-	qry->addChild("username",rc->account->getUserName().c_str());
-	//qry->addChild("password",rc->account->password.c_str());
+	Log::getInstance()->msg("Non-SASL Login: handshake");
 
-    SHA1Ref digest=SHA1Ref(new SHA1());
-    digest->init();
-    digest->updateASCII(streamHeader->getAttribute("id"));
-    digest->updateASCII(rc->account->password);
-    digest->finish();
-
-    std::string result=digest->getDigestHex();
-
-    qry->addChild("digest", result.c_str());
-
-    
-	qry->addChild("resource",rc->account->getResource().c_str());
+	JabberDataBlockRef login=loginStanza(true, false);
 
 	rc->jabberStream->sendStanza(login);
 }
 
+ProcessResult NonSASLAuth::blockArrived( JabberDataBlockRef block, const ResourceContextRef rc ) {
+    std::string type=block->getAttribute("type");
+    std::string id=block->getAttribute("id");
+    if (type=="result") {
+        if (id=="auth2") {
+            //session established
+            rc->jabberStream->jabberListener->loginSuccess();
+            return LAST_BLOCK_PROCESSED;
+        } else {
+            JabberDataBlockRef query=block->getChildByName("query");
+            bool plain= !(query->getChildByName("digest"));
 
+            if (plain) 
+                if (!rc->account->plainTextPassword) {
+                    rc->jabberStream->jabberListener->loginFailed("Plain password required");
+                    return LAST_BLOCK_PROCESSED;
+                }
+
+            JabberDataBlockRef login=loginStanza(false, plain);
+
+            rc->jabberStream->sendStanza(login);
+
+            return BLOCK_PROCESSED;
+        }
+    }
+
+    if (type=="error") {
+        // login failed
+        rc->jabberStream->jabberListener->loginFailed("Auth error");
+        return LAST_BLOCK_PROCESSED;
+    }
+    return BLOCK_REJECTED;
+}
+
+JabberDataBlockRef NonSASLAuth::loginStanza( bool get, bool sha1 ) {
+    JabberDataBlockRef login = JabberDataBlockRef(new JabberDataBlock("iq"));
+    login->setAttribute("type", (get)? "get"   : "set" );
+    login->setAttribute("id",   (get)? "auth1" : "auth2" );
+    JabberDataBlock * qry=login->addChild("query",NULL);
+    qry->setAttribute("xmlns","jabber:iq:auth");
+    
+    qry->addChild("username",rc->account->getUserName().c_str());
+    
+    if (!get) {
+        if (sha1) {
+            SHA1Ref digest=SHA1Ref(new SHA1());
+            digest->init();
+            digest->updateASCII(streamId);
+            digest->updateASCII(rc->account->password);
+            digest->finish();
+
+            std::string result=digest->getDigestHex();
+
+            qry->addChild("digest", result.c_str());
+        } else {
+            qry->addChild("password",rc->account->password.c_str());
+        }
+
+
+        qry->addChild("resource",rc->account->getResource().c_str());
+    }
+    return login;
+}
 ///////////////////////////////////////////////////////////////////////////////
 
 SASLAuth::SASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader){
     this->rc=rc;
-	//rc->log->msg("SASL Login: <stream:stream>");
+	//Log::getInstance()->msg("SASL Login: <stream:stream>");
 }
 
 SASLAuth::~SASLAuth() {
-    //rc->log->msg("~SASL Login");
+    //Log::getInstance()->msg("~SASL Login");
 }
 
 const std::string responseMd5Digest( const std::string &user, const std::string &pass, const std::string &realm, const std::string &digestUri, const std::string &nonce, const std::string cnonce);
 
 ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
-	//rc->log->msg("SASL Login: stanza  ", (*(block->toXML())).c_str() );
+	//Log::getInstance()->msg("SASL Login: stanza  ", (*(block->toXML())).c_str() );
 
 	if (block->getTagName()=="stream:features") {
 
@@ -95,7 +141,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 
             //DIGEST-MD5 mechanism
             if (mechanisms->hasChildByValue("DIGEST-MD5")) {
-                rc->log->msg("Init DIGEST-MD5");
+                Log::getInstance()->msg("Init DIGEST-MD5");
 
                 auth.setAttribute("mechanism", "DIGEST-MD5");
 
@@ -106,7 +152,13 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 
             //PLAIN mechanism
             if (mechanisms->hasChildByValue("PLAIN")) {
-				rc->log->msg("Sending PLAIN password");
+
+                if (!rc->account->plainTextPassword) {
+                    rc->jabberStream->jabberListener->loginFailed("Plain password required");
+                    return LAST_BLOCK_PROCESSED;
+                }
+
+				Log::getInstance()->msg("Sending PLAIN password");
 					
 				auth.setAttribute("mechanism", "PLAIN");
 
@@ -126,7 +178,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 		// resource binding session
 		JabberDataBlockRef bindsess=block->getChildByName("bind");
 		if (bindsess.get()!=NULL) {
-			rc->log->msg("Binding resource");
+			Log::getInstance()->msg("Binding resource");
 			JabberDataBlock bindIq("iq");
 			bindIq.setAttribute("type", "set");
 			bindIq.setAttribute("id", "bind");
@@ -167,7 +219,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
     }
 
     if (block->getTagName()=="proceed") {
-        rc->log->msg("Starting TLS connection");
+        Log::getInstance()->msg("Starting TLS connection");
 #ifndef NOSTARTTLS
         //starting tls layer socket
         /*ConnectionRef tlssocket=ConnectionRef(new TLSSocket(rc->connection));
@@ -180,7 +232,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
     }
 
     if (block->getTagName()=="compressed") {
-		rc->log->msg("Opening compressed stream");
+		Log::getInstance()->msg("Opening compressed stream");
 
 #ifndef NOZLIB
 		// switching to compressed stream
@@ -200,7 +252,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
     }
 
     if (block->getTagName()=="failure") { 
-        rc->jabberStream->jabberListener->loginFailed();
+        rc->jabberStream->jabberListener->loginFailed("Auth error");
         return LAST_BLOCK_PROCESSED;
     }
 
@@ -211,7 +263,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
             JabberDataBlockRef resource=bind->getChildByName("jid");
             std::string res=resource->getText();
 
-			rc->log->msg("Resource: ", res.c_str());
+			Log::getInstance()->msg("Resource: ", res.c_str());
 			//openung session
 			JabberDataBlock session("iq");
 			session.setAttribute("type", "set");

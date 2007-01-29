@@ -4,13 +4,17 @@
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
 
-class NonSASLAuth {
+class NonSASLAuth : public JabberDataBlockListener{
 public:
 	NonSASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader); 
 	~NonSASLAuth(){};
+    virtual const char * getTagName() const { return "iq"; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
 private:
+    JabberDataBlockRef loginStanza(bool get, bool sha1);
 	ResourceContextRef rc;
+    std::string streamId;
 };
 
 

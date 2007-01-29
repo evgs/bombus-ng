@@ -46,7 +46,7 @@ HWND		mainWnd;
 
 //ListViewRef logWnd;
 TabsCtrlRef tabs;
-ListViewODR::ref odrLog;
+
 ListViewODR::ref rosterWnd;
 ChatView::ref chatSample;
 ResourceContextRef rc;
@@ -246,7 +246,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     streamShutdown();
 
 				case IDM_JABBER_STREAMINFO:
-					rc->log->msg(
+                    Log::getInstance()->msg(
 						rc->jabberStream->connection->getStatistics().c_str()
 						);
 					break;
@@ -301,8 +301,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
             //tabs->addWindow(logWnd);
 
-            odrLog=ListViewODR::ref(new ListViewODR(hWnd, std::string("Log")));
-            tabs->addWindow(odrLog);
+            { 
+                ListViewODR::ref odrLog = ListViewODR::ref(new ListViewODR(hWnd, std::string("Log")));
+                tabs->addWindow(odrLog);
+                Log::getInstance()->bindLV(odrLog); 
+            }
 
             /*tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 1"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 2"))));
@@ -444,56 +447,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-/**************************************************************************************************************************/
-Log::Log(){
-}
-
-Log::~Log(){
-}
-
-wchar_t buf[256];
-
-const wchar_t * charToWchar(const char * src, const char *src2 = NULL) {
-	wchar_t *b=buf;
-
-	int i;
-	for (i=0; i<255; i++) {
-		if (*src ==0 ) break;
-		*(b++)=*(src++);
-	}
-
-	//*(b++)=0x20;
-	if (src2!=0)
-		for (; i<255; i++) {
-		if (*src2 ==0 ) break;
-		*(b++)=*(src2++);
-	}
-	*b=0;
-
-	return buf;
-}
-
-
-void addLog(const wchar_t * msg) {
-    //ListBox_AddString( logWnd->getListBoxHWnd(), msg);
-    ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), -1));
-    odrLog->addODR(r, true);
-}
-
-void Log::msg(const std::string &message){
-    addLog(charToWchar(message.c_str()));
-}
-
-void Log::msg(const char * message){
-    addLog(charToWchar(message));
-}
-
-void Log::msg(const char * message, const char *message2){
-    addLog(charToWchar(message, message2));
-}
-
-
-/**********************************************************************************/
+//////////////////////////////////////////////////////////////////////////
 class MTForwarder: public JabberDataBlockListener {
 public:
     MTForwarder(ResourceContextRef rc) {  /*this->rc=rc;*/  };
@@ -523,7 +477,7 @@ private:
 	ResourceContextRef rc;
 };
 ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-	rc->log->msg("Roster arrived");
+	Log::getInstance()->msg("Roster arrived");
 
     rc->roster->blockArrived(block, rc); // forwarding to dispatch roster stanza
     
@@ -560,7 +514,7 @@ private:
 };
 ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     
-    rc->log->msg("version request ", block->getAttribute("from").c_str());
+    Log::getInstance()->msg("version request ", block->getAttribute("from").c_str());
 
     std::string version=utf8::wchar_utf8(sysinfo::getOsVersion());
 
@@ -595,7 +549,7 @@ private:
 };
 ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     StringRef orig=block->toXML();
-	rc->log->msg("Message from ", block->getAttribute("from").c_str()); 
+	Log::getInstance()->msg("Message from ", block->getAttribute("from").c_str()); 
 	JabberDataBlock reply("message");
 	reply.setAttribute("type","chat");
 	reply.setAttribute("to", "evgs@jabber.ru/Psi_Home");
@@ -615,7 +569,7 @@ public:
     virtual void beginConversation(JabberDataBlockRef streamHeader);
     virtual void endConversation(const std::exception *ex);
     virtual void loginSuccess();
-    virtual void loginFailed();
+    virtual void loginFailed(const char * errMsg);
 
 private:
     ResourceContextRef rc;
@@ -626,16 +580,16 @@ void JabberStreamEvents::beginConversation(JabberDataBlockRef streamHeader){
     if (streamHeader->getAttribute("version")=="1.0") {
         rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(new SASLAuth(rc, streamHeader)));
     } else {
-        //JabberDataBlockListenerRef(new NonSASLAuth(rc, streamHeader));
+        rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(new NonSASLAuth(rc, streamHeader)));
     }
 }
 void JabberStreamEvents::endConversation(const std::exception *ex){
-    if (ex!=NULL)  rc->log->msg(ex->what());
-    rc->log->msg("End Conversation");
+    if (ex!=NULL)  Log::getInstance()->msg(ex->what());
+    Log::getInstance()->msg("End Conversation");
 }
 
 void JabberStreamEvents::loginSuccess(){
-    rc->log->msg("Login ok");
+    Log::getInstance()->msg("Login ok");
 
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster(rc) ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version(rc) ));
@@ -651,15 +605,15 @@ void JabberStreamEvents::loginSuccess(){
     rc->jabberStream->sendStanza(getRoster);
 }
 
-void JabberStreamEvents::loginFailed(){
-    rc->log->msg("Login failed");
+void JabberStreamEvents::loginFailed(const char * errMsg){
+    Log::getInstance()->msg("Login failed: ", errMsg);
     rc->jabberStream->sendXmppEndHeader();
 }
 
 bool JabberStreamEvents::connect(){
     std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 
-    rc->log->msg("Connect to ", host.c_str());
+    Log::getInstance()->msg("Connect to ", host.c_str());
     if (rc->account->useEncryption) {
         ConnectionRef tlsCon=ConnectionRef( new CeTLSSocket(host, rc->account->port));
         rc->jabberStream->connection=tlsCon;
@@ -669,7 +623,7 @@ bool JabberStreamEvents::connect(){
         rc->jabberStream->connection=ConnectionRef( new Socket(host, rc->account->port));
 
     /*if (rc->jabberStream->connection==NULL) {
-        rc->log->msg("Failed to open connection");
+        Log::getInstance()->msg("Failed to open connection");
         return false;
     }
     BOOST_ASSERT(rc->jabberStream->connection);
@@ -683,7 +637,7 @@ bool JabberStreamEvents::connect(){
 //////////////////////////////////////////////////////////////
 int prepareAccount(){
     rc=ResourceContextRef(new ResourceContext());
-    rc->log=new Log();
+    //Log::getInstance()=new Log();
     //rc->account=JabberAccountRef(new JabberAccount("bombus_mobilus@jivesoftware.com", "bombus-ng"));
     //rc->account->hostNameIp="213.180.203.19";
     //rc->account->password="l12sx95a";

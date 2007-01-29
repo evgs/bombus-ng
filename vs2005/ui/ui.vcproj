@@ -257,6 +257,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Log.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\crypto\MD5.cpp"
 				>
 			</File>

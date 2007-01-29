@@ -17,7 +17,6 @@ typedef boost::shared_ptr <Roster> RosterRef;
 
 class ResourceContext {
 public:
-	Log *log;
 	JabberAccountRef account;
 	JabberStreamRef jabberStream;
 	JabberStanzaDispatcherRef jabberStanzaDispatcherRT;

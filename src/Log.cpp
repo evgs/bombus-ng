@@ -1,20 +1,56 @@
 #include "Log.h"
-#include <stdio.h>
-
 Log::Log(){
 }
 
 Log::~Log(){
 }
 
+wchar_t buf[256];
+
+const wchar_t * charToWchar(const char * src, const char *src2 = NULL) {
+    wchar_t *b=buf;
+
+    int i;
+    for (i=0; i<255; i++) {
+        if (*src ==0 ) break;
+        *(b++)=*(src++);
+    }
+
+    //*(b++)=0x20;
+    if (src2!=0)
+        for (; i<255; i++) {
+            if (*src2 ==0 ) break;
+            *(b++)=*(src2++);
+        }
+        *b=0;
+
+        return buf;
+}
+
+
+void Log::addLog(const wchar_t * msg) {
+    //ListBox_AddString( logWnd->getListBoxHWnd(), msg);
+    ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), -1));
+    odrLog->addODR(r, true);
+}
+
 void Log::msg(const std::string &message){
-	puts(message.c_str());
+    addLog(charToWchar(message.c_str()));
 }
 
 void Log::msg(const char * message){
-	puts(message);
+    addLog(charToWchar(message));
 }
 
 void Log::msg(const char * message, const char *message2){
-	printf ("%s %s\n", message, message2);
+    addLog(charToWchar(message, message2));
+}
+
+Log::ref instance;
+
+Log::ref Log::getInstance() {
+    if (!instance) { 
+        instance=Log::ref(new Log());
+    }
+    return instance;
 }

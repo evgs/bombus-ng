@@ -9,7 +9,7 @@ public:
     virtual bool connect()=0;
     virtual void beginConversation(JabberDataBlockRef streamHeader)=0;
     virtual void loginSuccess()=0;
-    virtual void loginFailed()=0;
+    virtual void loginFailed(const char * errMsg)=0;
     virtual void endConversation(const std::exception *ex)=0;
 };
 

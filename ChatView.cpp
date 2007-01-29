@@ -51,7 +51,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             p=(ChatView *) (((CREATESTRUCT *)lParam)->lpCreateParams);
             SetWindowLong(hWnd, GWL_USERDATA, (LONG) p );
 
-            p->msgList=ListViewODR::ref(new ListViewODR(hWnd, std::string("Log")));
+            p->msgList=VirtualListView::ref(new VirtualListView(hWnd, std::string("Chat")));
             p->msgList->setParent(hWnd);
             p->msgList->showWindow(true);
             p->editWnd=DoCreateEditControl(hWnd);

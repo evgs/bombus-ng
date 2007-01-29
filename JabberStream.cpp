@@ -13,7 +13,7 @@
 JabberStream::JabberStream(void){}
 
 void JabberStream::run(JabberStream * _stream){
-	_stream->rc->log->msg("Reader thread strated");
+	Log::getInstance()->msg("Reader thread strated");
 
 	_stream->isRunning=true;
 
@@ -27,7 +27,7 @@ void JabberStream::run(JabberStream * _stream){
 	} catch (std::exception ex) {
         _stream->jabberListener->endConversation(&ex);
 	}
-    _stream->rc->log->msg("Reader thread stopped");
+    Log::getInstance()->msg("Reader thread stopped");
     _stream->rc->jabberStream=JabberStreamRef();
     _stream->isRunning=false;
 }
@@ -100,7 +100,7 @@ JabberStream::JabberStream(ResourceContextRef rc, JabberListenerRef listener){
 
 JabberStream::~JabberStream(void){
 
-	rc->log->msg("JabberStream destructor called");
+	Log::getInstance()->msg("JabberStream destructor called");
 }
 
 void JabberStream::sendStanza(JabberDataBlockRef stanza){

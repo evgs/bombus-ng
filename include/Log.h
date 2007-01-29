@@ -3,7 +3,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-#include "ListViewODR.h"
+#include "VirtualListView.h"
 
 class Log {
 public:
@@ -17,11 +17,11 @@ private:
 
     //static Log::ref instance;
 
-    ListViewODR::ref odrLog;
+    VirtualListView::ref odrLog;
 
 public:
 
-    void bindLV(ListViewODR::ref odrLog) { this->odrLog=odrLog; }
+    void bindLV(VirtualListView::ref odrLog) { this->odrLog=odrLog; }
 
 	void msg(const std::string &message);
 	void msg(const char * message);

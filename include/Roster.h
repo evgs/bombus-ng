@@ -5,8 +5,7 @@
 #include <windows.h>
 
 #include "Contact.h"
-#include "ListViewODR.h"
-
+#include "VirtualListView.h"
 
 //////////////////////////////////////////////////////////////////////////
 class RosterGroup: public IconTextElement {
@@ -60,10 +59,10 @@ public:
     virtual const char * getTagName() const { return NULL/*"iq"*/; }
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
-    void bindWindow(ListViewODR::ref roster){ this->roster=roster; }
+    void bindWindow(VirtualListView::ref roster){ this->roster=roster; }
 
     void processPresence(JabberDataBlockRef block);
 private:
-    ListViewODR::ref roster;
+    VirtualListView::ref roster;
 
 };

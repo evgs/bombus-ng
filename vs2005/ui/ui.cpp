@@ -25,7 +25,7 @@
 #include "Roster.h"
 
 #include "DlgAccount.h"
-#include "ListViewODR.h"
+#include "VirtualListView.h"
 #include "ChatView.h"
 #include "TabCtrl.h"
 
@@ -47,7 +47,7 @@ HWND		mainWnd;
 //ListViewRef logWnd;
 TabsCtrlRef tabs;
 
-ListViewODR::ref rosterWnd;
+VirtualListView::ref rosterWnd;
 ChatView::ref chatSample;
 ResourceContextRef rc;
 
@@ -293,7 +293,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
 
-            rosterWnd=ListViewODR::ref(new ListViewODR(hWnd, std::string("Roster")));
+            rosterWnd=VirtualListView::ref(new VirtualListView(hWnd, std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
             chatSample=ChatView::ref(new ChatView(hWnd, std::string("SampleChat")));
@@ -302,7 +302,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //tabs->addWindow(logWnd);
 
             { 
-                ListViewODR::ref odrLog = ListViewODR::ref(new ListViewODR(hWnd, std::string("Log")));
+                VirtualListView::ref odrLog = VirtualListView::ref(new VirtualListView(hWnd, std::string("Log")));
                 tabs->addWindow(odrLog);
                 Log::getInstance()->bindLV(odrLog); 
             }

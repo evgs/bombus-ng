@@ -15,7 +15,7 @@
 #include "Presence.h"
 
 Roster::Roster(){
-    roster=ListViewODR::ref();
+    roster=VirtualListView::ref();
 }
 
 /*void Roster::addContact(Contact::ref contact) {
@@ -140,6 +140,7 @@ void Roster::processPresence( JabberDataBlockRef block ) {
     }
 
     contact->status=typeIndex;
+    contact->update();
     makeViewList();
 }
 //////////////////////////////////////////////////////////////////////////
@@ -153,13 +154,13 @@ void Roster::makeViewList() {
 
     for (GroupList::const_iterator gi=groups.begin(); gi!=groups.end(); gi++) {
         RosterGroup::ref group=*gi;
-        list->odrVector.push_back(group);
+        list->push_back(group);
 
         if (!group->isExpanded()) continue;
 
         for (ContactList::const_iterator ci=contacts.begin(); ci!=contacts.end(); ci++) {
             Contact::ref contact=*ci;
-            if (group->equals(contact->group)) list->odrVector.push_back(contact);
+            if (group->equals(contact->group)) list->push_back(contact);
         }
     }
 

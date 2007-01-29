@@ -8,7 +8,7 @@
 #include <utf8.hpp>
 
 #include "Wnd.h"
-#include "ListViewODR.h"
+#include "VirtualListView.h"
 
 class ChatView : public Wnd{
 public:
@@ -25,7 +25,7 @@ public:
     void addMessage(const std::string & msg);
 
 protected:
-    ListViewODR::ref msgList;
+    VirtualListView::ref msgList;
     HWND		editWnd;
     int editHeight;
 

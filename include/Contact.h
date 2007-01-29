@@ -51,6 +51,7 @@ public:
     virtual int getIconIndex() const;
     virtual const wchar_t * getText() const;
 
+    void update();
 private:
     std::wstring wjid;
 };

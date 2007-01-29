@@ -24,15 +24,8 @@ public:
     bool operator==(ODRSetIterator &right);
 };
 
-class ODRSet {
-public:
-    ODRSet();
-    virtual ~ODRSet();
-    virtual ODRSetIterator::ref getEnum()=0;
-    typedef boost::shared_ptr<ODRSet> ref;
-protected:
-};
-
+typedef std::vector<ODRRef> ODRList;
+typedef boost::shared_ptr<ODRList> ODRListRef;
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -48,28 +41,27 @@ public:
     virtual const wchar_t * getWindowTitle() const;
     virtual const OwnerDrawRect * getODR() const;
 
-    void bindODRList(ODRSet::ref odr);
+    void bindODRList(ODRListRef odr) {  odrlist=odr; }
 
     void notifyListUpdate( bool redraw);
 
     virtual void eventOk();
+
+    void addODR(ODRRef odr, bool redraw);
 
     typedef boost::shared_ptr<VirtualListView> ref;
 protected:
 
     int winTop;
 
-    ODRSetIterator::ref cursorPos;
+    ODRRef cursorPos;
 
-    ODRSet::ref odrlist;
-
-
-    //HWND listScrollHWND;
-
-
+    ODRListRef odrlist;
 
     std::wstring title;
     WndTitleRef  wt;    
+
+    void init();
 
 private:
     enum {
@@ -78,6 +70,7 @@ private:
 
     bool wrapList;
     bool moveCursorTo(int x, int y);
+    void moveCursor(int direction);
     void cursorFit();
 
     static ATOM windowClass;

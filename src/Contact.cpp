@@ -10,8 +10,7 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     this->nickname=nickname;
     this->status=presence::OFFLINE;
 
-    wjid=utf8::utf8_wchar( (nickname.empty())? jid:nickname);
-    init();
+    update();
     messageList=MessageListRef(new MessageList());
 }
 bool Contact::hasUnreadMsgs() {
@@ -31,4 +30,11 @@ bool Contact::compare( Contact::ref left, Contact::ref right ) {
     if (left->status < right->status) return true;
     if (left->status > right->status) return false;
     return (left->wjid < right->wjid);
+}
+void Contact::update() {
+    std::string s=(nickname.empty())? jid.getBareJid():nickname;
+    std::string resource=jid.getResource();
+    if (resource.length()) { s+='/'; s+=resource; }
+    wjid=utf8::utf8_wchar( s );
+    init();
 }

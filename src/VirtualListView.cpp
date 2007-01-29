@@ -5,8 +5,6 @@
 #include <aygshell.h>
 #include "utf8.hpp"
 
-#include "ListViewODR.h"
-
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 
@@ -67,14 +65,12 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             //int index=-1;
 
             if (p->odrlist.get()) {
-                ODRSetIterator::ref i=p->odrlist->getEnum();
-                while (i->hasMoreElements()) {
-                    bool focused=false;
-                    try {
-                        //focused=i->equals(p->cursorPos);
-                    } catch (std::exception ex) {}
+                ODRList::const_iterator i=p->odrlist->begin();
+                while (i!=p->odrlist->end()) {
+                    ODRRef odr=*i; i++;
 
-                    ODRRef odr=i->get(); i->next();
+                    bool focused = (odr.get()==p->cursorPos.get());
+
                     int iHeight=odr->getHeight();
                     RECT ritem={0, y, p->clientRect.right, y+iHeight} ;
                     y+=iHeight;
@@ -200,14 +196,12 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             int lkeyData=lParam;
             if (lkeyData & 0x800000) break; //keyRelease 
             switch (vKey) {
-            case VK_UP: 
-                if (!(p->cursorPos->isFirstElement())) p->cursorPos->previous(); 
-                else if (p->wrapList) p->cursorPos->setLast();
+            case VK_UP:
+                p->moveCursor(-1);
                 break;
 
             case VK_DOWN: 
-                if (!(p->cursorPos->isLastElement())) p->cursorPos->next(); 
-                else if (p->wrapList) p->cursorPos->setFirst();
+                p->moveCursor(1);
                 break;
             }
             p->cursorFit();
@@ -262,8 +256,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
     case WM_USER+1:
         {
             //TODO: create interconnecting message object to avoid pointers
-            ODRList::ref r=ODRList::ref((ODRList *)lParam);
-            r->selfRef=r;
+            ODRListRef r=ODRListRef((ODRList *)lParam);
             p->bindODRList(r); //¿’“”Õ√ π5
 
             //p->bindODRList(ODRSet::ref((ODRSet *)lParam)); //¿’“”Õ√ π3
@@ -289,46 +282,43 @@ bool VirtualListView::moveCursorTo( int x, int y )
     if (y<0) return false;
 
     int yTop=0;
-    ODRSetIterator::ref i = odrlist->getEnum();
-    while ( i->hasMoreElements() ) {
+
+    for (ODRList::const_iterator i = odrlist->begin(); i!=odrlist->end(); i++ ) {
         int yBot=yTop+i->get()->getHeight();
 
         if (yTop<=y) {
             if (yBot>y) {
-                cursorPos=i;
+                cursorPos=*i;
 
                 cursorFit();
                 return true;
             }
         }
-        i->next();
         yTop=yBot;
     }
     return false;
 }
 
 void VirtualListView::cursorFit() {
-    return; /**/
     if (!cursorPos) return;
-    if (!cursorPos->hasMoreElements()) return;
 
-    ODRSetIterator::ref i = odrlist->getEnum();
     int yTop=0;
-    while ( i->hasMoreElements() ) {
+    for (ODRList::const_iterator i = odrlist->begin(); i!=odrlist->end(); i++) {
         int yBot=yTop+ i->get()->getHeight();
 
-        if (i->equals(cursorPos)) {
+        if ( (*i).get()==cursorPos.get() ) {
             if (yBot>winTop+clientRect.bottom) winTop=yBot-(clientRect.bottom);
             if (yTop<winTop) winTop=yTop;
             break;
         }
         yTop=yBot;
-        i->next();
     }
 }
 
 
-VirtualListView::VirtualListView() {
+VirtualListView::VirtualListView() { init(); }
+
+void VirtualListView::init() {
     if (windowClass==0)
         windowClass=RegisterWindowClass();
     if (windowClass==0) throw std::exception("Can't create window class");
@@ -338,6 +328,7 @@ VirtualListView::VirtualListView() {
 }
 
 VirtualListView::VirtualListView( HWND parent, const std::string & title ) {
+    init();
 
     parentHWnd=parent;
     SetParent(thisHWnd, parent);
@@ -345,7 +336,8 @@ VirtualListView::VirtualListView( HWND parent, const std::string & title ) {
     this->title=utf8::utf8_wchar(title);
 
     wt=WndTitleRef(new WndTitle(this, 0));
-    cursorPos=odrlist->getEnum();
+    cursorPos=ODRRef();//odrlist->front();
+    odrlist=ODRListRef(new ODRList());
 }
 
 const wchar_t * VirtualListView::getWindowTitle() const{
@@ -359,9 +351,8 @@ const OwnerDrawRect * VirtualListView::getODR() const { return wt.get(); }
 void VirtualListView::notifyListUpdate( bool redraw ) {
 
     int lastY=0;
-    ODRSetIterator::ref i = odrlist->getEnum();
-    while ( i->hasMoreElements() ) {
-        lastY+= i->get()->getHeight(); i->next();
+    for (ODRList::const_iterator i = odrlist->begin(); i!=odrlist->end(); i++) {
+        lastY+= i->get()->getHeight();
     }
 
     SCROLLINFO si;
@@ -377,13 +368,29 @@ void VirtualListView::notifyListUpdate( bool redraw ) {
     InvalidateRect(getHWnd(), NULL, true);
 }
 
-void VirtualListView::bindODRList( ODRSet::ref odr ) {
-    odrlist=odr;
-}
-
 void VirtualListView::eventOk() { }
 
+void VirtualListView::moveCursor( int direction ) {
+    for (ODRList::const_iterator i=odrlist->begin(); i!=odrlist->end(); i++) {
+        ODRRef r=*i;
+        if (r.get()==cursorPos.get()) {
+            if (direction>0) {
+                i++;
+                if (i==odrlist->end()) i=odrlist->begin();
+            } else {
+                if (i==odrlist->begin()) i=odrlist->end();
+                i--;
+            }
+            cursorPos=*i;
+            return;
+        }
+    }
+}
 
+void VirtualListView::addODR( ODRRef odr, bool redraw ) {
+    odrlist->push_back(odr);
+    notifyListUpdate(redraw);
+}
 ATOM VirtualListView::windowClass=0;
 
 //////////////////////////////////////////////////////////////////////////
@@ -396,8 +403,3 @@ bool ODRSetIterator::equals( ref iter2 ) {
 }
 bool ODRSetIterator::operator==( ODRSetIterator &right ) { return get()==right.get(); }
 
-//////////////////////////////////////////////////////////////////////////
-ODRSet::~ODRSet() {}
-
-ODRSet::ODRSet() { }
-//////////////////////////////////////////////////////////////////////////

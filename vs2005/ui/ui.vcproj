@@ -253,10 +253,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\ListViewODR.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\Log.cpp"
 				>
 			</File>
@@ -420,10 +416,6 @@
 			</File>
 			<File
 				RelativePath="..\..\include\jid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\ListViewODR.h"
 				>
 			</File>
 			<File

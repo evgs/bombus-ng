@@ -87,6 +87,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         contacts.push_back(contact);
         //todo: subscription=remove
     }
+    //std::stable_sort(contacts.begin(), contacts.end(), Contact::compare);
     makeViewList();
     return BLOCK_PROCESSED;
 }
@@ -145,6 +146,7 @@ void Roster::processPresence( JabberDataBlockRef block ) {
 }
 //////////////////////////////////////////////////////////////////////////
 void Roster::makeViewList() {
+
     std::stable_sort(contacts.begin(), contacts.end(), Contact::compare);
 
     //ODRSet::ref odrlist=ODRSet::ref(new ODRList());

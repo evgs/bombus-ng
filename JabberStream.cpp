@@ -94,7 +94,8 @@ JabberStream::JabberStream(ResourceContextRef rc, JabberListenerRef listener){
 	this->rc=rc;
     this->jabberListener=listener;
 
-	CreateThread(NULL, 0, jabberStreamThread, this, 0, NULL);
+	HANDLE thread=CreateThread(NULL, 0, jabberStreamThread, this, 0, NULL);
+    SetThreadPriority(thread, THREAD_PRIORITY_IDLE);
 	//boost::thread test( boost::bind(run, this) );
 }
 

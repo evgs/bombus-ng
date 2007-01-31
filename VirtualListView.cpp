@@ -166,13 +166,16 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             shrg.dwFlags = SHRG_RETURNCMD /*| SHRG_NOANIMATION*/;
 
             if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
-                /*HMENU hmenu = GetSubMenu(g_hMainMenu, 0);
+
+                HMENU hmenu = p->getContextMenu();
+                if (hmenu==NULL) break;
+
                 TrackPopupMenuEx(hmenu,
-                TPM_LEFTALIGN,
-                LOWORD(lParam),
-                HIWORD(lParam),
-                hWnd,
-                NULL);*/
+                    TPM_LEFTALIGN,
+                    LOWORD(lParam),
+                    HIWORD(lParam),
+                    hWnd,
+                    NULL);
             }
             break;
         }
@@ -395,6 +398,11 @@ void VirtualListView::addODR( ODRRef odr, bool redraw ) {
     odrlist->push_back(odr);
     notifyListUpdate(redraw);
 }
+
+HMENU VirtualListView::getContextMenu() {
+    return NULL;
+}
+
 ATOM VirtualListView::windowClass=0;
 
 //////////////////////////////////////////////////////////////////////////

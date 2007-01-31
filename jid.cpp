@@ -29,8 +29,6 @@ void Jid::setJid(const std::string &jid){
 	this->jid=jid;
 
 	int at=jid.find('@');
-    if (at==std::string.npos) 
-        at=-1;
 	int slash=jid.find('/');
     if (slash<0) {
         slash=jid.length();
@@ -45,7 +43,6 @@ void Jid::setBareJid(const std::string &bareJid){
 	this->bareJid=bareJid;
 
 	int at=bareJid.find('@');
-    if (at==std::string.npos) at=-1;
 	int slash=bareJid.find('/');
 	userName=bareJid.substr(0,at);
 	server=bareJid.substr(at+1,slash-at-1);

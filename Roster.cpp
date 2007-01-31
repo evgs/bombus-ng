@@ -236,6 +236,18 @@ RosterView::RosterView( HWND parent, const std::string & title ){
     wt=WndTitleRef(new WndTitle(this, 0));
     cursorPos=ODRRef();//odrlist->front();
     odrlist=ODRListRef(new ODRList());
+
+    ////
+    hmenu=CreatePopupMenu();
+    AppendMenu(hmenu, MF_STRING , 0, TEXT("Line 1"));
+    AppendMenu(hmenu, MF_STRING , 1, TEXT("Line 2"));
+    AppendMenu(hmenu, MF_STRING , 2, TEXT("Line 3"));
+    AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+    AppendMenu(hmenu, MF_STRING , 3, TEXT("Line 4"));
+}
+
+RosterView::~RosterView() {
+    if (hmenu!=NULL) DestroyMenu(hmenu);
 }
 
 void RosterView::eventOk() {
@@ -245,4 +257,8 @@ void RosterView::eventOk() {
     	p->setExpanded(!p->isExpanded());
         roster.lock()->makeViewList();
     }
+}
+
+HMENU RosterView::getContextMenu() {
+    return hmenu;
 }

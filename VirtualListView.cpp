@@ -194,7 +194,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
         {
             int vKey=(int)wParam;
             int lkeyData=lParam;
-            if (lkeyData & 0x800000) break; //keyRelease 
+            if (lkeyData & 0x80000000) break; //keyRelease 
             switch (vKey) {
             case VK_UP:
                 p->moveCursor(-1);
@@ -203,6 +203,10 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             case VK_DOWN: 
                 p->moveCursor(1);
                 break;
+
+            case VK_RETURN:
+                if (lkeyData &0xc0000000) break;
+                p->eventOk();
             }
             p->cursorFit();
             InvalidateRect(p->getHWnd(), NULL, true);

@@ -9,7 +9,7 @@
 #include "IconTextElement.h"
 
 #include "Presence.h"
-class Jid;
+#include "jid.h"
 
 /*enum Status {
     PRESENCE_ONLINE=0,

@@ -10,14 +10,17 @@
 #include "Wnd.h"
 #include "VirtualListView.h"
 
+#include "Contact.h"
+
 class ChatView : public Wnd{
 public:
-    ChatView(HWND parent, const std::string & title);
+    //ChatView(HWND parent, const std::string & title);
+    ChatView(HWND parent, Contact::ref contact);
     virtual ~ChatView();
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-    virtual const wchar_t * getWindowTitle() const;
+    //virtual const wchar_t * getWindowTitle() const;
     virtual const OwnerDrawRect * getODR() const;
 
     typedef boost::shared_ptr<ChatView> ref;
@@ -29,9 +32,7 @@ protected:
     HWND		editWnd;
     int editHeight;
 
-    std::wstring title;
-
-    WndTitleRef  wt;    
+    Contact::ref contact;
 
 private:
     static ATOM windowClass;

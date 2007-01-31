@@ -296,7 +296,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             rosterWnd=RosterView::ref(new RosterView(hWnd, std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
-            chatSample=ChatView::ref(new ChatView(hWnd, std::string("SampleChat")));
+            chatSample=ChatView::ref(new ChatView(hWnd, Contact::ref(new Contact("test@server","resource",""))));
             tabs->addWindow(chatSample);
             //logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
             //tabs->addWindow(logWnd);

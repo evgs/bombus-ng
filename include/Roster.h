@@ -75,9 +75,15 @@ private:
 class RosterView: public VirtualListView {
 public:
     RosterView(HWND parent, const std::string & title);
+    virtual ~RosterView();
+
     virtual void eventOk();
     boost::weak_ptr<Roster> roster;
 
     typedef boost::shared_ptr<RosterView> ref;
+
+    virtual HMENU getContextMenu();
+
 private:
+    HMENU hmenu;
 };

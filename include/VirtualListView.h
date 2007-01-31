@@ -49,6 +49,8 @@ public:
 
     void addODR(ODRRef odr, bool redraw);
 
+    virtual HMENU getContextMenu();
+
     typedef boost::shared_ptr<VirtualListView> ref;
 protected:
 

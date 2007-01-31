@@ -61,7 +61,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
 
-        {
+        /*{
 
             RECT rc = {0, 0, 100, 100};
 
@@ -69,7 +69,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             LPCTSTR t=p->title.c_str();
             DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
             DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);
-        }
+        }*/
 
         // TODO: Add any drawing code here...
 
@@ -141,7 +141,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     return 0;
 }
 
-ChatView::ChatView( HWND parent, const std::string & title ) 
+ChatView::ChatView( HWND parent, Contact::ref contact ) 
 {
     if (windowClass==0)
         windowClass=RegisterWindowClass();
@@ -153,21 +153,18 @@ ChatView::ChatView( HWND parent, const std::string & title )
     GetTextMetrics(NULL, &txm);
     editHeight=txm.tmHeight*4;
 
-    this->title=utf8::utf8_wchar(title);
+    this->contact=contact;
 
     thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("chat"), WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
 
-    wt=WndTitleRef(new WndTitle(this, 0));
 }
 
-const wchar_t * ChatView::getWindowTitle() const{
-    return title.c_str();
-}
+//const wchar_t * ChatView::getWindowTitle() const{  return TEXT("stub"); }
 
 ChatView::~ChatView() {}
 
-const OwnerDrawRect * ChatView::getODR() const { return wt.get(); }
+const OwnerDrawRect * ChatView::getODR() const { return contact.get(); }
 
 void ChatView::addMessage(const std::string & msg) {
     /*std::wstring umsg=utf8::utf8_wchar(msg);

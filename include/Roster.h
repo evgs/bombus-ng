@@ -16,6 +16,7 @@ public:
     typedef boost::shared_ptr<RosterGroup> ref;
     bool equals(const std::string &name) const { return groupName==name; }
 
+    void setExpanded(bool state) { expanded=state; }
     bool isExpanded() const { return expanded; }
     
     static bool compare( RosterGroup::ref left, RosterGroup::ref right);
@@ -62,7 +63,21 @@ public:
     void bindWindow(VirtualListView::ref roster){ this->roster=roster; }
 
     void processPresence(JabberDataBlockRef block);
+
+    typedef boost::shared_ptr<Roster> ref;
+
 private:
     VirtualListView::ref roster;
 
+};
+
+
+class RosterView: public VirtualListView {
+public:
+    RosterView(HWND parent, const std::string & title);
+    virtual void eventOk();
+    boost::weak_ptr<Roster> roster;
+
+    typedef boost::shared_ptr<RosterView> ref;
+private:
 };

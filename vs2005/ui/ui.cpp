@@ -47,7 +47,7 @@ HWND		mainWnd;
 //ListViewRef logWnd;
 TabsCtrlRef tabs;
 
-VirtualListView::ref rosterWnd;
+RosterView::ref rosterWnd;
 ChatView::ref chatSample;
 ResourceContextRef rc;
 
@@ -293,7 +293,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			//editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
 
-            rosterWnd=VirtualListView::ref(new VirtualListView(hWnd, std::string("Roster")));
+            rosterWnd=RosterView::ref(new RosterView(hWnd, std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
             chatSample=ChatView::ref(new ChatView(hWnd, std::string("SampleChat")));
@@ -658,6 +658,7 @@ int initJabber()
     //TODO: roster caching
     rc->roster=RosterRef(new Roster());
     rc->roster->bindWindow(rosterWnd);
+    rosterWnd->roster=rc->roster;
 
     rc->jabberStream=JabberStreamRef(new JabberStream(rc, JabberListenerRef(new JabberStreamEvents(rc))));
 

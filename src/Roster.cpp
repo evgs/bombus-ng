@@ -59,6 +59,9 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         JabberDataBlockRef jGroup=item->getChildByName("group"); 
         std::string group=(jGroup)? jGroup->getText() : "";
 
+        /*if (group.length()==0)*/ if (jid.find('@')==std::string.npos) 
+            group="Transports";
+
         std::string subscr=item->getAttribute("subscription");
         if (item->hasAttribute("ask")) {
             subscr+=',';
@@ -72,7 +75,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         } 
         if (contact==NULL) { 
             contact=Contact::ref(new Contact(jid, "", name));
-            std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
+            //std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
             //roster->addODR(contact, (i==query->getChilds()->end()));
         }   
         if (!findGroup(group)) {
@@ -135,8 +138,21 @@ void Roster::processPresence( JabberDataBlockRef block ) {
             contact->jid.setResource(jid.getResource());
         } else { 
             //todo: second attempt - clone contact from bareJidMap
-            //todo: third attempt - based on NOT-IN-LIST policy
-            return;
+
+            //third attempt - based on NOT-IN-LIST policy
+            contact=Contact::ref(new Contact(jid.getBareJid(), jid.getResource(), ""));
+
+            std::string group="-Not-In-List-";
+            if (!findGroup(group)) {
+                createGroup(group);
+                std::stable_sort(groups.begin(), groups.end(), RosterGroup::compare );
+            }
+
+            contact->subscr="NIL";
+            contact->group=group;
+
+            bareJidMap[contact->jid.getBareJid()]=contact;
+            contacts.push_back(contact);
         }
     }
 
@@ -205,4 +221,28 @@ int RosterGroup::getIconIndex() const {
 }
 bool RosterGroup::compare( RosterGroup::ref left, RosterGroup::ref right ) {
     return left->groupName < right ->groupName;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+RosterView::RosterView( HWND parent, const std::string & title ){
+    init();
+
+    parentHWnd=parent;
+    SetParent(thisHWnd, parent);
+
+    this->title=utf8::utf8_wchar(title);
+
+    wt=WndTitleRef(new WndTitle(this, 0));
+    cursorPos=ODRRef();//odrlist->front();
+    odrlist=ODRListRef(new ODRList());
+}
+
+void RosterView::eventOk() {
+    if (!cursorPos) return;
+    RosterGroup *p = dynamic_cast<RosterGroup *>(cursorPos.get());
+    if (p) {
+    	p->setExpanded(!p->isExpanded());
+        roster.lock()->makeViewList();
+    }
 }

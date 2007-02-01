@@ -295,13 +295,15 @@ HMENU RosterView::getContextMenu() {
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
-        if (type==RosterGroup::ROSTER) 
+        if (type==RosterGroup::ROSTER) {
             AppendMenu(hmenu, MF_STRING, 4, TEXT("Edit contact"));
-        AppendMenu(hmenu, MF_STRING, 5, TEXT("Subscription"));
-        AppendMenu(hmenu, MF_STRING, 6, TEXT("Delete"));
+            AppendMenu(hmenu, MF_STRING, 5, TEXT("Subscription"));
+        }
 
         if (type==RosterGroup::NOT_IN_LIST)
             AppendMenu(hmenu, MF_STRING, 4, TEXT("Add contact"));
+
+        AppendMenu(hmenu, MF_STRING, 6, TEXT("Delete"));
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 

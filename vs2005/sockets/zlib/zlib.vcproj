@@ -115,7 +115,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\..\..\zlib\inclide"
+				AdditionalIncludeDirectories="..\..\..\zlib\include"
 				PreprocessorDefinitions="NO_ERRNO_H"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"

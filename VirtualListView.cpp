@@ -151,6 +151,11 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
         } 
 
 
+    case WM_EXITMENULOOP:
+        {
+            p->releaseContextMenu();
+            break;
+        }
     case WM_LBUTTONDOWN:
         {
             SHRGINFO    shrg;
@@ -170,10 +175,11 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
                 HMENU hmenu = p->getContextMenu();
                 if (hmenu==NULL) break;
 
+                POINT pt={LOWORD(lParam), HIWORD(lParam) };
+                ClientToScreen(hWnd, &pt);
                 TrackPopupMenuEx(hmenu,
-                    TPM_LEFTALIGN,
-                    LOWORD(lParam),
-                    HIWORD(lParam),
+                    /*TPM_LEFTALIGN |*/ TPM_TOPALIGN,
+                    pt.x, pt.y,
                     hWnd,
                     NULL);
             }
@@ -399,19 +405,8 @@ void VirtualListView::addODR( ODRRef odr, bool redraw ) {
     notifyListUpdate(redraw);
 }
 
-HMENU VirtualListView::getContextMenu() {
-    return NULL;
-}
+HMENU VirtualListView::getContextMenu() { return NULL; }
+void VirtualListView::releaseContextMenu() {};
 
 ATOM VirtualListView::windowClass=0;
-
-//////////////////////////////////////////////////////////////////////////
-
-ODRSetIterator::~ODRSetIterator() {}
-bool ODRSetIterator::equals( ref iter2 ) { 
-    if (!hasMoreElements()) return false;
-    if (!iter2->hasMoreElements()) return false;
-    return get()==iter2->get(); 
-}
-bool ODRSetIterator::operator==( ODRSetIterator &right ) { return get()==right.get(); }
 

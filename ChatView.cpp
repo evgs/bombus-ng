@@ -149,9 +149,10 @@ ChatView::ChatView( HWND parent, Contact::ref contact )
 
     parentHWnd=parent;
 
-    TEXTMETRIC txm;
-    GetTextMetrics(NULL, &txm);
-    editHeight=txm.tmHeight*4;
+    //TEXTMETRIC txm;
+    //GetTextMetrics(NULL, &txm); //TODO - hdc must not be NULL
+    //editHeight=txm.tmHeight*4;
+    editHeight=60;
 
     this->contact=contact;
 

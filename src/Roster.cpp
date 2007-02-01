@@ -16,6 +16,9 @@
 
 Roster::Roster(){
     roster=VirtualListView::ref();
+    createGroup("Self-Contact", RosterGroup::SELF_CONTACT);
+    createGroup("Transports", RosterGroup::TRANSPORTS);
+    createGroup("Not-In-List", RosterGroup::NOT_IN_LIST);
 }
 
 /*void Roster::addContact(Contact::ref contact) {
@@ -79,7 +82,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
             //roster->addODR(contact, (i==query->getChilds()->end()));
         }   
         if (!findGroup(group)) {
-            createGroup(group);
+            createGroup(group, RosterGroup::ROSTER);
             std::stable_sort(groups.begin(), groups.end(), RosterGroup::compare );
         }
 
@@ -142,11 +145,7 @@ void Roster::processPresence( JabberDataBlockRef block ) {
             //third attempt - based on NOT-IN-LIST policy
             contact=Contact::ref(new Contact(jid.getBareJid(), jid.getResource(), ""));
 
-            std::string group="-Not-In-List-";
-            if (!findGroup(group)) {
-                createGroup(group);
-                std::stable_sort(groups.begin(), groups.end(), RosterGroup::compare );
-            }
+            std::string group="Not-In-List";
 
             contact->subscr="NIL";
             contact->group=group;
@@ -174,12 +173,20 @@ void Roster::makeViewList() {
         RosterGroup::ref group=*gi;
         list->push_back(group);
 
+        int elemCount=0;
+
         if (!group->isExpanded()) continue;
 
         for (ContactList::const_iterator ci=contacts.begin(); ci!=contacts.end(); ci++) {
             Contact::ref contact=*ci;
-            if (group->equals(contact->group)) list->push_back(contact);
+            if (group->equals(contact->group)) {
+                list->push_back(contact);
+                elemCount++;
+            }
         }
+
+        if (elemCount==0) { list->pop_back();  continue; } 
+
     }
 
     //roster->bindODRList(odrlist);
@@ -195,16 +202,18 @@ RosterGroup::ref Roster::findGroup( const std::string &name ) {
     return RosterGroup::ref();
 }
 
-RosterGroup::ref Roster::createGroup( const std::string &name ) {
+RosterGroup::ref Roster::createGroup( const std::string &name, RosterGroup::Type type ) 
+{
     
-    RosterGroup::ref newGrp=RosterGroup::ref(new RosterGroup(name));
+    RosterGroup::ref newGrp=RosterGroup::ref(new RosterGroup(name, type));
     groups.push_back(newGrp);
     return newGrp;
 }
 
 
-RosterGroup::RosterGroup( const std::string &name ) {
+RosterGroup::RosterGroup( const std::string &name, Type type ) {
     groupName=name;
+    this->type=type;
     wstr=utf8::utf8_wchar((name.length()==0)? "General" : name);
     expanded=true;
     init();
@@ -220,6 +229,8 @@ int RosterGroup::getIconIndex() const {
         icons::ICON_COLLAPSED_INDEX;
 }
 bool RosterGroup::compare( RosterGroup::ref left, RosterGroup::ref right ) {
+    if (left->type < right->type) return true;
+    if (left->type > right->type) return false;
     return left->groupName < right ->groupName;
 }
 
@@ -238,17 +249,10 @@ RosterView::RosterView( HWND parent, const std::string & title ){
     odrlist=ODRListRef(new ODRList());
 
     ////
-    hmenu=CreatePopupMenu();
-    AppendMenu(hmenu, MF_STRING , 0, TEXT("Line 1"));
-    AppendMenu(hmenu, MF_STRING , 1, TEXT("Line 2"));
-    AppendMenu(hmenu, MF_STRING , 2, TEXT("Line 3"));
-    AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-    AppendMenu(hmenu, MF_STRING , 3, TEXT("Line 4"));
+    hmenu=NULL;
 }
 
-RosterView::~RosterView() {
-    if (hmenu!=NULL) DestroyMenu(hmenu);
-}
+RosterView::~RosterView() {}
 
 void RosterView::eventOk() {
     if (!cursorPos) return;
@@ -260,5 +264,58 @@ void RosterView::eventOk() {
 }
 
 HMENU RosterView::getContextMenu() {
+    if (hmenu!=NULL) releaseContextMenu();
+    hmenu=CreatePopupMenu();
+
+    if (!cursorPos) return NULL;
+    //////////////////////////////////////////////////////////////////////////
+    // Group actions
+    RosterGroup *rg = dynamic_cast<RosterGroup *>(cursorPos.get());
+    if (rg) {
+        AppendMenu(hmenu, MF_STRING , 0, TEXT("Rename"));
+    }
+
+    Contact * c = dynamic_cast<Contact *>(cursorPos.get());
+    if (c) {
+        RosterGroup::Type type=roster.lock()->findGroup(c->group)->type;
+
+        if (type==RosterGroup::TRANSPORTS) {
+            AppendMenu(hmenu, MF_STRING, 1, TEXT("Logon"));
+            AppendMenu(hmenu, MF_STRING, 2, TEXT("Logoff"));
+            AppendMenu(hmenu, MF_STRING, 2, TEXT("Resolve Nicknames"));
+            AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+        }
+        AppendMenu(hmenu, MF_STRING , 0, TEXT("Open chat"));
+
+        AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+
+        AppendMenu(hmenu, MF_STRING, 1, TEXT("VCard"));
+        AppendMenu(hmenu, MF_STRING, 2, TEXT("Client Info"));
+        AppendMenu(hmenu, MF_STRING, 3, TEXT("Commands"));
+
+        AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+
+        if (type==RosterGroup::ROSTER) 
+            AppendMenu(hmenu, MF_STRING, 4, TEXT("Edit contact"));
+        AppendMenu(hmenu, MF_STRING, 5, TEXT("Subscription"));
+        AppendMenu(hmenu, MF_STRING, 6, TEXT("Delete"));
+
+        if (type==RosterGroup::NOT_IN_LIST)
+            AppendMenu(hmenu, MF_STRING, 4, TEXT("Add contact"));
+
+        AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+
+        AppendMenu(hmenu, MF_STRING, 7, TEXT("Send status"));
+        if (type!=RosterGroup::TRANSPORTS) {
+            AppendMenu(hmenu, MF_STRING, 8, TEXT("Send file"));
+            AppendMenu(hmenu, MF_STRING, 9, TEXT("Invite"));
+        }
+    }
+
     return hmenu;
+}
+
+void RosterView::releaseContextMenu() {
+    if (hmenu!=NULL) DestroyMenu(hmenu);
+    hmenu=NULL;
 }

@@ -10,7 +10,15 @@
 //////////////////////////////////////////////////////////////////////////
 class RosterGroup: public IconTextElement {
 public:
-    RosterGroup(const std::string &name);
+
+    enum Type {
+        SELF_CONTACT=0,
+        ROSTER,
+        NOT_IN_LIST,
+        TRANSPORTS
+    };
+
+    RosterGroup(const std::string &name, Type type);
     virtual int getColor() const;
 
     typedef boost::shared_ptr<RosterGroup> ref;
@@ -20,6 +28,8 @@ public:
     bool isExpanded() const { return expanded; }
     
     static bool compare( RosterGroup::ref left, RosterGroup::ref right);
+
+    Type type;
 
 protected:
     virtual const wchar_t * getText() const;
@@ -52,7 +62,7 @@ public:
     Contact::ref findContact (const std::string &jid) const;
 
     RosterGroup::ref findGroup(const std::string &name);
-    RosterGroup::ref createGroup(const std::string &name);
+    RosterGroup::ref createGroup(const std::string &name, RosterGroup::Type type);
     void makeViewList();
 
     virtual const char * getType() const{ return NULL; /* result/set */ }
@@ -83,6 +93,7 @@ public:
     typedef boost::shared_ptr<RosterView> ref;
 
     virtual HMENU getContextMenu();
+    virtual void releaseContextMenu();
 
 private:
     HMENU hmenu;

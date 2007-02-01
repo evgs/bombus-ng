@@ -6,23 +6,6 @@
 #include <vector>
 
 //////////////////////////////////////////////////////////////////////////
-class ODRSetIterator {
-public:
-    typedef boost::shared_ptr<ODRSetIterator> ref;
-
-    virtual ~ODRSetIterator();
-    virtual bool isFirstElement()=0;
-    virtual bool isLastElement()=0;
-    virtual void setFirst()=0;
-    virtual void setLast()=0;
-    virtual ODRRef get()=0;
-    virtual void next()=0;
-    virtual void previous()=0;
-    virtual bool hasMoreElements()=0;
-
-    bool equals(ref iter2);
-    bool operator==(ODRSetIterator &right);
-};
 
 typedef std::vector<ODRRef> ODRList;
 typedef boost::shared_ptr<ODRList> ODRListRef;
@@ -50,6 +33,7 @@ public:
     void addODR(ODRRef odr, bool redraw);
 
     virtual HMENU getContextMenu();
+    virtual void releaseContextMenu();
 
     typedef boost::shared_ptr<VirtualListView> ref;
 protected:

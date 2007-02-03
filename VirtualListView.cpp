@@ -156,12 +156,11 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
         }
     case WM_LBUTTONDOWN:
         {
-            SHRGINFO    shrg;
-
             SetFocus(hWnd);
             if (!(p->moveCursorTo(LOWORD(lParam), HIWORD(lParam)))) break;
             InvalidateRect(p->getHWnd(), NULL, true);
 
+            SHRGINFO    shrg;
             shrg.cbSize = sizeof(shrg);
             shrg.hwndClient = hWnd;
             shrg.ptDown.x = LOWORD(lParam);
@@ -334,21 +333,23 @@ void VirtualListView::cursorFit() {
 }
 
 
-VirtualListView::VirtualListView() { init(); }
+VirtualListView::VirtualListView() { /*init(); - MUST NOT be called before setting up parentHWnd */ }
 
 void VirtualListView::init() {
+    BOOST_ASSERT(parentHWnd);
+
     if (windowClass==0)
         windowClass=RegisterWindowClass();
     if (windowClass==0) throw std::exception("Can't create window class");
-    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_VISIBLE | WS_VSCROLL,
-        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL/*parent*/, NULL, g_hInst, (LPVOID)this);
+    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentHWnd, NULL, g_hInst, (LPVOID)this);
     wrapList=true;
 }
 
 VirtualListView::VirtualListView( HWND parent, const std::string & title ) {
+    parentHWnd=parent;
     init();
 
-    parentHWnd=parent;
     SetParent(thisHWnd, parent);
 
     this->title=utf8::utf8_wchar(title);

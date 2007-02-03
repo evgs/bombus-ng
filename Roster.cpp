@@ -242,9 +242,9 @@ bool RosterGroup::compare( RosterGroup::ref left, RosterGroup::ref right ) {
 
 //////////////////////////////////////////////////////////////////////////
 RosterView::RosterView( HWND parent, const std::string & title ){
-    /*init(); - in default constructor*/ 
-
     parentHWnd=parent;
+    init(); 
+
     SetParent(thisHWnd, parent);
 
     this->title=utf8::utf8_wchar(title);
@@ -337,7 +337,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 if (tabs->switchByODR(cursorPos)) break;
 
                 //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
-                tabs->addWindow(ChatView::ref(new ChatView(NULL, cursorPos)));
+                tabs->addWindow(ChatView::ref(new ChatView(tabs->getHWnd(), cursorPos)));
                 tabs->switchByODR(cursorPos);
                 break;
             }

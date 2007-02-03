@@ -141,7 +141,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     return 0;
 }
 
-ChatView::ChatView( HWND parent, Contact::ref contact ) 
+ChatView::ChatView( HWND parent, ODRRef contact ) 
 {
     if (windowClass==0)
         windowClass=RegisterWindowClass();
@@ -165,7 +165,7 @@ ChatView::ChatView( HWND parent, Contact::ref contact )
 
 ChatView::~ChatView() {}
 
-const OwnerDrawRect * ChatView::getODR() const { return contact.get(); }
+const ODR * ChatView::getODR() const { return contact.get(); }
 
 void ChatView::addMessage(const std::string & msg) {
     /*std::wstring umsg=utf8::utf8_wchar(msg);

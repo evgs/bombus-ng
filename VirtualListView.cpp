@@ -118,8 +118,6 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             break;
         }
 
-
-
     case WM_SIZE: 
         { 
             //HDWP hdwp; 
@@ -241,14 +239,14 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
 
             //TODO: flicker-free scrolling
             switch (scrollCode) {
-    case SB_LINEDOWN:   si.nPos+=tabHeight; break;
-    case SB_LINEUP:     si.nPos-=tabHeight; break;
-    case SB_ENDSCROLL:  break;
-    case SB_PAGEUP:     si.nPos-=si.nPage;  break;
-    case SB_PAGEDOWN:   si.nPos+=si.nPage;  break;
-    case SB_THUMBTRACK:
-    case SB_THUMBPOSITION: si.nPos=si.nTrackPos; break;
-        //default:            si.nPos=si.nTrackPos; break;
+            case SB_LINEDOWN:   si.nPos+=tabHeight; break;
+            case SB_LINEUP:     si.nPos-=tabHeight; break;
+            case SB_ENDSCROLL:  break;
+            case SB_PAGEUP:     si.nPos-=si.nPage;  break;
+            case SB_PAGEDOWN:   si.nPos+=si.nPage;  break;
+            case SB_THUMBTRACK:
+            case SB_THUMBPOSITION: si.nPos=si.nTrackPos; break;
+            //default:            si.nPos=si.nTrackPos; break;
             }
 
 
@@ -264,6 +262,13 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             SetScrollInfo(p->thisHWnd, SB_VERT, &si, TRUE);
             return true;
 
+        }
+
+    case WM_COMMAND: 
+        {
+            int cmdId=LOWORD(wParam);
+            p->OnCommand(cmdId, lParam);
+            break;
         }
 
     case WM_USER+1:
@@ -359,10 +364,10 @@ const wchar_t * VirtualListView::getWindowTitle() const{
 
 VirtualListView::~VirtualListView() {}
 
-const OwnerDrawRect * VirtualListView::getODR() const { return wt.get(); }
+const ODR * VirtualListView::getODR() const { return wt.get(); }
 
 void VirtualListView::notifyListUpdate( bool redraw ) {
-
+    if (!odrlist) return;
     int lastY=0;
     for (ODRList::const_iterator i = odrlist->begin(); i!=odrlist->end(); i++) {
         lastY+= i->get()->getHeight();
@@ -407,6 +412,6 @@ void VirtualListView::addODR( ODRRef odr, bool redraw ) {
 
 HMENU VirtualListView::getContextMenu() { return NULL; }
 void VirtualListView::releaseContextMenu() {};
-
+void VirtualListView::OnCommand( int cmdId, LONG lParam ) {};
 ATOM VirtualListView::windowClass=0;
 

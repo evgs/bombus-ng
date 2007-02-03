@@ -14,7 +14,7 @@ void Wnd::setParent( HWND parent ) {
 }
 const wchar_t * Wnd::getWindowTitle() const { return TEXT("<name stub>"); }
 
-const OwnerDrawRect * Wnd::getODR() const { return NULL; }
+const ODR * Wnd::getODR() const { return NULL; }
 
 //////////////////////////////////////////////////////////////////////////
 

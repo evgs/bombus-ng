@@ -22,7 +22,7 @@ public:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
     virtual const wchar_t * getWindowTitle() const;
-    virtual const OwnerDrawRect * getODR() const;
+    virtual const ODR * getODR() const;
 
     void bindODRList(ODRListRef odr) {  odrlist=odr; }
 
@@ -34,6 +34,7 @@ public:
 
     virtual HMENU getContextMenu();
     virtual void releaseContextMenu();
+    virtual void OnCommand(int cmdId, LONG lParam);
 
     typedef boost::shared_ptr<VirtualListView> ref;
 protected:

@@ -18,7 +18,7 @@ public:
     void setParent(HWND parent);
 
     virtual const wchar_t * getWindowTitle() const;
-    virtual const OwnerDrawRect * getODR() const;
+    virtual const ODR * getODR() const;
 
 protected:
     RECT clientRect;

@@ -128,6 +128,7 @@
 				AdditionalIncludeDirectories="\libs\boost;..\..\zlib\include;..\..\include"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
 				RuntimeLibrary="0"
+				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="3"

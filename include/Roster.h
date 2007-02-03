@@ -94,7 +94,16 @@ public:
 
     virtual HMENU getContextMenu();
     virtual void releaseContextMenu();
+    virtual void OnCommand(int cmdId, LONG lParam);
 
+    enum actions {
+        OPENCHAT=50000,
+        LOGON, LOGOFF, RESOLVENICKNAMES,
+        VCARD, CLIENTINFO, COMMANDS,
+        EDITCONTACT, SUBSCR, ADDCONTACT, DELETECONTACT, 
+        SENDSTATUS, SENDFILE, INVITE, 
+        RENAMEGRP
+    };
 private:
     HMENU hmenu;
 };

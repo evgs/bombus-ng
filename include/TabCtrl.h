@@ -13,6 +13,8 @@ public:
 
     void addWindow (const WndRef &wnd);
     void showActiveTab();
+    bool switchByWndRef(WndRef targetWnd);
+    bool switchByODR(ODRRef title);
 
 protected:
     HWND tabScrollHWnd;

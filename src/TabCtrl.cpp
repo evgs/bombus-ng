@@ -182,7 +182,7 @@ void TabsCtrl::tabDoLayout(HDC hdc) {
     for (TabList::const_iterator i=tabs.begin(); i!=tabs.end(); i++) {
         TabInfoRef tab=*i;
         RECT r={0,0,10,10};
-        const OwnerDrawRect * odr=tab->wndChild->getODR();
+        const ODR * odr=tab->wndChild->getODR();
         if (odr) {
             r.bottom=odr->getHeight();
             r.right=odr->getWidth();
@@ -213,7 +213,7 @@ void TabsCtrl::drawTab( HDC hdc, int offset, TabInfoRef tab, bool active ) {
 
     SetBkMode(hdc, TRANSPARENT);
     r.left+=2; r.right-=2;
-    const OwnerDrawRect * odr=tab->wndChild->getODR();
+    const ODR * odr=tab->wndChild->getODR();
     if (odr) {
         odr->draw(hdc, r);
     } else 
@@ -253,5 +253,33 @@ void TabsCtrl::updateChildsLayout() {
     //DeferWindowPos(hdwp, tabScrollHWnd, HWND_TOP, width-40, 0,  40, 16, SWP_NOZORDER);
 
     EndDeferWindowPos(hdwp); 
+}
+
+bool TabsCtrl::switchByWndRef( WndRef targetWnd ) {
+    for (TabList::iterator i = tabs.begin(); i != tabs.end(); i++) {
+        if (i->get()->wndChild==targetWnd) {
+            InvalidateRect(getHWnd(), NULL, true);
+            showActiveTab();
+            activeTab=i;
+            InvalidateRect(getHWnd(), NULL, true);
+            showActiveTab();
+            return true;
+        }
+    }
+    return false;
+}
+
+bool TabsCtrl::switchByODR( ODRRef title ) {
+    for (TabList::iterator i=tabs.begin(); i!=tabs.end(); i++) {
+        if (i->get()->wndChild->getODR()==title.get()) {
+            InvalidateRect(getHWnd(), NULL, true);
+            showActiveTab();
+            activeTab=i;
+            InvalidateRect(getHWnd(), NULL, true);
+            showActiveTab();
+            return true;
+        }
+    }
+    return false;
 }
 ATOM TabsCtrl::windowClass=0;

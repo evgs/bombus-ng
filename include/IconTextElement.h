@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <string>
 
-class IconTextElement : public OwnerDrawRect {
+class IconTextElement : public ODR {
 public:
     virtual int getWidth() const;
     virtual int getHeight() const;

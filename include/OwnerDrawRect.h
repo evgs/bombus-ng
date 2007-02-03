@@ -4,9 +4,9 @@
 #include <windows.h>
 #include <list>
 
-class OwnerDrawRect {
+class ODR {
 public:
-    virtual ~OwnerDrawRect(){};
+    virtual ~ODR(){};
 
     virtual int getWidth() const =0;
     virtual int getHeight() const =0;
@@ -15,5 +15,5 @@ public:
     virtual void draw(HDC hdc, RECT &rt) const=0;
 };
 
-typedef boost::shared_ptr<OwnerDrawRect> ODRRef;
+typedef boost::shared_ptr<ODR> ODRRef;
 

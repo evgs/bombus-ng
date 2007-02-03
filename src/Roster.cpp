@@ -329,7 +329,7 @@ void RosterView::releaseContextMenu() {
     hmenu=NULL;
 }
 void RosterView::OnCommand( int cmdId, LONG lParam ) {
-    Contact * c = dynamic_cast<Contact *>(cursorPos.get());
+    Contact::ref c = boost::dynamic_pointer_cast<Contact>(cursorPos);
     if (c) {
     switch (cmdId) {
         case RosterView::OPENCHAT: 
@@ -337,7 +337,8 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 if (tabs->switchByODR(cursorPos)) break;
 
                 //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
-                tabs->addWindow(ChatView::ref(new ChatView(tabs->getHWnd(), cursorPos)));
+                ChatView::ref newChat=ChatView::ref(new ChatView(tabs->getHWnd(), cursorPos));
+                tabs->addWindow(newChat);
                 tabs->switchByODR(cursorPos);
                 break;
             }

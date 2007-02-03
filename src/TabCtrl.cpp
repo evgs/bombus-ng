@@ -56,9 +56,9 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
         {
             hdc = BeginPaint(hWnd, &ps);
-            if (p->makeTabLayout) {
+            /*if (p->makeTabLayout) {
                 p->tabDoLayout(hdc);
-            }
+            }*/
 
             for (TabList::const_iterator i=p->tabs.begin(); i!=p->tabs.end(); i++) {
                 if (i != p->activeTab) drawTab(hdc, p->xOffset, *i, false);
@@ -108,6 +108,28 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             InvalidateRect(p->getHWnd(), NULL, true);
             p->showActiveTab();
 
+            SHRGINFO    shrg;
+            shrg.cbSize = sizeof(shrg);
+            shrg.hwndClient = hWnd;
+            shrg.ptDown.x = LOWORD(lParam);
+            shrg.ptDown.y = HIWORD(lParam);
+            shrg.dwFlags = SHRG_RETURNCMD /*| SHRG_NOANIMATION*/;
+
+            if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
+
+                HMENU hmenu = NULL;//p->getWindowMenu();
+                if (hmenu==NULL) break;
+
+                POINT pt={LOWORD(lParam), HIWORD(lParam) };
+                ClientToScreen(hWnd, &pt);
+                TrackPopupMenuEx(hmenu,
+                    /*TPM_LEFTALIGN |*/ TPM_TOPALIGN,
+                    pt.x, pt.y,
+                    hWnd,
+                    NULL);
+            }
+            break;
+
             break;
         }
 
@@ -153,7 +175,7 @@ TabsCtrl::TabsCtrl( HWND parent ) {
     if (windowClass==0) throw std::exception("Can't create window class");
 
     parentHWnd=parent;
-    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_VISIBLE,
+    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_VISIBLE | WS_CHILD,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
     makeTabLayout=false;
     xOffset=0;
@@ -167,11 +189,12 @@ void TabsCtrl::addWindow( const WndRef &wnd ) {
     tabs.push_back(newTab);
     wnd->setParent(thisHWnd);
     if (activeTab==tabs.end()) activeTab=tabs.begin();
-    makeTabLayout=true;
+    tabDoLayout();
+    updateChildsLayout();
     showWindow(true);
 }
 
-void TabsCtrl::tabDoLayout(HDC hdc) {
+void TabsCtrl::tabDoLayout(/*HDC hdc*/) {
 
     int x=0;
     int nTabs=tabs.size();
@@ -183,17 +206,20 @@ void TabsCtrl::tabDoLayout(HDC hdc) {
         TabInfoRef tab=*i;
         RECT r={0,0,10,10};
         const ODR * odr=tab->wndChild->getODR();
-        if (odr) {
-            r.bottom=odr->getHeight();
-            r.right=odr->getWidth();
-        } else 
-            DrawText(hdc, tab->wndChild->getWindowTitle(), -1, &r, DT_CALCRECT | DT_LEFT | DT_TOP);
+        BOOST_ASSERT(odr);
+        //if (odr) {
+
+        r.bottom=odr->getHeight();
+        r.right=odr->getWidth();
+
+        //} else DrawText(hdc, tab->wndChild->getWindowTitle(), -1, &r, DT_CALCRECT | DT_LEFT | DT_TOP);
+
         tab->tabWidth=r.right+4;
         if (tab->tabWidth>maxTabWidth) tab->tabWidth=maxTabWidth;
         tab->tabXPos=x;
         x+=tab->tabWidth;
     }
-    makeTabLayout=false;
+    //makeTabLayout=false;
 
 }
 
@@ -260,9 +286,6 @@ bool TabsCtrl::switchByWndRef( WndRef targetWnd ) {
         if (i->get()->wndChild==targetWnd) {
             InvalidateRect(getHWnd(), NULL, true);
             showActiveTab();
-            activeTab=i;
-            InvalidateRect(getHWnd(), NULL, true);
-            showActiveTab();
             return true;
         }
     }
@@ -272,8 +295,6 @@ bool TabsCtrl::switchByWndRef( WndRef targetWnd ) {
 bool TabsCtrl::switchByODR( ODRRef title ) {
     for (TabList::iterator i=tabs.begin(); i!=tabs.end(); i++) {
         if (i->get()->wndChild->getODR()==title.get()) {
-            InvalidateRect(getHWnd(), NULL, true);
-            showActiveTab();
             activeTab=i;
             InvalidateRect(getHWnd(), NULL, true);
             showActiveTab();

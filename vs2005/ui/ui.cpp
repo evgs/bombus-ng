@@ -292,17 +292,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 			//editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));
+            //tabs->setParent(hWnd);
 
-            rosterWnd=RosterView::ref(new RosterView(hWnd, std::string("Roster")));
+            rosterWnd=RosterView::ref(new RosterView(tabs->getHWnd(), std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
-            chatSample=ChatView::ref(new ChatView(hWnd, Contact::ref(new Contact("test@server","resource",""))));
-            tabs->addWindow(chatSample);
+            chatSample=ChatView::ref(new ChatView(tabs->getHWnd(), Contact::ref(new Contact("test@server","resource",""))));
+            //tabs->addWindow(chatSample);
             //logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
             //tabs->addWindow(logWnd);
 
             { 
-                VirtualListView::ref odrLog = VirtualListView::ref(new VirtualListView(hWnd, std::string("Log")));
+                VirtualListView::ref odrLog = VirtualListView::ref(new VirtualListView(tabs->getHWnd(), std::string("Log")));
                 tabs->addWindow(odrLog);
                 Log::getInstance()->bindLV(odrLog); 
             }

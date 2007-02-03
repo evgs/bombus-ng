@@ -61,15 +61,16 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     case WM_PAINT:
         hdc = BeginPaint(hWnd, &ps);
 
-        /*{
+        {
 
-            RECT rc = {0, 0, 100, 100};
+            RECT rc = {0, 0, tabHeight, 100};
+            p->contact->draw(hdc, rc);
 
-            SetBkMode(hdc, TRANSPARENT);
+            /*SetBkMode(hdc, TRANSPARENT);
             LPCTSTR t=p->title.c_str();
             DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
-            DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);
-        }*/
+            DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);*/
+        }
 
         // TODO: Add any drawing code here...
 
@@ -143,6 +144,8 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
 ChatView::ChatView( HWND parent, ODRRef contact ) 
 {
+    BOOST_ASSERT(parent);
+
     if (windowClass==0)
         windowClass=RegisterWindowClass();
     if (windowClass==0) throw std::exception("Can't create window class");
@@ -156,7 +159,7 @@ ChatView::ChatView( HWND parent, ODRRef contact )
 
     this->contact=contact;
 
-    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("chat"), WS_VISIBLE,
+    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("chat"), WS_CHILD |WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
 
 }

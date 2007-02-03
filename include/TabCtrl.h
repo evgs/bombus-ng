@@ -3,6 +3,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <windows.h>
+#include <aygshell.h>
 
 #include "Wnd.h"
 
@@ -33,7 +34,7 @@ protected:
     TabList::iterator activeTab;
 
     bool makeTabLayout;
-    void tabDoLayout(HDC hdc);
+    void tabDoLayout(/*HDC hdc*/);
     void updateChildsLayout();
 
 private:

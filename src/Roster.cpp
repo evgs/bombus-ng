@@ -265,6 +265,8 @@ void RosterView::eventOk() {
     if (p) {
     	p->setExpanded(!p->isExpanded());
         roster.lock()->makeViewList();
+    } else {
+        OnCommand(RosterView::OPENCHAT, 0);
     }
 }
 
@@ -329,15 +331,15 @@ void RosterView::releaseContextMenu() {
     hmenu=NULL;
 }
 void RosterView::OnCommand( int cmdId, LONG lParam ) {
-    Contact::ref c = boost::dynamic_pointer_cast<Contact>(cursorPos);
-    if (c) {
+    Contact::ref focusedContact = boost::dynamic_pointer_cast<Contact>(cursorPos); // <<< Yes, I did it :))
+    if (focusedContact) {
     switch (cmdId) {
         case RosterView::OPENCHAT: 
             {
                 if (tabs->switchByODR(cursorPos)) break;
 
                 //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
-                ChatView::ref newChat=ChatView::ref(new ChatView(tabs->getHWnd(), cursorPos));
+                ChatView::ref newChat=ChatView::ref(new ChatView(tabs->getHWnd(), focusedContact));
                 tabs->addWindow(newChat);
                 tabs->switchByODR(cursorPos);
                 break;

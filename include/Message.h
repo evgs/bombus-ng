@@ -4,9 +4,30 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
-class Message {
+#include "OwnerDrawRect.h"
+
+class MessageElement : public ODR {
 public:
-    enum MsgType {
+    MessageElement(){};
+    MessageElement(const std::string &str);
+    virtual int getWidth() const;
+    virtual int getHeight() const;
+    virtual int getColor() const;
+
+    virtual void draw(HDC hdc, RECT &rt) const;
+
+protected:
+    std::wstring wstr;
+    int width;
+    int height;
+    void init();
+    virtual const wchar_t * getText() const;
+};
+
+
+class Message : public MessageElement{
+public:
+    enum MsgType : int {
         SENT=0,
         INCOMING_HISTORY=1,
         INCOMING=2,
@@ -14,6 +35,9 @@ public:
         PRESENCE_ASK_SUBSCR=11,
         PRESENCE_SUBSCRIBED=12
     };
+
+    typedef boost::shared_ptr<Message> ref;
+
 public:
     Message(std::string body, std::string fromName, int type);
 
@@ -25,6 +49,6 @@ public:
     MsgType type;
 };
 
-typedef boost::shared_ptr<Message> MessageRef;
-typedef std::list<MessageRef> MessageList;
+
+typedef std::list<Message::ref> MessageList;
 typedef boost::shared_ptr<MessageList> MessageListRef;

@@ -262,6 +262,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Message.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\crypto\MessageDigest.cpp"
 				>
 			</File>

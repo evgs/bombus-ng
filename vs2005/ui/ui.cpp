@@ -549,15 +549,19 @@ private:
 	ResourceContextRef rc;
 };
 ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-    StringRef orig=block->toXML();
-	Log::getInstance()->msg("Message from ", block->getAttribute("from").c_str()); 
-	JabberDataBlock reply("message");
-	reply.setAttribute("type","chat");
-	reply.setAttribute("to", "evgs@jabber.ru/Psi_Home");
-	reply.addChild("body", NULL)->setText(XMLStringPrep( *orig ));
+    std::string from=block->getAttribute("from");
+    std::string body=block->getChildByName("body")->getText();
 
-	//rc->jabberStream->sendStanza(reply);
-    chatSample->addMessage(*orig);
+    StringRef orig=block->toXML();
+	Log::getInstance()->msg("Message from ", from.c_str()); 
+
+    Contact::ref c = rc->roster->findContact(from);
+
+    Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING));
+
+    c->messageList->push_back(msg);
+    tabs->switchByODR(c);
+    //chatSample->addMessage(*orig);
 
 	return BLOCK_PROCESSED;
 }

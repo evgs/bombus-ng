@@ -11,13 +11,15 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     this->status=presence::OFFLINE;
 
     update();
-    messageList=MessageListRef(new MessageList());
+    messageList=ODRListRef(new ODRList);
 }
 bool Contact::hasUnreadMsgs() {
-    for ( MessageList::const_iterator i=messageList->begin();  
-          i!=messageList->end();
-          i++ ) {
-        if (i->get()->unread) return true;
+    for ( ODRList::const_iterator i=messageList->begin();   i!=messageList->end();  i++ ) {
+        ODRRef r=*i;
+        Message *m = dynamic_cast<Message *>(r.get());
+        if(m) {
+        	if (m->unread) return true;
+        }
     }
     return false;
 }

@@ -16,7 +16,7 @@
 class ChatView : public Wnd{
 public:
     //ChatView(HWND parent, const std::string & title);
-    ChatView(HWND parent, ODRRef contact);
+    ChatView(HWND parent, Contact::ref contact);
     virtual ~ChatView();
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -33,27 +33,11 @@ protected:
     HWND		editWnd;
     int editHeight;
 
-    ODRRef contact;
+    Contact::ref contact;
 
 private:
     static ATOM windowClass;
     ATOM RegisterWindowClass();
 };
 //////////////////////////////////////////////////////////////////////////
-class MessageElement : public ODR {
-public:
-    MessageElement(const std::string &str);
-    virtual int getWidth() const;
-    virtual int getHeight() const;
-    virtual int getColor() const;
-
-    virtual void draw(HDC hdc, RECT &rt) const;
-
-protected:
-    std::wstring wstr;
-    int width;
-    int height;
-    void init();
-    virtual const wchar_t * getText() const;
-};
 

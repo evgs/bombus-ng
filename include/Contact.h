@@ -11,6 +11,8 @@
 #include "Presence.h"
 #include "jid.h"
 
+#include "VirtualListView.h"
+
 /*enum Status {
     PRESENCE_ONLINE=0,
     PRESENCE_CHAT=1,
@@ -40,7 +42,7 @@ public:
 
     presence::PresenceIndex status;
 
-    MessageListRef messageList;
+    ODRListRef messageList;
 
     bool hasUnreadMsgs();
     static bool compare(Contact::ref left, Contact::ref right);

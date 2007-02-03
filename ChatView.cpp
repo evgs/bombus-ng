@@ -55,6 +55,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             p->msgList->setParent(hWnd);
             p->msgList->showWindow(true);
             p->editWnd=DoCreateEditControl(hWnd);
+            p->msgList->bindODRList(p->contact->messageList);
             break;
         }
 
@@ -142,7 +143,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     return 0;
 }
 
-ChatView::ChatView( HWND parent, ODRRef contact ) 
+ChatView::ChatView( HWND parent, Contact::ref contact ) 
 {
     BOOST_ASSERT(parent);
 

@@ -344,6 +344,7 @@ void VirtualListView::init() {
     thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentHWnd, NULL, g_hInst, (LPVOID)this);
     wrapList=true;
+    winTop=0;
 }
 
 VirtualListView::VirtualListView( HWND parent, const std::string & title ) {

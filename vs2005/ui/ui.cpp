@@ -256,8 +256,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					break;
 
                 default:
-                    //if (tabs) tabs->fwdWMCommand(wmId);
-                    return DefWindowProc(hWnd, message, wParam, lParam);
+                    if (tabs) tabs->fwdWMCommand(wmId);
+                    //return DefWindowProc(hWnd, message, wParam, lParam);
             }
             break;
         case WM_CREATE:

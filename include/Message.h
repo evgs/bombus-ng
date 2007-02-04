@@ -5,6 +5,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "OwnerDrawRect.h"
+#include "JabberDataBlock.h"
 
 class MessageElement : public ODR {
 public:
@@ -40,6 +41,8 @@ public:
 
 public:
     Message(std::string body, std::string fromName, int type);
+
+    JabberDataBlockRef constructStanza(const std::string &to) const;
 
     std::string body;
     std::string fromName;

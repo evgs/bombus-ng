@@ -303,4 +303,8 @@ bool TabsCtrl::switchByODR( ODRRef title ) {
     }
     return false;
 }
+
+void TabsCtrl::fwdWMCommand( int wmId ) {
+    SendMessage(activeTab->get()->wndChild->getHWnd(), WM_COMMAND, wmId, 0);
+}
 ATOM TabsCtrl::windowClass=0;

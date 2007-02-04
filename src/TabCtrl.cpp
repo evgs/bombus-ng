@@ -283,18 +283,7 @@ void TabsCtrl::updateChildsLayout() {
 
 bool TabsCtrl::switchByWndRef( WndRef targetWnd ) {
     for (TabList::iterator i = tabs.begin(); i != tabs.end(); i++) {
-        if (i->get()->wndChild==targetWnd) {
-            InvalidateRect(getHWnd(), NULL, true);
-            showActiveTab();
-            return true;
-        }
-    }
-    return false;
-}
-
-bool TabsCtrl::switchByODR( ODRRef title ) {
-    for (TabList::iterator i=tabs.begin(); i!=tabs.end(); i++) {
-        if (i->get()->wndChild->getODR()==title.get()) {
+        if (i->get()->wndChild->getHWnd()==targetWnd->getHWnd()) {
             activeTab=i;
             InvalidateRect(getHWnd(), NULL, true);
             showActiveTab();
@@ -304,7 +293,21 @@ bool TabsCtrl::switchByODR( ODRRef title ) {
     return false;
 }
 
+bool TabsCtrl::switchByODR( ODRRef targetWnd ) {
+    return switchByWndRef(getWindowByODR(targetWnd));
+}
+
+WndRef TabsCtrl::getWindowByODR(ODRRef const &title) {
+    for (TabList::iterator i=tabs.begin(); i!=tabs.end(); i++) {
+        if (i->get()->wndChild->getODR()==title.get()) {
+            return i->get()->wndChild;
+        }
+    }
+    return WndRef();
+}
+
 void TabsCtrl::fwdWMCommand( int wmId ) {
     SendMessage(activeTab->get()->wndChild->getHWnd(), WM_COMMAND, wmId, 0);
 }
+
 ATOM TabsCtrl::windowClass=0;

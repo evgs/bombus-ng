@@ -15,7 +15,8 @@ public:
     void addWindow (const WndRef &wnd);
     void showActiveTab();
     bool switchByWndRef(WndRef targetWnd);
-    bool switchByODR(ODRRef title);
+    bool switchByODR(ODRRef targetWnd);
+    WndRef getWindowByODR(ODRRef const &title);
 
     void fwdWMCommand(int wmId);
 protected:

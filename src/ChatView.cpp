@@ -197,6 +197,8 @@ void ChatView::showWindow( bool show ) {
     tbbi.fsState = (show)? TBSTATE_ENABLED : TBSTATE_HIDDEN;
 
     ::SendMessage (g_hWndMenuBar, TB_SETBUTTONINFO, IDS_SEND, (LPARAM)&tbbi);
+
+    if (show) InvalidateRect(msgList->getHWnd(), NULL, false);
 }
 ATOM ChatView::windowClass=0;
 

@@ -3,9 +3,13 @@
 #include <windowsx.h>
 #include "../vs2005/ui/ui.h"
 
+#include "ResourceContext.h"
+#include "JabberStream.h"
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern HWND	g_hWndMenuBar;		// menu bar handle
+extern ResourceContextRef rc;
 //////////////////////////////////////////////////////////////////////////
 ATOM ChatView::RegisterWindowClass() {
     WNDCLASS wc;
@@ -31,7 +35,7 @@ HWND WINAPI DoCreateEditControl(HWND hwndParent) {
     HWND hWndEdit; 
     //TCITEM tie; 
 
-    hWndEdit=CreateWindow(_T("EDIT"), _T("LOG"), 
+    hWndEdit=CreateWindow(_T("EDIT"), NULL, 
         WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL
         | ES_MULTILINE , 
         0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
@@ -125,6 +129,19 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             if (wParam==IDS_SEND) {
                 wchar_t buf[1024];
                 int len=SendMessage(p->editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
+                if (len==0) break;
+                std::string body=utf8::wchar_utf8(buf);
+                //TODO: xml escaping
+                Message::ref msg=Message::ref(new Message(body, "", Message::SENT));
+                p->contact->messageList->push_back(msg);
+                p->showWindow(true);
+
+                JabberDataBlockRef out=msg->constructStanza(p->contact->jid.getJid());
+                //Reset form
+                rc->jabberStream->sendStanza(*out);
+
+                buf[0]=0;
+                SendMessage(p->editWnd, WM_SETTEXT, 1024, (LPARAM) buf);
             }
             break;             
         }

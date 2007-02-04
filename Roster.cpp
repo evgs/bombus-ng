@@ -336,12 +336,13 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
     switch (cmdId) {
         case RosterView::OPENCHAT: 
             {
-                if (tabs->switchByODR(cursorPos)) break;
-
-                //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
-                ChatView::ref newChat=ChatView::ref(new ChatView(tabs->getHWnd(), focusedContact));
-                tabs->addWindow(newChat);
-                tabs->switchByODR(cursorPos);
+                WndRef chat=tabs->getWindowByODR(cursorPos);
+                if (!chat) {
+                    //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
+                    chat=WndRef(new ChatView(tabs->getHWnd(), focusedContact));
+                    tabs->addWindow(chat);
+                }
+                tabs->switchByWndRef(chat);
                 break;
             }
         case RosterView::LOGON: 

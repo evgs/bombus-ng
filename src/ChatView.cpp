@@ -1,9 +1,11 @@
 #include "ChatView.h"
 #include <commctrl.h>
 #include <windowsx.h>
+#include "../vs2005/ui/ui.h"
 
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
+extern HWND	g_hWndMenuBar;		// menu bar handle
 //////////////////////////////////////////////////////////////////////////
 ATOM ChatView::RegisterWindowClass() {
     WNDCLASS wc;
@@ -118,6 +120,14 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             break; 
         } 
 
+    case WM_COMMAND: 
+        {
+            if (wParam==IDS_SEND) {
+                wchar_t buf[1024];
+                int len=SendMessage(p->editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
+            }
+            break;             
+        }
         /*case WM_CTLCOLORSTATIC:
         case WM_CTLCOLORLISTBOX:
         case WM_CTLCOLOREDIT: 
@@ -176,6 +186,17 @@ void ChatView::addMessage(const std::string & msg) {
     ODRRef r=ODRRef(new IconTextElementContainer(umsg, -1));*/
     ODRRef r=ODRRef(new MessageElement(msg));
     msgList->addODR(r, true);
+}
+
+void ChatView::showWindow( bool show ) {
+    Wnd::showWindow(show);
+
+    TBBUTTONINFO tbbi;
+    tbbi.cbSize = sizeof(tbbi);
+    tbbi.dwMask = TBIF_STATE;
+    tbbi.fsState = (show)? TBSTATE_ENABLED : TBSTATE_HIDDEN;
+
+    ::SendMessage (g_hWndMenuBar, TB_SETBUTTONINFO, IDS_SEND, (LPARAM)&tbbi);
 }
 ATOM ChatView::windowClass=0;
 

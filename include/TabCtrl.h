@@ -17,6 +17,7 @@ public:
     bool switchByWndRef(WndRef targetWnd);
     bool switchByODR(ODRRef title);
 
+    void fwdWMCommand(int wmId);
 protected:
     HWND tabScrollHWnd;
 

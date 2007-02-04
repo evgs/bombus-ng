@@ -14,7 +14,7 @@ public:
 
     HWND getHWnd() const{ return thisHWnd; }
 
-    void showWindow(bool show);
+    virtual void showWindow(bool show);
     void setParent(HWND parent);
 
     virtual const wchar_t * getWindowTitle() const;

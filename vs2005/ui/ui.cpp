@@ -252,29 +252,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					break;
 
 				case IDM_WINDOWS_LOG:
-					//listWnd=logWnd;
-					//SetWindowLong(rosterWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
-					//SetWindowLong(logWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
-					//SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-					//SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-
-                    //ShowWindow(rosterWnd, SW_HIDE);
-                    //logWnd->showWindow(true);
-                    //ShowWindow(editWnd, SW_SHOW);
-					break;
 				case IDM_WINDOWS_ROSTER:
-					//listWnd=rosterWnd;
-					//SetWindowLong(logWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
-					//SetWindowLong(rosterWnd, GWL_STYLE, WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT);
-					//SetWindowPos(rosterWnd, NULL, 0,0, 0,0, SWP_SHOWWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-					//SetWindowPos(logWnd, NULL, 0,0, 0,0, SWP_HIDEWINDOW| SWP_NOSIZE | SWP_NOMOVE| SWP_NOZORDER);
-
-                    //ShowWindow(rosterWnd, SW_SHOW);
-                    //logWnd->showWindow(false);
-                    //ShowWindow(editWnd, SW_HIDE);
 					break;
 
                 default:
+                    //if (tabs) tabs->fwdWMCommand(wmId);
                     return DefWindowProc(hWnd, message, wParam, lParam);
             }
             break;

@@ -219,14 +219,15 @@ STRINGTABLE
 BEGIN
     IDS_APP_TITLE           "Bombus"
     IDC_UI                  "UI"
-    IDS_JABBER              "Jabber"
-    IDS_WINDOWS             "Windows"
 END
 
 STRINGTABLE 
 BEGIN
+    IDS_JABBER              "Jabber"
+    IDS_WINDOWS             "Windows"
     IDS_EXIT                "EXIT"
     IDS_HELP                "Help"
+    IDS_SEND                "Send"
 END
 
 #endif    // Russian resources

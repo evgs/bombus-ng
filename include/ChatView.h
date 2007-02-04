@@ -28,6 +28,8 @@ public:
 
     void addMessage(const std::string & msg);
 
+    virtual void showWindow(bool show);
+
 protected:
     VirtualListView::ref msgList;
     HWND		editWnd;

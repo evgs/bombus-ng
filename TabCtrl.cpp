@@ -282,6 +282,7 @@ void TabsCtrl::updateChildsLayout() {
 }
 
 bool TabsCtrl::switchByWndRef( WndRef targetWnd ) {
+    if (!targetWnd) return false;
     for (TabList::iterator i = tabs.begin(); i != tabs.end(); i++) {
         if (i->get()->wndChild->getHWnd()==targetWnd->getHWnd()) {
             activeTab=i;

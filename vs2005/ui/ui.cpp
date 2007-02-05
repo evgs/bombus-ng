@@ -541,6 +541,10 @@ ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceC
 
     Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING));
 
+    std::wstring soundName(appRootPath);
+    soundName+=TEXT("message.wav");
+    PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
+
     c->messageList->push_back(msg);
     tabs->switchByODR(c);
     //chatSample->addMessage(*orig);

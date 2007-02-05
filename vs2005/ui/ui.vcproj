@@ -94,7 +94,7 @@
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles="skin.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0"
+				AdditionalFiles="skin.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;message.wav|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0"
 			/>
 			<DebuggerTool
 			/>

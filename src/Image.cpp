@@ -71,6 +71,12 @@ void ImgList::drawElement( HDC hdc, int index, int x, int y ) const {
 }
 //////////////////////////////////////////////////////////////////////////
 void Image::createMask() {
+
+    // TODO: http://support.microsoft.com/kb/94961 - generate mask like this:
+    //   OrigColor = SetBkColor(srcDC, TransColor)
+    //    Success = BitBlt(maskDC, 0, 0, bmp.bmWidth, bmp.bmHeight, srcDC,
+    //       0, 0, SRCCOPY)
+    //    TransColor = SetBkColor(srcDC, OrigColor)
     BITMAP bm;
     GetObject(bmp, sizeof(bm), &bm);
 

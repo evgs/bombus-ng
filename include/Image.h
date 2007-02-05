@@ -12,7 +12,8 @@ public:
     void createMask();
 protected:
     HBITMAP bmp;
-    HBITMAP mask;
+    //HBITMAP mask;
+    COLORREF transparentColor;
     Image();
 private:
 };

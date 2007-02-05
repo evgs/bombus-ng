@@ -11,14 +11,13 @@ extern std::wstring appRootPath;
 Image::Image( LPCTSTR path ) {
     std::wstring bmpPath=appRootPath+path;
     bmp=SHLoadImageFile(bmpPath.c_str());  
-    mask=NULL;
 }
 
 Image::Image() {}
 
 Image::~Image() {
     if (bmp) DeleteObject(bmp);
-    if (mask) DeleteObject(mask);
+    //if (mask) DeleteObject(mask);
 }
 
 
@@ -36,69 +35,31 @@ int getColor(BITMAP &bm, int x, int y) {
 void Image::drawImage( HDC hdc, int x, int y ) const {
     BITMAP bm;
     GetObject(bmp, sizeof(bm), &bm);
-    HDC src=CreateCompatibleDC(NULL);
-    SelectObject(src, bmp);
 
-    //char *bits=new char()
-
-    MaskBlt(hdc, x,y, bm.bmWidth, bm.bmHeight, 
-            src, 0,0, 
-            mask, 0, 0, 
-            MAKEROP4(SRCCOPY, NORASTEROP));
-    //AlphaBlend(hdc, x,y, bm.bmWidth, bm.bmHeight, src, 0,0, bm.bmWidth, bm.bmHeight, )
-    DeleteDC(src);
+    TransparentImage(hdc, x, y,  bm.bmWidth, bm.bmHeight, 
+        bmp, 0, 0,  bm.bmWidth, bm.bmHeight, 
+        transparentColor);
 }
 //////////////////////////////////////////////////////////////////////////
 void ImgList::drawElement( HDC hdc, int index, int x, int y ) const {
-    //BITMAP bm;
-    //GetObject(bmp, sizeof(bm), &bm);
-    HDC src=CreateCompatibleDC(NULL);
-    SelectObject(src, bmp);
-
-    //char *bits=new char()
 
     int xm=(index&0x0f) * elWidth;
     int ym=((index&0xf0) >> 4) * elHeight;
     
-    MaskBlt(hdc, x,y,  elWidth, elHeight, 
-        src, xm, ym, 
-        mask, xm, ym, 
-        MAKEROP4(SRCCOPY, NORASTEROP));
-    //AlphaBlend(hdc, x,y, bm.bmWidth, bm.bmHeight, src, 0,0, bm.bmWidth, bm.bmHeight, )
-    DeleteDC(src);
-
-
+    TransparentImage(hdc, x,y, elWidth,elHeight, 
+                     bmp, xm,ym, elWidth,elHeight,
+                     transparentColor);
 }
 //////////////////////////////////////////////////////////////////////////
 void Image::createMask() {
 
-    // TODO: http://support.microsoft.com/kb/94961 - generate mask like this:
-    //   OrigColor = SetBkColor(srcDC, TransColor)
-    //    Success = BitBlt(maskDC, 0, 0, bmp.bmWidth, bmp.bmHeight, srcDC,
-    //       0, 0, SRCCOPY)
-    //    TransColor = SetBkColor(srcDC, OrigColor)
-    BITMAP bm;
-    GetObject(bmp, sizeof(bm), &bm);
 
-    int bmaskWB=bm.bmWidth/8;
-    char *bmask=new char[bmaskWB*bm.bmHeight];
+    HDC hdcImage=CreateCompatibleDC(NULL);
+    SelectObject(hdcImage, bmp);
 
-    int maskColor=getColor(bm, 0, 0);
+    transparentColor=GetPixel(hdcImage, 0, 0);
 
-    LPCHAR p=bmask;
-    for (int y=bm.bmHeight; y>0; y--) {
-        for (int xb=0; xb<bmaskWB; xb++) {
-            char buf;
-            for (char b=0; b<8; b++) {
-                buf=(buf<<1) | ((getColor(bm, xb*8+b, y-1)==maskColor)? 0:1);
-            }
-            *(p++)=buf;
-        }
-    }
-    mask=CreateBitmap( bm.bmWidth, bm.bmHeight, 1, 1, bmask);
-
-    delete bmask;
-
+    DeleteDC(hdcImage);
 }
 
 

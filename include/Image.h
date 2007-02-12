@@ -8,9 +8,9 @@ public:
     Image(LPCTSTR path);
     virtual ~Image();
 
-    void drawImage(HDC hdc, int x, int y) const;
-    void createMask();
+    virtual void drawImage(HDC hdc, int x, int y) const;
 protected:
+    void createMask();
     HBITMAP bmp;
     //HBITMAP mask;
     COLORREF transparentColor;
@@ -19,21 +19,37 @@ private:
 };
 typedef boost::shared_ptr<Image> ImageRef;
 
-class ImgList : private Image {
+//////////////////////////////////////////////////////////////////////////
+class ImgList {
 public:
-    ImgList(LPCTSTR path);
+    virtual ~ImgList(){};
+    virtual void drawElement (HDC hdc, int index, int x, int y) const =0;
+    virtual int getElementWidth() const =0;
+    virtual int getElementHeight() const =0;
+};
+typedef boost::shared_ptr<ImgList> ImgListRef;
+
+
+class ImgArray : public ImgList{
+public:
+    ImgArray(LPCTSTR path, int nColumns, int nRows);
+    virtual ~ImgArray();
     void setGridSize(int nColumns, int nRows);
 
     virtual void drawElement (HDC hdc, int index, int x, int y) const;
-    int getElementWidth() const { return elWidth; }
+    virtual int getElementWidth() const { return elWidth; }
+    virtual int getElementHeight() const { return elHeight; }
 private:
+    HBITMAP bmp;
+    COLORREF transparentColor;
+
     int nColumns;
     int nRows;
     int elWidth;
     int elHeight;
 };
-typedef boost::shared_ptr<ImgList> ImgListRef;
 
+//////////////////////////////////////////////////////////////////////////
 namespace icons {
 enum IconDef {
     ICON_INVISIBLE_INDEX = 0x10,

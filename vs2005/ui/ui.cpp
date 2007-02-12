@@ -269,8 +269,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.nToolBarId = IDR_MENU;
             mbi.hInstRes   = g_hInst;
 
-            skin=ImgListRef(new ImgList(TEXT("skin.png")));
-            skin->setGridSize(8, 6);
+            skin=ImgListRef(new ImgArray(TEXT("skin.png"), 8, 6));
+            //skin->setGridSize(8, 6);
 
 			//editWnd=DoCreateEditControl(hWnd);
             tabs=TabsCtrlRef(new TabsCtrl(hWnd));

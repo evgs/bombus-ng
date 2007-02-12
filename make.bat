@@ -7,4 +7,4 @@ del /s /q dist\
 mkdir dist
 xcopy /y "vs2005\ui\Pocket PC 2003 (ARMV4)\Release\Bombus.exe" dist\
 xcopy /s /y resources\*.* dist\
-pkzip dist\bombus.zip dist\*.*
+pkzipc -add -rec -path=relative dist\bombus.zip dist\*.*

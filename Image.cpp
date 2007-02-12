@@ -11,6 +11,11 @@ extern std::wstring appRootPath;
 Image::Image( LPCTSTR path ) {
     std::wstring bmpPath=appRootPath+path;
     bmp=SHLoadImageFile(bmpPath.c_str());  
+
+    HDC hdcImage=CreateCompatibleDC(NULL);
+    SelectObject(hdcImage, bmp);
+    transparentColor=GetPixel(hdcImage, 0, 0);
+    DeleteDC(hdcImage);
 }
 
 Image::Image() {}
@@ -20,18 +25,6 @@ Image::~Image() {
     //if (mask) DeleteObject(mask);
 }
 
-
-int getColor(BITMAP &bm, int x, int y) {
-    LPCHAR p=(LPCHAR) bm.bmBits+y*bm.bmWidthBytes;
-    switch (bm.bmBitsPixel) {
-        case 8: p+=x; return *p; 
-        case 16: p+=x*2; return *((LPWORD)p); 
-        case 24: p+=x*3; return *((LPWORD)p)  | *(p+2) ; 
-        case 32: p+=x*4; return *((LPDWORD)p); 
-    }
-    return 0;
-}
-//////////////////////////////////////////////////////////////////////////
 void Image::drawImage( HDC hdc, int x, int y ) const {
     BITMAP bm;
     GetObject(bmp, sizeof(bm), &bm);
@@ -41,7 +34,7 @@ void Image::drawImage( HDC hdc, int x, int y ) const {
         transparentColor);
 }
 //////////////////////////////////////////////////////////////////////////
-void ImgList::drawElement( HDC hdc, int index, int x, int y ) const {
+void ImgArray::drawElement( HDC hdc, int index, int x, int y ) const {
 
     int xm=(index&0x0f) * elWidth;
     int ym=((index&0xf0) >> 4) * elHeight;
@@ -50,20 +43,8 @@ void ImgList::drawElement( HDC hdc, int index, int x, int y ) const {
                      bmp, xm,ym, elWidth,elHeight,
                      transparentColor);
 }
-//////////////////////////////////////////////////////////////////////////
-void Image::createMask() {
 
-
-    HDC hdcImage=CreateCompatibleDC(NULL);
-    SelectObject(hdcImage, bmp);
-
-    transparentColor=GetPixel(hdcImage, 0, 0);
-
-    DeleteDC(hdcImage);
-}
-
-
-void ImgList::setGridSize( int nColumns, int nRows ) {
+void ImgArray::setGridSize( int nColumns, int nRows ) {
     BITMAP bm;
     GetObject(bmp, sizeof(bm), &bm);
 
@@ -73,8 +54,18 @@ void ImgList::setGridSize( int nColumns, int nRows ) {
     elHeight=bm.bmHeight/nRows;
 }
 
-ImgList::ImgList( LPCTSTR path ) {
+ImgArray::ImgArray( LPCTSTR path, int nColumns, int nRows ) {
     std::wstring bmpPath=appRootPath+path;
-    bmp=SHLoadImageFile(bmpPath.c_str());  
-    createMask();
+    bmp=SHLoadImageFile(bmpPath.c_str()); 
+
+    HDC hdcImage=CreateCompatibleDC(NULL);
+    SelectObject(hdcImage, bmp);
+    transparentColor=GetPixel(hdcImage, 0, 0);
+    DeleteDC(hdcImage);
+
+    setGridSize(nColumns, nRows);
+}
+
+ImgArray::~ImgArray(){
+    if (bmp) DeleteObject(bmp);
 }

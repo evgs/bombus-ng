@@ -39,6 +39,9 @@ protected:
     void tabDoLayout(/*HDC hdc*/);
     void updateChildsLayout();
 
+    HMENU getContextMenu();
+    void releaseContextMenu();
+
 private:
 
     static ATOM windowClass;
@@ -46,6 +49,8 @@ private:
     static void drawTab(HDC hdc, int offset, TabInfoRef tab, bool active);
     /*int width;
     int height;*/
+
+    HMENU hmenu;
 };
 
 typedef boost::shared_ptr<TabsCtrl> TabsCtrlRef;

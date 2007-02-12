@@ -117,7 +117,7 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
             if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
 
-                HMENU hmenu = NULL;//p->getWindowMenu();
+                HMENU hmenu = p->getContextMenu();
                 if (hmenu==NULL) break;
 
                 POINT pt={LOWORD(lParam), HIWORD(lParam) };
@@ -131,6 +131,22 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             break;
 
             break;
+        }
+
+    case WM_MEASUREITEM:
+        {
+            LPMEASUREITEMSTRUCT mi=(LPMEASUREITEMSTRUCT)lParam;
+            ODR * odr=(ODR *)(mi->itemData);
+            mi->itemHeight=odr->getHeight();
+            mi->itemWidth=odr->getWidth();
+            return true;
+        }
+    case WM_DRAWITEM:
+        {
+            LPDRAWITEMSTRUCT di=(LPDRAWITEMSTRUCT) lParam;
+            ODR * odr=(ODR *)(di->itemData);
+            odr->draw(di->hDC, di->rcItem);
+            return TRUE;
         }
 
     case WM_SIZE: 
@@ -180,6 +196,8 @@ TabsCtrl::TabsCtrl( HWND parent ) {
     makeTabLayout=false;
     xOffset=0;
     activeTab=tabs.end();
+
+    hmenu=NULL;
 }
 
 
@@ -312,3 +330,33 @@ void TabsCtrl::fwdWMCommand( int wmId ) {
 }
 
 ATOM TabsCtrl::windowClass=0;
+
+
+HMENU TabsCtrl::getContextMenu() {
+    if (hmenu!=NULL) releaseContextMenu();
+    //if (!cursorPos) return NULL;
+
+    hmenu=CreatePopupMenu();
+    AppendMenu(hmenu, MF_STRING, 49999, TEXT("Close"));
+    AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+    int index=50000;
+    for (TabList::iterator i=tabs.begin(); i!=tabs.end(); i++) {
+        const ODR * title=i->get()->wndChild->getODR();
+        //LPCTSTR title=i->get()->wndChild->getODR()->getText();
+        //AppendMenu(hmenu, MF_STRING, index, title);
+        AppendMenu(hmenu, MF_OWNERDRAW, index, (LPCWSTR) title);
+        index++;
+    }
+    AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+    AppendMenu(hmenu, MF_STRING, 49998, TEXT("Close2"));
+
+    //AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+
+
+    return hmenu;
+}
+
+void TabsCtrl::releaseContextMenu() {
+    if (hmenu!=NULL) DestroyMenu(hmenu);
+    hmenu=NULL;
+}

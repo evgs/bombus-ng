@@ -23,7 +23,7 @@ void IconTextElement::init() {
 }
 
 void IconTextElement::draw(HDC hdc, RECT &rt) const {
-    SetBkMode(hdc, TRANSPARENT);
+    //SetBkMode(hdc, TRANSPARENT);
     int iconIdx=getIconIndex();
     if (iconIdx>=0) {
         skin->drawElement(hdc, getIconIndex(), rt.left, rt.top);

@@ -2,6 +2,8 @@
 
 #include <windows.h>
 #include <boost/shared_ptr.hpp>
+#include <string>
+#include <vector>
 
 class Image {
 public:
@@ -92,3 +94,16 @@ enum IconDef {
 };
 
 }
+
+class Skin : public ImgList {
+public:
+    Skin(LPCTSTR path);
+    virtual ~Skin();
+    virtual void drawElement (HDC hdc, int index, int x, int y) const;
+    virtual int getElementWidth() const;
+    virtual int getElementHeight() const;
+    virtual int getBaseIndex(const std::string &setName);
+protected:
+    std::vector<std::string> names;
+    std::vector<ImgListRef> iconset;
+};

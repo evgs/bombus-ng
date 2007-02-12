@@ -56,5 +56,6 @@ public:
     void update();
 private:
     std::wstring wjid;
+    int transpIndex;
 };
 

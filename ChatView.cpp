@@ -194,7 +194,9 @@ ChatView::ChatView( HWND parent, Contact::ref contact )
 
 //const wchar_t * ChatView::getWindowTitle() const{  return TEXT("stub"); }
 
-ChatView::~ChatView() {}
+ChatView::~ChatView() {
+    DestroyWindow(editWnd);
+}
 
 const ODR * ChatView::getODR() const { return contact.get(); }
 

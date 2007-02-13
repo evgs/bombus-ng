@@ -44,6 +44,13 @@ protected:
 
 private:
 
+    enum actions {
+        CLOSETAB=41000,
+        TAB_BEGIN_INDEX=40000,
+        TAB_END_INDEX=40200
+    };
+
+
     static ATOM windowClass;
     ATOM RegisterWindowClass();
     static void drawTab(HDC hdc, int offset, TabInfoRef tab, bool active);

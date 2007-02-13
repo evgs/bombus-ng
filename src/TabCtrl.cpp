@@ -144,11 +144,33 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     case WM_DRAWITEM:
         {
             LPDRAWITEMSTRUCT di=(LPDRAWITEMSTRUCT) lParam;
+            HBRUSH bgnd=CreateSolidBrush(GetBkColor(di->hDC));
+            FillRect(di->hDC, &(di->rcItem), bgnd);
+            DeleteObject(bgnd);
             ODR * odr=(ODR *)(di->itemData);
             odr->draw(di->hDC, di->rcItem);
             return TRUE;
         }
 
+    case WM_COMMAND:
+        {
+            int cmd=LOWORD(wParam);
+            if (cmd>=TabsCtrl::TAB_BEGIN_INDEX  && cmd<TabsCtrl::TAB_END_INDEX) {
+                //switch to the selected tab
+                int selIndex=cmd-TabsCtrl::TAB_BEGIN_INDEX;
+                p->activeTab=p->tabs.begin();
+                while (selIndex>0 && p->activeTab!=p->tabs.end()) {
+                    selIndex--; p->activeTab++;
+                }
+                InvalidateRect(p->getHWnd(), NULL, true);
+                p->showActiveTab();
+                return 0;
+            }
+            if (cmd==TabsCtrl::CLOSETAB) {
+                //close current tab
+            }
+            return 0;
+        }
     case WM_SIZE: 
         { 
             int height=GET_Y_LPARAM(lParam);
@@ -337,9 +359,9 @@ HMENU TabsCtrl::getContextMenu() {
     //if (!cursorPos) return NULL;
 
     hmenu=CreatePopupMenu();
-    AppendMenu(hmenu, MF_STRING, 49999, TEXT("Close"));
+    AppendMenu(hmenu, MF_STRING, TabsCtrl::CLOSETAB, TEXT("Close"));
     AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-    int index=50000;
+    int index=TabsCtrl::TAB_BEGIN_INDEX;
     for (TabList::iterator i=tabs.begin(); i!=tabs.end(); i++) {
         const ODR * title=i->get()->wndChild->getODR();
         //LPCTSTR title=i->get()->wndChild->getODR()->getText();
@@ -347,8 +369,8 @@ HMENU TabsCtrl::getContextMenu() {
         AppendMenu(hmenu, MF_OWNERDRAW, index, (LPCWSTR) title);
         index++;
     }
-    AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-    AppendMenu(hmenu, MF_STRING, 49998, TEXT("Close2"));
+    //AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+    //AppendMenu(hmenu, MF_STRING, 49998, TEXT("Close2"));
 
     //AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 

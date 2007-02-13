@@ -6,6 +6,7 @@ void Wnd::showWindow( bool show ) {
 
 Wnd::~Wnd() { 
     //TODO: release unused windows
+    DestroyWindow(thisHWnd);
 }
 
 void Wnd::setParent( HWND parent ) {

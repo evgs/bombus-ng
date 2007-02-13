@@ -5,6 +5,8 @@
 #include <windows.h>
 #include <aygshell.h>
 
+#include <vector>
+
 #include "Wnd.h"
 
 class TabsCtrl : public Wnd{
@@ -29,11 +31,11 @@ protected:
         WndRef wndChild;
     };
     typedef boost::shared_ptr<TabInfo> TabInfoRef;
-    typedef std::list<TabInfoRef> TabList;
+    typedef std::vector<TabInfoRef> TabList;
 
     int xOffset;
     TabList tabs;
-    TabList::iterator activeTab;
+    int /*TabList::iterator*/ activeTab;
 
     bool makeTabLayout;
     void tabDoLayout(/*HDC hdc*/);

@@ -60,8 +60,10 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                 p->tabDoLayout(hdc);
             }*/
 
-            for (TabList::const_iterator i=p->tabs.begin(); i!=p->tabs.end(); i++) {
-                if (i != p->activeTab) drawTab(hdc, p->xOffset, *i, false);
+            unsigned int activeTab=p->activeTab;
+
+            for (unsigned int i=0; i < p->tabs.size(); i++) {
+                if (i != activeTab) drawTab(hdc, p->xOffset, p->tabs[i], false);
             }
 
             int width=p->clientRect.right;
@@ -70,7 +72,8 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             MoveToEx(hdc, 0, tabHeight-1, NULL);
             LineTo(hdc, width, tabHeight-1);
             SelectObject(hdc, old);
-            /*if (p->activeTab.get())*/ drawTab(hdc, p->xOffset, *(p->activeTab), true);
+            if (activeTab >= 0  &&  activeTab < p->tabs.size() )
+                drawTab(hdc, p->xOffset, p->tabs[activeTab], true);
 
             RECT b={width-32, 0,  width-16, tabHeight};
             DrawFrameControl(hdc, &b, DFC_SCROLL, DFCS_SCROLLLEFT);
@@ -93,12 +96,12 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
             if (mouseX > width - 16) { 
                 p->activeTab++; 
-                if (p->activeTab == p->tabs.end()) p->activeTab--;
+                if (p->activeTab == p->tabs.size()) p->activeTab--;
             } else if (mouseX > width - 32) {
-                if (p->activeTab != p->tabs.begin()) p->activeTab--;
+                if (p->activeTab != 0) p->activeTab--;
             } else
-            for (TabList::iterator i=p->tabs.begin(); i!=p->tabs.end(); i++) {
-                TabInfoRef tab=*i;
+            for (unsigned int i=0; i < p->tabs.size(); i++) {
+                TabInfoRef tab=p->tabs[i];
                 int tabX=p->xOffset+tab->tabXPos;
                 if (mouseX < tabX) continue;
                 if (mouseX > tabX+tab->tabWidth ) continue;
@@ -157,18 +160,16 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             int cmd=LOWORD(wParam);
             if (cmd>=TabsCtrl::TAB_BEGIN_INDEX  && cmd<TabsCtrl::TAB_END_INDEX) {
                 //switch to the selected tab
-                int selIndex=cmd-TabsCtrl::TAB_BEGIN_INDEX;
-                p->activeTab=p->tabs.begin();
-                while (selIndex>0 && p->activeTab!=p->tabs.end()) {
-                    selIndex--; p->activeTab++;
-                }
-                InvalidateRect(p->getHWnd(), NULL, true);
-                p->showActiveTab();
-                return 0;
+                p->activeTab=cmd-TabsCtrl::TAB_BEGIN_INDEX;
             }
             if (cmd==TabsCtrl::CLOSETAB) {
                 //close current tab
+                int activeTab=p->activeTab;
+                if (activeTab>1) p->tabs.erase(p->tabs.begin()+activeTab);
+                if (activeTab>=p->tabs.size()) p->activeTab--;
             }
+            InvalidateRect(p->getHWnd(), NULL, true);
+            p->showActiveTab();
             return 0;
         }
     case WM_SIZE: 
@@ -217,7 +218,7 @@ TabsCtrl::TabsCtrl( HWND parent ) {
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
     makeTabLayout=false;
     xOffset=0;
-    activeTab=tabs.end();
+    activeTab=-1;
 
     hmenu=NULL;
 }
@@ -228,7 +229,7 @@ void TabsCtrl::addWindow( const WndRef &wnd ) {
     newTab->wndChild=wnd;
     tabs.push_back(newTab);
     wnd->setParent(thisHWnd);
-    if (activeTab==tabs.end()) activeTab=tabs.begin();
+    if (activeTab<0) activeTab=0;
     tabDoLayout();
     updateChildsLayout();
     showWindow(true);
@@ -287,15 +288,15 @@ void TabsCtrl::drawTab( HDC hdc, int offset, TabInfoRef tab, bool active ) {
 }
 
 void TabsCtrl::showActiveTab() {
-    TabInfoRef tab =*activeTab;
+    TabInfoRef tab =tabs[activeTab];
     int tabX1=tab->tabXPos;
     int tabX2=tabX1+tab->tabWidth;
 
     if (tabX1 < -xOffset) xOffset=-tabX1;
     if (tabX2 > (clientRect.right-32)-xOffset) xOffset=-(tabX2-(clientRect.right-32));
 
-    for (TabList::const_iterator i=tabs.begin(); i!=tabs.end(); i++) {
-        TabInfoRef tab=*i;
+    for (unsigned int i=0; i < tabs.size(); i++) {
+        TabInfoRef tab=tabs[i];
         tab->wndChild->showWindow( i == activeTab ); 
     }
 }
@@ -323,8 +324,8 @@ void TabsCtrl::updateChildsLayout() {
 
 bool TabsCtrl::switchByWndRef( WndRef targetWnd ) {
     if (!targetWnd) return false;
-    for (TabList::iterator i = tabs.begin(); i != tabs.end(); i++) {
-        if (i->get()->wndChild->getHWnd()==targetWnd->getHWnd()) {
+    for (unsigned int i = 0; i < tabs.size(); i++) {
+        if (tabs[i]->wndChild->getHWnd()==targetWnd->getHWnd()) {
             activeTab=i;
             InvalidateRect(getHWnd(), NULL, true);
             showActiveTab();
@@ -348,7 +349,7 @@ WndRef TabsCtrl::getWindowByODR(ODRRef const &title) {
 }
 
 void TabsCtrl::fwdWMCommand( int wmId ) {
-    SendMessage(activeTab->get()->wndChild->getHWnd(), WM_COMMAND, wmId, 0);
+    SendMessage(tabs[activeTab]->wndChild->getHWnd(), WM_COMMAND, wmId, 0);
 }
 
 ATOM TabsCtrl::windowClass=0;

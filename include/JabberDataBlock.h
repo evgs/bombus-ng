@@ -30,14 +30,15 @@ public:
 	const std::string& getTagName() const{ return tagName; }
 
 	bool hasAttribute(const std::string & byName);
-	const std::string& getAttribute(const std::string & byName);
+    std::string getAttribute(const std::string & byName);
 
 	void setAttribute(const std::string &name, const std::string &value);
 	void setAttribute(const char *name, const char * value);
 
-	const std::string& getText() const{ return text; }
-	void setText(const std::string &_text) { text=_text; }
-	void setText(const char *_text) { text=_text; }
+    std::string getText() const; 
+    void _setText(const std::string &_text) { text=_text; }
+    void setText(const std::string &_text);
+	void setText(const char *_text);
 
     JabberDataBlockRefList * getChilds() {return &childs;};
 	void addChild(JabberDataBlockRef child);

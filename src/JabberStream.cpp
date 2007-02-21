@@ -75,7 +75,7 @@ bool JabberStream::tagEnd(const std::string & tagname) {
 }
 
 void JabberStream::plainTextEncountered(const std::string & body){
-	stanzaStack.top()->setText(body);
+	stanzaStack.top()->_setText(body);
 }
 
 #ifdef _WIN32_WCE

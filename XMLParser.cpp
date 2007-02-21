@@ -124,3 +124,38 @@ std::string XMLStringPrep(const std::string & data){
 	}
 	return result;
 }
+
+std::string XMLStringExpand(const std::string & data){
+    std::string result;
+    std::string escapedChar;
+    bool inEsc=false;
+    for (std::string::const_iterator i=data.begin(); i!=data.end(); i++) {
+        char ch=*i;
+        switch (ch) {
+            case '&':
+                if (inEsc) throw std::exception("Malformed XML escape sequence");
+                inEsc=true; 
+                escapedChar.clear();
+                break;
+            case ';':   
+                if (inEsc) {
+                    ch=0;
+                    inEsc=false;
+                    if (escapedChar=="amp")  ch='&';
+                    if (escapedChar=="quot") ch='"'; 
+                    if (escapedChar=="lt")   ch='<'; 
+                    if (escapedChar=="gt")   ch='>';
+                    if (escapedChar=="apos") ch='\'';
+                    if (escapedChar[0]=='#') { 
+                        escapedChar[0]=' ';
+                        ch=atoi(escapedChar.c_str());
+                    }
+                    if (ch==0) throw std::exception("Malformed XML escape sequence");
+                }
+            default: if (inEsc) escapedChar+=ch; else result+=ch;
+        }
+    }
+
+    if (inEsc) throw std::exception("Malformed XML escape sequence");
+    return result;
+}

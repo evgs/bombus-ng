@@ -3,6 +3,8 @@
 #include "JabberDataBlock.h"
 #include <boost/assert.hpp>
 
+#include "XMLParser.h"
+
 using namespace std;
 
 JabberDataBlock::JabberDataBlock(void){}
@@ -17,18 +19,19 @@ JabberDataBlock::JabberDataBlock(const std::string & _tagName, const StringMap &
 
 JabberDataBlock::JabberDataBlock(const char * _tagName, const char * _text){
 	tagName=_tagName;
-	if (_text) text=_text;
+	if (_text) setText(_text);
 }
 
 
 JabberDataBlock::~JabberDataBlock(void)
 {}
 
-const std::string& JabberDataBlock::getAttribute(const std::string &byName) {
+std::string JabberDataBlock::getAttribute( const std::string & byName ) 
+{
 	// TODO:
 	//StringMap::const_iterator i=attr.find(byName);
 	//return i->second;
-	return attr[byName];
+	return XMLStringExpand(attr[byName]);
 }
 
 bool JabberDataBlock::hasAttribute(const std::string & byName) {
@@ -37,10 +40,10 @@ bool JabberDataBlock::hasAttribute(const std::string & byName) {
 }
 
 void JabberDataBlock::setAttribute(const std::string & name,const std::string & value) {
-	attr[name]=value;
+	attr[name]=XMLStringPrep(value);
 }
 void JabberDataBlock::setAttribute(const char *name, const char *value) {
-	attr[string(name)]=string(value);
+	setAttribute(string(name), string(value));
 }
 
 void JabberDataBlock::addChild(JabberDataBlockRef child){
@@ -110,3 +113,14 @@ StringRef JabberDataBlock::toXML(){
 
 }
 
+std::string JabberDataBlock::getText() const
+{
+    return XMLStringExpand(text);
+}
+
+void JabberDataBlock::setText( const std::string &_text ) {
+    text=XMLStringPrep(_text);
+}
+void JabberDataBlock::setText( const char *_text ) {
+    setText(string(_text));
+}

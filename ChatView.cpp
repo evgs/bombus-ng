@@ -69,7 +69,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
         hdc = BeginPaint(hWnd, &ps);
 
         {
-
+            //p->contact->nUnread=0;
             RECT rc = {0, 0, tabHeight, 100};
             p->contact->draw(hdc, rc);
 
@@ -135,6 +135,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                 Message::ref msg=Message::ref(new Message(body, "", Message::SENT));
                 p->contact->messageList->push_back(msg);
                 p->showWindow(true);
+                p->msgList->moveCursorEnd();
 
                 JabberDataBlockRef out=msg->constructStanza(p->contact->jid.getJid());
                 //Reset form
@@ -217,8 +218,17 @@ void ChatView::showWindow( bool show ) {
 
     ::SendMessage (g_hWndMenuBar, TB_SETBUTTONINFO, IDS_SEND, (LPARAM)&tbbi);
 
+    if (show) contact->nUnread=0;
+
     if (show) msgList->notifyListUpdate(true);
     if (show) InvalidateRect(msgList->getHWnd(), NULL, false);
+
+    if (show) SetFocus(editWnd);
+
+}
+
+void ChatView::moveUnread() {
+    msgList->moveCursorEnd();
 }
 ATOM ChatView::windowClass=0;
 

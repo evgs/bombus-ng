@@ -316,6 +316,13 @@ bool VirtualListView::moveCursorTo( int x, int y )
     return false;
 }
 
+bool VirtualListView::moveCursorEnd() {
+    if (odrlist.get()==NULL) return false;
+    cursorPos=odrlist->back();
+    cursorFit();
+    return true;
+}
+
 void VirtualListView::cursorFit() {
     if (!cursorPos) return;
 
@@ -415,5 +422,6 @@ void VirtualListView::addODR( ODRRef odr, bool redraw ) {
 HMENU VirtualListView::getContextMenu() { return NULL; }
 void VirtualListView::releaseContextMenu() {};
 void VirtualListView::OnCommand( int cmdId, LONG lParam ) {};
+
 ATOM VirtualListView::windowClass=0;
 

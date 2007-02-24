@@ -25,6 +25,8 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     this->nickname=nickname;
     this->status=presence::OFFLINE;
 
+    nUnread=0;
+
     transpIndex=identifyTransport(jid);
 
     update();
@@ -38,7 +40,7 @@ Contact::ref Contact::clone() {
     return c;
 }
 
-bool Contact::hasUnreadMsgs() {
+/*bool Contact::hasUnreadMsgs() {
     for ( ODRList::const_iterator i=messageList->begin();   i!=messageList->end();  i++ ) {
         ODRRef r=*i;
         Message *m = dynamic_cast<Message *>(r.get());
@@ -47,9 +49,13 @@ bool Contact::hasUnreadMsgs() {
         }
     }
     return false;
-}
+}*/
+
 int Contact::getColor() const{ return 0; }
-int Contact::getIconIndex() const{ return status+transpIndex; }
+int Contact::getIconIndex() const{ 
+    if (nUnread>0) return icons::ICON_MESSAGE_INDEX;
+    return status+transpIndex; 
+}
 
 const wchar_t * Contact::getText() const{ return wjid.c_str(); }
 //////////////////////////////////////////////////////////////////////////

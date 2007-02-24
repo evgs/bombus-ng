@@ -77,6 +77,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         }
 
         //todo: разное поведение для roster request и roster push
+        //при push модифицировать ВСЕ экземпляры по bareJid
         Contact::ref contact;
         if (rosterPush) {
             contact=findContact(jid);
@@ -136,27 +137,34 @@ void Roster::processPresence( JabberDataBlockRef block ) {
     std::string priority=block->getChildText("priority");
     std::string status=block->getChildText("status");
 
+    //first attempt - if we already have this contact in our list
     Contact::ref contact=findContact(from);
     if (!contact) {
         Jid jid(from);
-        //first attempt - search for contact without resource
+        //second attempt - search for contact without resource
         contact=findContact(jid.getBareJid());
         if (contact) {
             // store resource
             contact->jid.setResource(jid.getResource());
         } else { 
-            //todo: second attempt - clone contact from bareJidMap
+            //todo: third attempt - clone contact from bareJidMap
+            if ( bareJidMap.count(jid.getBareJid())!=0 ) {
+                contact=bareJidMap[jid.getBareJid()];
+                contact=contact->clone();
+                contact->jid.setResource(jid.getResource());
+                contacts.push_back(contact);
+            } else {
 
-            //third attempt - based on NOT-IN-LIST policy
-            contact=Contact::ref(new Contact(jid.getBareJid(), jid.getResource(), ""));
-
-            std::string group="Not-In-List";
-
-            contact->subscr="NIL";
-            contact->group=group;
-
-            bareJidMap[contact->jid.getBareJid()]=contact;
-            contacts.push_back(contact);
+                //finally - based on NOT-IN-LIST policy
+                contact=Contact::ref(new Contact(jid.getBareJid(), jid.getResource(), ""));
+                
+                std::string group="Not-In-List";
+                
+                contact->subscr="NIL";
+                contact->group=group;
+                //bareJidMap[contact->jid.getBareJid()]=contact;
+                contacts.push_back(contact);
+            }
         }
     }
 

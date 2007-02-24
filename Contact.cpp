@@ -30,6 +30,14 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     update();
     messageList=ODRListRef(new ODRList);
 }
+
+Contact::ref Contact::clone() {
+    Contact::ref c=Contact::ref(new Contact(jid.getBareJid(), jid.getResource(), nickname));
+    c->subscr=subscr;
+    c->group=group;
+    return c;
+}
+
 bool Contact::hasUnreadMsgs() {
     for ( ODRList::const_iterator i=messageList->begin();   i!=messageList->end();  i++ ) {
         ODRRef r=*i;

@@ -34,8 +34,9 @@ void Jid::setJid(const std::string &jid){
         slash=jid.length();
         resource="";
     } else resource=jid.substr(slash+1);
-	userName=jid.substr(0,at);
 	server=jid.substr(at+1,slash-at-1);
+    if (at==-1) at=0;
+    userName=jid.substr(0,at);
 
 	updateJid();
 };
@@ -44,14 +45,18 @@ void Jid::setBareJid(const std::string &bareJid){
 
 	int at=bareJid.find('@');
 	int slash=bareJid.find('/');
-	userName=bareJid.substr(0,at);
 	server=bareJid.substr(at+1,slash-at-1);
+    if (at==-1) at=0;
+    userName=bareJid.substr(0,at);
 
 	updateJid();
 };
 
 void Jid::updateJid(void){
-	bareJid=userName+'@'+server;
+	bareJid=userName;
+    if (userName.length()!=0) bareJid+='@';
+    bareJid+=server;
+
 	if (resource.empty()) jid=bareJid; 
 	else jid=bareJid+'/'+resource;
 };

@@ -518,12 +518,12 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 	return BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
-class MessageFwd : public JabberDataBlockListener {
+class MessageRecv : public JabberDataBlockListener {
 public:
-	MessageFwd(ResourceContextRef rc) {
+	MessageRecv(ResourceContextRef rc) {
 		this->rc=rc;
 	}
-	~MessageFwd(){};
+	~MessageRecv(){};
 	virtual const char * getType() const{ return NULL; }
 	virtual const char * getId() const{ return NULL; }
 	virtual const char * getTagName() const { return "message"; }
@@ -531,14 +531,14 @@ public:
 private:
 	ResourceContextRef rc;
 };
-ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     std::string from=block->getAttribute("from");
     std::string body=block->getChildByName("body")->getText();
 
     StringRef orig=block->toXML();
 	Log::getInstance()->msg("Message from ", from.c_str()); 
 
-    Contact::ref c = rc->roster->findContact(from);
+    Contact::ref c = rc->roster->getContactEntry(from);
 
     Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING));
 
@@ -546,9 +546,17 @@ ProcessResult MessageFwd::blockArrived(JabberDataBlockRef block, const ResourceC
     soundName+=TEXT("message.wav");
     PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
 
+    c->nUnread++;
     c->messageList->push_back(msg);
+
+    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
+    if(cv) {
+        cv->moveUnread();
+    }
+
     tabs->switchByODR(c);
-    //chatSample->addMessage(*orig);
+
+    InvalidateRect(rosterWnd->getHWnd(),NULL, FALSE);
 
 	return BLOCK_PROCESSED;
 }
@@ -585,7 +593,7 @@ void JabberStreamEvents::loginSuccess(){
 
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster(rc) ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version(rc) ));
-    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageFwd(rc) ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv(rc) ));
 
     JabberDataBlock getRoster("iq");
     getRoster.setAttribute("type","get");

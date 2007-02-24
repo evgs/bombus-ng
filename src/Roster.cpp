@@ -137,6 +137,15 @@ void Roster::processPresence( JabberDataBlockRef block ) {
     std::string priority=block->getChildText("priority");
     std::string status=block->getChildText("status");
 
+    Contact::ref contact=getContactEntry(from);
+
+    contact->status=typeIndex;
+    contact->update();
+    makeViewList();
+}
+//////////////////////////////////////////////////////////////////////////
+Contact::ref Roster::getContactEntry(const std::string & from){
+
     //first attempt - if we already have this contact in our list
     Contact::ref contact=findContact(from);
     if (!contact) {
@@ -157,9 +166,9 @@ void Roster::processPresence( JabberDataBlockRef block ) {
 
                 //finally - based on NOT-IN-LIST policy
                 contact=Contact::ref(new Contact(jid.getBareJid(), jid.getResource(), ""));
-                
+
                 std::string group="Not-In-List";
-                
+
                 contact->subscr="NIL";
                 contact->group=group;
                 //bareJidMap[contact->jid.getBareJid()]=contact;
@@ -167,10 +176,7 @@ void Roster::processPresence( JabberDataBlockRef block ) {
             }
         }
     }
-
-    contact->status=typeIndex;
-    contact->update();
-    makeViewList();
+    return contact;
 }
 //////////////////////////////////////////////////////////////////////////
 void Roster::makeViewList() {

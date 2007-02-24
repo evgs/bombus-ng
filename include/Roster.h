@@ -60,6 +60,7 @@ public:
 
     //void addContact(Contact::ref contact);
     Contact::ref findContact (const std::string &jid) const;
+    Contact::ref getContactEntry(const std::string & jid);
 
     RosterGroup::ref findGroup(const std::string &name);
     RosterGroup::ref createGroup(const std::string &name, RosterGroup::Type type);
@@ -73,7 +74,6 @@ public:
     void bindWindow(VirtualListView::ref roster){ this->roster=roster; }
 
     void processPresence(JabberDataBlockRef block);
-
     typedef boost::shared_ptr<Roster> ref;
 
 private:

@@ -31,7 +31,10 @@ public:
 
     ODRListRef messageList;
 
-    bool hasUnreadMsgs();
+    //bool hasUnreadMsgs();
+
+    int nUnread;
+
     static bool compare(Contact::ref left, Contact::ref right);
 
     //////////////////////////////////////////////////////////////////////////

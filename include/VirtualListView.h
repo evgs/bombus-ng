@@ -36,7 +36,12 @@ public:
     virtual void releaseContextMenu();
     virtual void OnCommand(int cmdId, LONG lParam);
 
+    bool moveCursorEnd();
+
+
     typedef boost::shared_ptr<VirtualListView> ref;
+
+
 protected:
 
     int winTop;

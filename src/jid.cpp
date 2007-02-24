@@ -1,4 +1,5 @@
 #include "jid.h"
+//#include <boost/algorithm/string.hpp>
 
 Jid::Jid() {
 	userName=server=resource=jid=bareJid="";

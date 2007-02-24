@@ -27,6 +27,7 @@ public:
     typedef boost::shared_ptr<ChatView> ref;
 
     void addMessage(const std::string & msg);
+    void moveUnread();
 
     virtual void showWindow(bool show);
 

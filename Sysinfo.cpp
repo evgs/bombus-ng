@@ -23,3 +23,9 @@ const std::wstring sysinfo::getOsVersion() {
 
 }
 
+bool sysinfo::screenIsVGA() {
+    RECT ws;
+    SystemParametersInfo(SPI_GETWORKAREA, sizeof(ws), &ws, 0);
+
+    return (ws.right - ws.left > 240);
+}

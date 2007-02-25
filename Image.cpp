@@ -7,10 +7,10 @@
 
 #define NORASTEROP (0x00AA0029)
 
-extern std::wstring appRootPath;
+extern std::wstring skinRootPath;
 
 Image::Image( LPCTSTR path ) {
-    std::wstring bmpPath=appRootPath+path;
+    std::wstring bmpPath=skinRootPath+path;
     bmp=SHLoadImageFile(bmpPath.c_str());  
 
     HDC hdcImage=CreateCompatibleDC(NULL);
@@ -56,7 +56,7 @@ void ImgArray::setGridSize( int nColumns, int nRows ) {
 }
 
 ImgArray::ImgArray( LPCTSTR path, int nColumns, int nRows ) {
-    std::wstring bmpPath=appRootPath+path;
+    std::wstring bmpPath=skinRootPath+path;
     bmp=SHLoadImageFile(bmpPath.c_str()); 
     //if (bmp==NULL) throw
 
@@ -77,7 +77,7 @@ Skin::Skin( LPCTSTR path )  {
     names.push_back("");
     iconset.push_back(ImgListRef(new ImgArray(TEXT("skin.png"), 8, 6)));
 
-    std::wstring srcPath=appRootPath+path+TEXT("transports\\*.*");
+    std::wstring srcPath=skinRootPath+path+TEXT("transports\\*.*");
 
     WIN32_FIND_DATA wfd;
 

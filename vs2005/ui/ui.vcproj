@@ -94,7 +94,7 @@
 				ForceDirty="-1"
 				RemoteDirectory=""
 				RegisterOutput="0"
-				AdditionalFiles="transports\aim.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui\|0;transports\icq.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui\|0;transports\mrim.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui\|0;transports\rss.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui\|0;transports\yahoo.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui\|0;skin.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;message.wav|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0"
+				AdditionalFiles="qvga\transports\aim.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;qvga\transports\icq.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;qvga\transports\mrim.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;qvga\transports\rss.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;qvga\transports\yahoo.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;qvga\skin.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;vga\transports\aim.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;vga\transports\icq.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;vga\transports\mrim.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;vga\transports\rss.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;vga\transports\yahoo.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;vga\skin.png|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0;message.wav|$(ProjectDir)..\..\resources|%CSIDL_PROGRAM_FILES%\ui|0"
 			/>
 			<DebuggerTool
 			/>

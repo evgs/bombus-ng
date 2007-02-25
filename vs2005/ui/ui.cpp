@@ -54,6 +54,7 @@ ResourceContextRef rc;
 ImgListRef skin;
 
 std::wstring appRootPath;
+std::wstring skinRootPath;
 
 int prepareAccount();
 int initJabber();
@@ -161,6 +162,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     appRootPath=appName;
     int namePos=appRootPath.find_last_of(_T("\\"))+1;
     appRootPath.erase(namePos, appRootPath.length()-namePos);
+
+    skinRootPath=appRootPath+TEXT("qvga\\");
 
     if (!MyRegisterClass(hInstance, szWindowClass)) 	return FALSE;
 

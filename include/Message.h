@@ -28,6 +28,7 @@ protected:
 
 class Message : public MessageElement{
 public:
+    virtual int getColor() const;
     enum MsgType : int {
         SENT=0,
         INCOMING_HISTORY=1,

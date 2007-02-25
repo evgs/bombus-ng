@@ -75,9 +75,9 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             if (activeTab >= 0  &&  activeTab < p->tabs.size() )
                 drawTab(hdc, p->xOffset, p->tabs[activeTab], true);
 
-            RECT b={width-32, 0,  width-16, tabHeight};
+            RECT b={width-2*tabHeight, 0,  width-tabHeight, tabHeight};
             DrawFrameControl(hdc, &b, DFC_SCROLL, DFCS_SCROLLLEFT);
-            b.left+=16; b.right+=16;
+            b.left+=tabHeight; b.right+=tabHeight;
             DrawFrameControl(hdc, &b, DFC_SCROLL, DFCS_SCROLLRIGHT);
 
             EndPaint(hWnd, &ps);
@@ -94,10 +94,10 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
             if (mouseY >= tabHeight) break;
 
-            if (mouseX > width - 16) { 
+            if (mouseX > width - tabHeight) { 
                 p->activeTab++; 
                 if (p->activeTab == p->tabs.size()) p->activeTab--;
-            } else if (mouseX > width - 32) {
+            } else if (mouseX > width - 2*tabHeight) {
                 if (p->activeTab != 0) p->activeTab--;
             } else
             for (unsigned int i=0; i < p->tabs.size(); i++) {

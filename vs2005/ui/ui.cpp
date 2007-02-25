@@ -56,6 +56,8 @@ ImgListRef skin;
 std::wstring appRootPath;
 std::wstring skinRootPath;
 
+int tabHeight;
+
 int prepareAccount();
 int initJabber();
 void streamShutdown();
@@ -163,7 +165,16 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     int namePos=appRootPath.find_last_of(_T("\\"))+1;
     appRootPath.erase(namePos, appRootPath.length()-namePos);
 
-    skinRootPath=appRootPath+TEXT("qvga\\");
+    wchar_t * skinRelPath;
+    if (sysinfo::screenIsVGA()) {
+        skinRelPath=TEXT("vga\\");
+        tabHeight=32; //TODO: remove hardcode
+    } else {
+        skinRelPath=TEXT("qvga\\");
+        tabHeight=16; //TODO: remove hardcode
+    }
+    skinRootPath=appRootPath+skinRelPath;
+    
 
     if (!MyRegisterClass(hInstance, szWindowClass)) 	return FALSE;
 
@@ -211,9 +222,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 //
 
-// tab variables here
-int tabHeight=16;
-//int editHeight=64;
 
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

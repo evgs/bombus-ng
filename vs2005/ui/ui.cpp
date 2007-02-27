@@ -22,6 +22,7 @@
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
 
+#include "EntityCaps.h"
 #include "Roster.h"
 
 #include "DlgAccount.h"
@@ -469,16 +470,12 @@ ProcessResult MTForwarder::blockArrived(JabberDataBlockRef block, const Resource
 //////////////////////////////////////////////////////////////
 class GetRoster : public JabberDataBlockListener {
 public:
-	GetRoster(ResourceContextRef rc) {
-		this->rc=rc;
-	}
+    GetRoster() {}
 	~GetRoster(){};
 	virtual const char * getType() const{ return "result"; }
 	virtual const char * getId() const{ return "roster"; }
 	virtual const char * getTagName() const { return "iq"; }
 	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
-private:
-	ResourceContextRef rc;
 };
 ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 	Log::getInstance()->msg("Roster arrived");
@@ -495,7 +492,11 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 	presence.addChild("status", 
 		"please, don't send any messages here! \n"
 		"they will be dropped because it is debug version" );
-	rc->jabberStream->sendStanza(presence);
+
+    presence.addChild(EntityCaps::presenceEntityCaps());
+    //c->setAttribute("ext", "none");
+    
+    rc->jabberStream->sendStanza(presence);
 
     /*presence.setAttribute("to","devel@conference.jabber.ru/bng");
     rc->jabberStream->sendStanza(presence);*/
@@ -505,51 +506,46 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 //////////////////////////////////////////////////////////////
 class Version : public JabberDataBlockListener {
 public:
-	Version(ResourceContextRef rc) {
-		this->rc=rc;
-	}
+    Version() {}
 	~Version(){};
 	virtual const char * getType() const{ return "get"; }
 	virtual const char * getId() const{ return NULL; }
 	virtual const char * getTagName() const { return "iq"; }
 	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
-private:
-	ResourceContextRef rc;
 };
 ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+    
+    JabberDataBlockRef query=block->getChildByName("query");
+    if (!query) return BLOCK_REJECTED;
+    if (query->getAttribute("xmlns")!="jabber:iq:version") return BLOCK_REJECTED;
     
     Log::getInstance()->msg("version request ", block->getAttribute("from").c_str());
 
     std::string version=utf8::wchar_utf8(sysinfo::getOsVersion());
 
 
-	JabberDataBlock reply("iq");
-	reply.setAttribute("type","result");
-	reply.setAttribute("id", block->getAttribute("id"));
-	reply.setAttribute("to", block->getAttribute("from"));
+    JabberDataBlock result("iq");
+    result.setAttribute("to", block->getAttribute("from"));
+    result.setAttribute("type", "result");
+    result.setAttribute("id", block->getAttribute("id"));
+    result.addChild(query);
 
-	JabberDataBlock * qry=reply.addChild("query",NULL);
-	qry->setAttribute("xmlns","jabber:iq:version");
-	qry->addChild("name","Bombus-ng");
-    qry->addChild("version",::appVersion.c_str());
-	qry->addChild("os",version.c_str());
+	query->addChild("name","Bombus-ng");
+    query->addChild("version",::appVersion.c_str());
+	query->addChild("os",version.c_str());
 
-	rc->jabberStream->sendStanza(reply);
+	rc->jabberStream->sendStanza(result);
 	return BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
 class MessageRecv : public JabberDataBlockListener {
 public:
-	MessageRecv(ResourceContextRef rc) {
-		this->rc=rc;
-	}
+	MessageRecv() {}
 	~MessageRecv(){};
 	virtual const char * getType() const{ return NULL; }
 	virtual const char * getId() const{ return NULL; }
 	virtual const char * getTagName() const { return "message"; }
 	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
-private:
-	ResourceContextRef rc;
 };
 ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     std::string from=block->getAttribute("from");
@@ -611,9 +607,10 @@ void JabberStreamEvents::endConversation(const std::exception *ex){
 void JabberStreamEvents::loginSuccess(){
     Log::getInstance()->msg("Login ok");
 
-    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster(rc) ));
-    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version(rc) ));
-    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv(rc) ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new EntityCaps() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv() ));
 
     JabberDataBlock getRoster("iq");
     getRoster.setAttribute("type","get");

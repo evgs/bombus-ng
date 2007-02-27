@@ -226,6 +226,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\EntityCaps.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\IconTextElement.cpp"
 				>
 			</File>
@@ -381,6 +385,10 @@
 			</File>
 			<File
 				RelativePath=".\DlgAccount.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\EntityCaps.h"
 				>
 			</File>
 			<File

@@ -55,6 +55,7 @@ ImgListRef skin;
 
 std::wstring appRootPath;
 std::wstring skinRootPath;
+std::string appVersion;
 
 int tabHeight;
 
@@ -159,9 +160,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         return 0;
     } 
 
-    wchar_t appName[1024];
-    GetModuleFileName(hInstance, appName, sizeof(appName));
-    appRootPath=appName;
+    wchar_t wbuf[1024];
+    GetModuleFileName(hInstance, wbuf, sizeof(wbuf));
+    appRootPath=wbuf;
     int namePos=appRootPath.find_last_of(_T("\\"))+1;
     appRootPath.erase(namePos, appRootPath.length()-namePos);
 
@@ -174,7 +175,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         tabHeight=16; //TODO: remove hardcode
     }
     skinRootPath=appRootPath+skinRelPath;
-    
+
+    LoadString(g_hInst, IDS_VERSION, wbuf, sizeof(wbuf));
+    appVersion=utf8::wchar_utf8(wbuf);
 
     if (!MyRegisterClass(hInstance, szWindowClass)) 	return FALSE;
 
@@ -416,9 +419,9 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
                 SHInitDialog(&shidi);
 
                 wchar_t buf[256];
-                //LoadString(g_hInst, IDS_VERSION, buf, 256);
-                //SetDlgItemText(hDlg, IDC_AVERSION, buf);
-                SetDlgItemText(hDlg, IDC_AVERSION, MAKEINTRESOURCE(IDS_VERSION));
+                LoadString(g_hInst, IDS_VERSION, buf, 256);
+                SetDlgItemText(hDlg, IDC_AVERSION, buf);
+                //SetDlgItemText(hDlg, IDC_AVERSION, MAKEINTRESOURCE(IDS_VERSION));
             }
             return (INT_PTR)TRUE;
 
@@ -528,7 +531,7 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 	JabberDataBlock * qry=reply.addChild("query",NULL);
 	qry->setAttribute("xmlns","jabber:iq:version");
 	qry->addChild("name","Bombus-ng");
-	qry->addChild("version","0.0.3-devel");
+    qry->addChild("version",::appVersion.c_str());
 	qry->addChild("os",version.c_str());
 
 	rc->jabberStream->sendStanza(reply);

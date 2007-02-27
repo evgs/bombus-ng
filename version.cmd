@@ -1,8 +1,10 @@
+@echo off
+rem This script generates version.rc and sets env variables REVN and REVDATE
+
 SET VERSION=0.0.2
 
 SET VPATH=vs2005\ui\version.rc
 
-rem @echo off
 
 mkdir tmp
 echo SET REVN=$WCREV$>tmp\1

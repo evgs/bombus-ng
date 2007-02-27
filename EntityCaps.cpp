@@ -42,7 +42,7 @@ JabberDataBlockRef EntityCaps::presenceEntityCaps() {
     c->setAttribute("xmlns", "http://jabber.org/protocol/caps");
     c->setAttribute("node", "http://bombus-im.org/ng");
     c->setAttribute("ver", appVersion.c_str());
-    c->setAttribute("ext", "a");
+    c->setAttribute("ext", appVersion.c_str());
 
     return c;
 }

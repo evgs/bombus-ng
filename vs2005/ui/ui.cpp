@@ -239,9 +239,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             wmEvent = HIWORD(wParam); 
             // Parse the menu selections:
             switch (wmId) {
-				case IDM_HELP_ABOUT:
+                case IDM_HELP_ABOUT: {
 					DialogBox(g_hInst, (LPCTSTR)IDD_ABOUTBOX, hWnd, About);
-				break;
+				    break;
+                }
 				case IDM_JABBER_ACCOUNT:
 					DialogAccount(g_hInst, hWnd, rc->account);
 					break;
@@ -413,6 +414,11 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
                 shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN | SHIDIF_SIZEDLGFULLSCREEN | SHIDIF_EMPTYMENU;
                 shidi.hDlg = hDlg;
                 SHInitDialog(&shidi);
+
+                wchar_t buf[256];
+                //LoadString(g_hInst, IDS_VERSION, buf, 256);
+                //SetDlgItemText(hDlg, IDC_AVERSION, buf);
+                SetDlgItemText(hDlg, IDC_AVERSION, MAKEINTRESOURCE(IDS_VERSION));
             }
             return (INT_PTR)TRUE;
 

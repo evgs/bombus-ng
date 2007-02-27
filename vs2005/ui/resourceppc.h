@@ -12,6 +12,8 @@
 #define IDD_ABOUTBOX                    105
 #define IDD_ACCNT                       106
 #define IDS_SEND                        107
+#define IDS_VERSION                     108
+#define IDS_REVDATE                     109
 #define IDM_SEND                        110
 #define IDI_BOMBUS                      130
 #define IDC_STATIC_2                    202
@@ -26,6 +28,9 @@
 #define IDC_E_HOSTIP                    1009
 #define IDC_E_RESOURCE                  1010
 #define IDC_E_PORT                      1011
+#define IDC_EDIT1                       1013
+#define IDC_AREV                        1013
+#define IDC_AVERSION                    1014
 #define ID_JABBER_ONLINE                32771
 #define IDM_JABBER_ONLINE               32772
 #define ID_JABBER_STREAMINFO            32773
@@ -51,7 +56,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        132
 #define _APS_NEXT_COMMAND_VALUE         32786
-#define _APS_NEXT_CONTROL_VALUE         1013
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

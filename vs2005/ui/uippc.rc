@@ -97,9 +97,11 @@ EXSTYLE 0x80000000L
 CAPTION "About Bombus"
 FONT 8, "MS Shell Dlg"
 BEGIN
-    LTEXT           "Bombus Version 0.0.1",IDC_STATIC_2,47,7,70,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2006",IDC_STATIC_3,47,18,66,8
+    LTEXT           "Bombus",IDC_STATIC_2,47,7,26,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2006",IDC_STATIC_3,47,19,66,8
     ICON            IDI_BOMBUS,IDC_STATIC,15,7,20,20
+    LTEXT           "$VERSION$",IDC_AVERSION,86,7,46,8
+    EDITTEXT        IDC_AREV,17,41,120,59,ES_AUTOHSCROLL | ES_READONLY
 END
 
 
@@ -174,44 +176,6 @@ IDI_BOMBUS              ICON                    "bombus.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Version
-//
-
-VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,0,2,0
- PRODUCTVERSION 0,0,2,0
- FILEFLAGSMASK 0x17L
-#ifdef _DEBUG
- FILEFLAGS 0x1L
-#else
- FILEFLAGS 0x0L
-#endif
- FILEOS 0x4L
- FILETYPE 0x1L
- FILESUBTYPE 0x0L
-BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "000004b0"
-        BEGIN
-            VALUE "FileDescription", "Jabber Client"
-            VALUE "FileVersion", "0, 0, 2, 0"
-            VALUE "InternalName", "Bombus"
-            VALUE "LegalCopyright", "Copyright (C) 2007"
-            VALUE "OriginalFilename", "ui.exe"
-            VALUE "ProductName", "Bombus"
-            VALUE "ProductVersion", "0, 0, 2, 0"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x0, 1200
-    END
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // String Table
 //
 
@@ -228,6 +192,7 @@ BEGIN
     IDS_EXIT                "EXIT"
     IDS_HELP                "Help"
     IDS_SEND                "Send"
+#include "version.rc"
 END
 
 #endif    // Russian resources

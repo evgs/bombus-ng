@@ -553,7 +553,7 @@ private:
 };
 ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     std::string from=block->getAttribute("from");
-    std::string body=block->getChildByName("body")->getText();
+    std::string body=block->getChildText("body");
 
     StringRef orig=block->toXML();
 	Log::getInstance()->msg("Message from ", from.c_str()); 

@@ -96,6 +96,8 @@ public:
     virtual void releaseContextMenu();
     virtual void OnCommand(int cmdId, LONG lParam);
 
+    virtual void showWindow(bool show);
+
     enum actions {
         OPENCHAT=50000,
         LOGON, LOGOFF, RESOLVENICKNAMES,

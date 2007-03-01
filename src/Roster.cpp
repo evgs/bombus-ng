@@ -378,3 +378,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
     }
     }
 }
+void RosterView::showWindow( bool show ) {
+    Wnd::showWindow(show);
+    if (show) SetFocus(getHWnd());
+}

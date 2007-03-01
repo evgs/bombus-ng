@@ -127,22 +127,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     case WM_COMMAND: 
         {
             if (wParam==IDS_SEND) {
-                wchar_t buf[1024];
-                int len=SendMessage(p->editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
-                if (len==0) break;
-                std::string body=utf8::wchar_utf8(buf);
-                //TODO: xml escaping
-                Message::ref msg=Message::ref(new Message(body, "", Message::SENT));
-                p->contact->messageList->push_back(msg);
-                p->showWindow(true);
-                p->msgList->moveCursorEnd();
-
-                JabberDataBlockRef out=msg->constructStanza(p->contact->jid.getJid());
-                //Reset form
-                rc->jabberStream->sendStanza(*out);
-
-                buf[0]=0;
-                SendMessage(p->editWnd, WM_SETTEXT, 1024, (LPARAM) buf);
+                p->sendJabberMessage();
             }
             break;             
         }
@@ -233,6 +218,25 @@ void ChatView::moveUnread() {
 ATOM ChatView::windowClass=0;
 
 //////////////////////////////////////////////////////////////////////////
+void ChatView::sendJabberMessage() {
+    wchar_t buf[1024];
+    int len=SendMessage(editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
+    if (len==0) return;
+    std::string body=utf8::wchar_utf8(buf);
+    //TODO: xml escaping
+    Message::ref msg=Message::ref(new Message(body, "", Message::SENT));
+    contact->messageList->push_back(msg);
+    showWindow(true);
+    msgList->moveCursorEnd();
+
+    JabberDataBlockRef out=msg->constructStanza(contact->jid.getJid());
+    //Reset form
+    rc->jabberStream->sendStanza(*out);
+
+    buf[0]=0;
+    SendMessage(editWnd, WM_SETTEXT, 1024, (LPARAM) buf);
+}
+
 //////////////////////////////////////////////////////////////////////////  
 // WARNING!!! ONLY FOR WM2003 and higher
 //////////////////////////////////////////////////////////////////////////

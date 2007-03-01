@@ -20,7 +20,7 @@ public:
     virtual ~ChatView();
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
+    void sendJabberMessage();
     //virtual const wchar_t * getWindowTitle() const;
     virtual const ODR * getODR() const;
 

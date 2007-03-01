@@ -168,6 +168,7 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                 if (activeTab>1) p->tabs.erase(p->tabs.begin()+activeTab);
                 if (activeTab>=p->tabs.size()) p->activeTab--;
             }
+            p->tabDoLayout();
             InvalidateRect(p->getHWnd(), NULL, true);
             p->showActiveTab();
             return 0;

@@ -260,6 +260,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case IDM_JABBER_OFFLINE:
                     streamShutdown();
+                    break;
 
 				case IDM_JABBER_STREAMINFO:
                     Log::getInstance()->msg(

@@ -9,7 +9,7 @@
 
 #include "DlgAccount.h"
 
-#include "resourceppc.h"
+#include "..\vs2005\ui\resourceppc.h"
 
 #include "utf8.hpp"
 

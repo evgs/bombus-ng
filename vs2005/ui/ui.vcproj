@@ -222,7 +222,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DlgAccount.cpp"
+				RelativePath="..\..\src\DlgAccount.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DlgStatus.cpp"
 				>
 			</File>
 			<File
@@ -384,7 +388,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\DlgAccount.h"
+				RelativePath="..\..\include\DlgAccount.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\DlgStatus.h"
 				>
 			</File>
 			<File

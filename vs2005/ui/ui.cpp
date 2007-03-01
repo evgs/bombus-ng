@@ -26,6 +26,7 @@
 #include "Roster.h"
 
 #include "DlgAccount.h"
+#include "DlgStatus.h"
 #include "VirtualListView.h"
 #include "ChatView.h"
 #include "TabCtrl.h"
@@ -254,6 +255,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     SendMessage (hWnd, WM_CLOSE, 0, 0);				
                     break;
 
+                case IDM_JABBER_STATUS:
+                    DialogStatus(g_hInst, hWnd, rc);
+                    break;
 				case IDM_JABBER_ONLINE:
 					initJabber();
 					break;

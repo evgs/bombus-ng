@@ -32,6 +32,7 @@ IDR_MENU MENU
 BEGIN
     POPUP "Jabber"
     BEGIN
+        MENUITEM "Status",                      IDM_JABBER_STATUS
         MENUITEM "ONLINE",                      IDM_JABBER_ONLINE
         MENUITEM "OFFLINE",                     IDM_JABBER_OFFLINE
         MENUITEM "stream info",                 IDM_JABBER_STREAMINFO
@@ -104,6 +105,23 @@ BEGIN
     EDITTEXT        IDC_AREV,17,41,120,59,ES_AUTOHSCROLL | ES_READONLY
 END
 
+IDD_STATUS DIALOG  0, 0, 156, 129
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+EXSTYLE 0x80000000L
+FONT 8, "MS Shell Dlg"
+BEGIN
+    EDITTEXT        IDC_E_STATUS,7,41,142,41,ES_LOWERCASE | ES_AUTOHSCROLL
+    EDITTEXT        IDC_E_PRIORITY,33,87,29,12,ES_AUTOHSCROLL
+    CONTROL         "Save",IDC_X_PRESAVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,117,24,32,10
+    PUSHBUTTON      "Set",IDOK,24,108,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,84,108,50,14
+    LTEXT           "Priority",IDC_STATIC,7,89,25,8
+    COMBOBOX        IDC_C_STATUS,33,7,116,71,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Status",IDC_STATIC,7,10,24,8
+    COMBOBOX        IDC_C_PRESET,33,22,76,38,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Preset",IDC_STATIC,7,24,24,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -122,6 +140,14 @@ BEGIN
     END
 
     IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 149
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 122
+    END
+
+    IDD_STATUS, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 149
@@ -192,7 +218,8 @@ BEGIN
     IDS_EXIT                "EXIT"
     IDS_HELP                "Help"
     IDS_SEND                "Send"
-#include "version.rc"
+    IDS_VERSION             "0.0.2.135"
+    IDS_REVDATE             "2007-02-28 02-19-26"
 END
 
 #endif    // Russian resources

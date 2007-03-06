@@ -278,6 +278,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Notify.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ResourceContext.cpp"
 				>
 			</File>
@@ -453,6 +457,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\crypto\MessageDigest.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\Notify.h"
 				>
 			</File>
 			<File

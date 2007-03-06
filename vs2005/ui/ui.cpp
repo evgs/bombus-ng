@@ -11,6 +11,8 @@
 #include <windowsx.h>
 #include <aygshell.h>
 
+#include "Notify.h"
+
 #include "Log.h"
 #include "Socket.h"
 #include "CETLSSocket.h"
@@ -580,10 +582,14 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
 
     std::wstring soundName(appRootPath);
     soundName+=TEXT("message.wav");
+    
+    Notify::PlayNotify();
+    
     PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
 
     c->nUnread++;
     c->messageList->push_back(msg);
+
 
     ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
     if(cv) {

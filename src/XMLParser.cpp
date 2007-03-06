@@ -120,7 +120,7 @@ std::string XMLStringPrep(const std::string & data){
 			case '>':   result+="&gt;" ; break;
 			case '\'':  result+="&apos;" ; break;
                 // not nessesary
-            case 0x0d:  result+="&#13;" ; break;
+            case 0x0d:  /*result+="&#13;"*/ ; break;
             case 0x0a:  result+="&#10;" ; break;
 			default: result+=ch;
 		}

@@ -218,8 +218,6 @@ BEGIN
     IDS_EXIT                "EXIT"
     IDS_HELP                "Help"
     IDS_SEND                "Send"
-    IDS_VERSION             "0.0.2.135"
-    IDS_REVDATE             "2007-02-28 02-19-26"
 END
 
 #endif    // Russian resources

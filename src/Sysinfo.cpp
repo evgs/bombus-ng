@@ -27,5 +27,5 @@ bool sysinfo::screenIsVGA() {
     RECT ws;
     SystemParametersInfo(SPI_GETWORKAREA, sizeof(ws), &ws, 0);
 
-    return (ws.right - ws.left > 240);
+    return (ws.right - ws.left > 320); // VGA will have 480 or 640 pixels width
 }

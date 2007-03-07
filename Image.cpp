@@ -4,6 +4,7 @@
 
 #include <string>
 #include <utf8.hpp>
+#include "lstring.h"
 
 #define NORASTEROP (0x00AA0029)
 
@@ -92,6 +93,7 @@ Skin::Skin( LPCTSTR path )  {
         std::string name=utf8::wchar_utf8(wfd.cFileName);
         int dot=name.find('.');
         name.erase(dot, name.length()-dot);
+        locale::toLowerCase(name);
         names.push_back(name);
     } while (FindNextFile(sf, &wfd));
     FindClose(sf);

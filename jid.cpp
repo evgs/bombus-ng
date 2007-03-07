@@ -1,5 +1,6 @@
 #include "jid.h"
 //#include <boost/algorithm/string.hpp>
+#include "lstring.h"
 
 Jid::Jid() {
 	userName=server=resource=jid=bareJid="";
@@ -54,6 +55,9 @@ void Jid::setBareJid(const std::string &bareJid){
 };
 
 void Jid::updateJid(void){
+    locale::toLowerCase(userName);
+    locale::toLowerCase(server);
+
 	bareJid=userName;
     if (userName.length()!=0) bareJid+='@';
     bareJid+=server;

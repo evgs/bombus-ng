@@ -266,6 +266,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\lstring.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\crypto\MD5.cpp"
 				>
 			</File>
@@ -445,6 +449,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\Log.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\lstring.h"
 				>
 			</File>
 			<File

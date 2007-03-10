@@ -33,7 +33,6 @@ public:
     void addODR(ODRRef odr, bool redraw);
 
     virtual HMENU getContextMenu();
-    virtual void releaseContextMenu();
     virtual void OnCommand(int cmdId, LONG lParam);
 
     bool moveCursorEnd();

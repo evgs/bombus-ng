@@ -93,7 +93,6 @@ public:
     typedef boost::shared_ptr<RosterView> ref;
 
     virtual HMENU getContextMenu();
-    virtual void releaseContextMenu();
     virtual void OnCommand(int cmdId, LONG lParam);
 
     virtual void showWindow(bool show);
@@ -107,5 +106,4 @@ public:
         RENAMEGRP
     };
 private:
-    HMENU hmenu;
 };

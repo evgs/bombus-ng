@@ -148,12 +148,6 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             break; 
         } 
 
-
-    case WM_EXITMENULOOP:
-        {
-            p->releaseContextMenu();
-            break;
-        }
     case WM_LBUTTONDOWN:
         {
             SetFocus(hWnd);
@@ -179,6 +173,8 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
                     pt.x, pt.y,
                     hWnd,
                     NULL);
+
+                DestroyMenu(hmenu);
             }
             break;
         }
@@ -420,7 +416,6 @@ void VirtualListView::addODR( ODRRef odr, bool redraw ) {
 }
 
 HMENU VirtualListView::getContextMenu() { return NULL; }
-void VirtualListView::releaseContextMenu() {};
 void VirtualListView::OnCommand( int cmdId, LONG lParam ) {};
 
 ATOM VirtualListView::windowClass=0;

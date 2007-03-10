@@ -42,8 +42,53 @@ namespace editbox {
 long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { 
     WNDPROC OldWndProc=(WNDPROC) GetWindowLong(hWnd, GWL_USERDATA);
     switch(msg) { 
-    case WM_RBUTTONDOWN: 
-        return 0; 
+    case WM_LBUTTONDOWN:
+        {
+
+            SHRGINFO    shrg;
+            shrg.cbSize = sizeof(shrg);
+            shrg.hwndClient = hWnd;
+            shrg.ptDown.x = LOWORD(lParam);
+            shrg.ptDown.y = HIWORD(lParam);
+            shrg.dwFlags = SHRG_RETURNCMD /*| SHRG_NOANIMATION*/;
+
+            if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
+
+                DWORD sel=SendMessage(hWnd, EM_GETSEL, 0, 0);
+
+                UINT paste = (IsClipboardFormatAvailable(CF_UNICODETEXT))?  MF_STRING : MF_STRING | MF_GRAYED;
+                UINT cut = (LOWORD(sel)!=HIWORD(sel))? MF_STRING : MF_STRING | MF_GRAYED;
+                UINT undo= (SendMessage(hWnd, EM_CANUNDO, 0, 0))? MF_STRING : MF_STRING | MF_GRAYED;;
+
+                HMENU hmenu = CreatePopupMenu();
+                if (hmenu==NULL) break;
+
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, 0, TEXT("Add Smile"));
+                AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
+                AppendMenu(hmenu, cut, WM_CUT, TEXT("Cut") );
+                AppendMenu(hmenu, cut, WM_COPY, TEXT("Copy") );
+                AppendMenu(hmenu, paste, WM_PASTE, TEXT("Paste") );
+                AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
+                AppendMenu(hmenu, undo, EM_UNDO, TEXT("Undo") );
+
+                POINT pt={LOWORD(lParam), HIWORD(lParam) };
+                ClientToScreen(hWnd, &pt);
+
+                int cmdId=TrackPopupMenuEx(hmenu,
+                    TPM_BOTTOMALIGN | TPM_RETURNCMD,
+                    pt.x, pt.y,
+                    hWnd,
+                    NULL);
+
+                DestroyMenu(hmenu);
+
+                if (cmdId>0) PostMessage(hWnd, cmdId, 0, 0);
+
+                return 0;
+            }
+            break;
+        }
+
     case WM_KEYDOWN:
         if (wParam==VK_CONTROL) editbox::editBoxShifts=true;
         if (wParam==VK_SHIFT)   editbox::editBoxShifts=true;
@@ -159,32 +204,6 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
             break; 
         } 
-
-    case WM_LBUTTONDOWN:
-        {
-
-            SHRGINFO    shrg;
-            shrg.cbSize = sizeof(shrg);
-            shrg.hwndClient = hWnd;
-            shrg.ptDown.x = LOWORD(lParam);
-            shrg.ptDown.y = HIWORD(lParam);
-            shrg.dwFlags = SHRG_RETURNCMD /*| SHRG_NOANIMATION*/;
-
-            if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
-
-                /*HMENU hmenu = p->getContextMenu();
-                if (hmenu==NULL) break;
-
-                POINT pt={LOWORD(lParam), HIWORD(lParam) };
-                ClientToScreen(hWnd, &pt);
-                TrackPopupMenuEx(hmenu,
-                    TPM_TOPALIGN,
-                    pt.x, pt.y,
-                    hWnd,
-                    NULL);*/
-            }
-            break;
-        }
 
     case WM_COMMAND: 
         {

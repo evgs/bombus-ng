@@ -676,8 +676,8 @@ int prepareAccount(){
     return 0;
 }
 //////////////////////////////////////////////////////////////
-int initJabber()
-{
+int initJabber() {
+    if (rc->jabberStream) return 0;
     rc->jabberStanzaDispatcherRT=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
     rc->jabberStanzaDispatcher2=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 

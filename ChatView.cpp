@@ -1,6 +1,7 @@
 #include "ChatView.h"
 #include <commctrl.h>
 #include <windowsx.h>
+#include <aygshell.h>
 #include "../vs2005/ui/ui.h"
 
 #include "ResourceContext.h"
@@ -29,6 +30,37 @@ ATOM ChatView::RegisterWindowClass() {
 }
 
 
+
+//////////////////////////////////////////////////////////////////////////
+// real WndProc for edit box
+long (WINAPI *EditWndProc)(HWND w,UINT msg,WPARAM wParam,LPARAM lParam); 
+
+namespace editbox {
+    static bool editBoxShifts=false;
+}
+
+long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { 
+    WNDPROC OldWndProc=(WNDPROC) GetWindowLong(hWnd, GWL_USERDATA);
+    switch(msg) { 
+    case WM_RBUTTONDOWN: 
+        return 0; 
+    case WM_KEYDOWN:
+        if (wParam==VK_CONTROL) editbox::editBoxShifts=true;
+        if (wParam==VK_SHIFT)   editbox::editBoxShifts=true;
+        break; 
+    case WM_KEYUP:
+        editbox::editBoxShifts=false;
+        break;
+    case WM_CHAR:
+        if (wParam==VK_RETURN && !editbox::editBoxShifts) {
+            PostMessage(GetParent(hWnd), WM_COMMAND, IDS_SEND, 0);
+            return 0;
+        }
+        break;
+    } 
+    return CallWindowProc(OldWndProc,hWnd,msg,wParam,lParam); 
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 HWND WINAPI DoCreateEditControl(HWND hwndParent) {
 
@@ -40,6 +72,10 @@ HWND WINAPI DoCreateEditControl(HWND hwndParent) {
         | ES_MULTILINE , 
         0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
         hwndParent, NULL, g_hInst, NULL); 
+
+    WNDPROC OldEditWndProc = (WNDPROC)SetWindowLong(hWndEdit, GWL_WNDPROC,  (LONG)EditSubClassProc); 
+    SetWindowLong(hWndEdit, GWL_USERDATA, (LONG)OldEditWndProc);
+
     return hWndEdit;
 }
 
@@ -123,6 +159,32 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
             break; 
         } 
+
+    case WM_LBUTTONDOWN:
+        {
+
+            SHRGINFO    shrg;
+            shrg.cbSize = sizeof(shrg);
+            shrg.hwndClient = hWnd;
+            shrg.ptDown.x = LOWORD(lParam);
+            shrg.ptDown.y = HIWORD(lParam);
+            shrg.dwFlags = SHRG_RETURNCMD /*| SHRG_NOANIMATION*/;
+
+            if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
+
+                /*HMENU hmenu = p->getContextMenu();
+                if (hmenu==NULL) break;
+
+                POINT pt={LOWORD(lParam), HIWORD(lParam) };
+                ClientToScreen(hWnd, &pt);
+                TrackPopupMenuEx(hmenu,
+                    TPM_TOPALIGN,
+                    pt.x, pt.y,
+                    hWnd,
+                    NULL);*/
+            }
+            break;
+        }
 
     case WM_COMMAND: 
         {

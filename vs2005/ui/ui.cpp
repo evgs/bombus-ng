@@ -91,27 +91,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_UI));
 
 	// Main message loop:
-    bool shifts=false;
-	while (GetMessage(&msg, NULL, 0, 0)) 
-	{
-		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) 
-		{
-            bool doTranslate=true;
-            if (msg.message==WM_KEYDOWN) {
-                if (msg.wParam==VK_RETURN && !shifts) {
-                    doTranslate=false;
-                    PostMessage(GetParent(msg.hwnd), WM_COMMAND, IDS_SEND, 0);
-                }
-                if (msg.wParam==VK_CONTROL) shifts=true;
-                if (msg.wParam==VK_SHIFT) shifts=true;
-            }
-            if (msg.message==WM_KEYUP) {   shifts=false;  }
-
-            if (doTranslate) 
-                TranslateMessage(&msg);
+	while (GetMessage(&msg, NULL, 0, 0)) {
+		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
+            TranslateMessage(&msg);
             DispatchMessage(&msg);
-            
-
 		}
 	}
     Shell_NotifyIcon(false, NULL);
@@ -520,7 +503,7 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
     
     rc->jabberStream->sendStanza(presence);
 
-    /*presence.setAttribute("to","devel@conference.jabber.ru/bng");
+    /*presence.setAttribute("to","devil@conference.jabber.ru/evgs-bng");
     rc->jabberStream->sendStanza(presence);*/
 
 	return LAST_BLOCK_PROCESSED;

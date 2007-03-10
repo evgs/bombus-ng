@@ -130,6 +130,8 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                     pt.x, pt.y,
                     hWnd,
                     NULL);
+
+                DestroyMenu(hmenu);
             }
             break;
 
@@ -220,8 +222,6 @@ TabsCtrl::TabsCtrl( HWND parent ) {
     makeTabLayout=false;
     xOffset=0;
     activeTab=-1;
-
-    hmenu=NULL;
 }
 
 
@@ -357,10 +357,8 @@ ATOM TabsCtrl::windowClass=0;
 
 
 HMENU TabsCtrl::getContextMenu() {
-    if (hmenu!=NULL) releaseContextMenu();
-    //if (!cursorPos) return NULL;
 
-    hmenu=CreatePopupMenu();
+    HMENU hmenu=CreatePopupMenu();
     AppendMenu(hmenu, MF_STRING, TabsCtrl::CLOSETAB, TEXT("Close"));
     AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
     int index=TabsCtrl::TAB_BEGIN_INDEX;
@@ -380,7 +378,3 @@ HMENU TabsCtrl::getContextMenu() {
     return hmenu;
 }
 
-void TabsCtrl::releaseContextMenu() {
-    if (hmenu!=NULL) DestroyMenu(hmenu);
-    hmenu=NULL;
-}

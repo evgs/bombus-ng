@@ -268,7 +268,6 @@ RosterView::RosterView( HWND parent, const std::string & title ){
     odrlist=ODRListRef(new ODRList());
 
     ////
-    hmenu=NULL;
 }
 
 RosterView::~RosterView() {}
@@ -285,10 +284,9 @@ void RosterView::eventOk() {
 }
 
 HMENU RosterView::getContextMenu() {
-    if (hmenu!=NULL) releaseContextMenu();
     if (!cursorPos) return NULL;
 
-    hmenu=CreatePopupMenu();
+    HMENU hmenu=CreatePopupMenu();
 
     //////////////////////////////////////////////////////////////////////////
     // Group actions
@@ -340,10 +338,6 @@ HMENU RosterView::getContextMenu() {
     return hmenu;
 }
 
-void RosterView::releaseContextMenu() {
-    if (hmenu!=NULL) DestroyMenu(hmenu);
-    hmenu=NULL;
-}
 void RosterView::OnCommand( int cmdId, LONG lParam ) {
     Contact::ref focusedContact = boost::dynamic_pointer_cast<Contact>(cursorPos); // <<< Yes, I did it :))
     if (focusedContact) {

@@ -677,7 +677,7 @@ int prepareAccount(){
 }
 //////////////////////////////////////////////////////////////
 int initJabber() {
-    if (rc->jabberStream) return 0;
+    if (rc->jabberStream) return 1;
     rc->jabberStanzaDispatcherRT=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
     rc->jabberStanzaDispatcher2=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 
@@ -692,6 +692,7 @@ int initJabber() {
 }
 //////////////////////////////////////////////////////////////////////////
 void streamShutdown(){
+    if (!rc->jabberStream) return;
     rc->jabberStream->sendXmppEndHeader();
 }
 

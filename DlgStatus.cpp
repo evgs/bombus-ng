@@ -16,7 +16,7 @@
 #include "utf8.hpp"
 
 
-INT_PTR CALLBACK DlgStatus(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK DlgStatusWndProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -87,6 +87,6 @@ INT_PTR CALLBACK DlgStatus(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam
 
 void DialogStatus(HINSTANCE g_hInst, HWND parent, ResourceContextRef rc) {
     /*dlgAccountParam=accnt;*/
-    DialogBox(g_hInst, (LPCTSTR)IDD_STATUS, parent, DlgStatus);
+    DialogBoxParam(g_hInst, (LPCTSTR)IDD_STATUS, parent, DlgStatusWndProc, NULL);
 }
 

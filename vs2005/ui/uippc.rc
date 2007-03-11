@@ -33,8 +33,6 @@ BEGIN
     POPUP "Jabber"
     BEGIN
         MENUITEM "Status",                      IDM_JABBER_STATUS
-        MENUITEM "ONLINE",                      IDM_JABBER_ONLINE
-        MENUITEM "OFFLINE",                     IDM_JABBER_OFFLINE
         MENUITEM "stream info",                 IDM_JABBER_STREAMINFO
         MENUITEM "Account",                     IDM_JABBER_ACCOUNT
         MENUITEM "Exit",                        IDM_EXIT

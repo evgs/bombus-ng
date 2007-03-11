@@ -258,13 +258,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 case IDM_JABBER_STATUS:
                     DlgStatus::createDialog(hWnd, rc);
                     break;
-				case IDM_JABBER_ONLINE:
+
+				/*case IDM_JABBER_ONLINE:
 					initJabber();
 					break;
 
                 case IDM_JABBER_OFFLINE:
                     streamShutdown();
-                    break;
+                    break;*/
 
 				case IDM_JABBER_STREAMINFO:
                     Log::getInstance()->msg(
@@ -603,6 +604,7 @@ void JabberStreamEvents::beginConversation(JabberDataBlockRef streamHeader){
 void JabberStreamEvents::endConversation(const std::exception *ex){
     if (ex!=NULL)  Log::getInstance()->msg(ex->what());
     Log::getInstance()->msg("End Conversation");
+    rosterWnd->setIcon(presence::OFFLINE);
 }
 
 void JabberStreamEvents::loginSuccess(){
@@ -626,6 +628,7 @@ void JabberStreamEvents::loginSuccess(){
 void JabberStreamEvents::loginFailed(const char * errMsg){
     Log::getInstance()->msg("Login failed: ", errMsg);
     rc->jabberStream->sendXmppEndHeader();
+    rosterWnd->setIcon(icons::ICON_ERROR_INDEX);
 }
 
 bool JabberStreamEvents::connect(){

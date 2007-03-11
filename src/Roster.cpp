@@ -263,7 +263,7 @@ RosterView::RosterView( HWND parent, const std::string & title ){
 
     this->title=utf8::utf8_wchar(title);
 
-    wt=WndTitleRef(new WndTitle(this, 0));
+    wt=WndTitleRef(new WndTitle(this, presence::OFFLINE));
     cursorPos=ODRRef();//odrlist->front();
     odrlist=ODRListRef(new ODRList());
 
@@ -375,4 +375,8 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
 void RosterView::showWindow( bool show ) {
     Wnd::showWindow(show);
     if (show) SetFocus(getHWnd());
+}
+void RosterView::setIcon( int iconIndex ) {
+    wt->setIcon(iconIndex);
+    InvalidateRect(tabs->getHWnd(), NULL, false);
 }

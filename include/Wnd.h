@@ -37,6 +37,8 @@ public:
     virtual const wchar_t * getText() const;
     virtual int getIconIndex() const;
 
+    void setIcon(int index) {iconIndex=index;}
+
 private:
     int iconIndex;
     Wnd *wnd;

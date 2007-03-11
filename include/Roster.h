@@ -97,6 +97,8 @@ public:
 
     virtual void showWindow(bool show);
 
+    void setIcon(int iconIndex);
+
     enum actions {
         OPENCHAT=50000,
         LOGON, LOGOFF, RESOLVENICKNAMES,

@@ -256,7 +256,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
 
                 case IDM_JABBER_STATUS:
-                    DialogStatus(g_hInst, hWnd, rc);
+                    DlgStatus::createDialog(hWnd, rc);
                     break;
 				case IDM_JABBER_ONLINE:
 					initJabber();
@@ -301,7 +301,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             rosterWnd=RosterView::ref(new RosterView(tabs->getHWnd(), std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
-            chatSample=ChatView::ref(new ChatView(tabs->getHWnd(), Contact::ref(new Contact("test@server","resource",""))));
+            //chatSample=ChatView::ref(new ChatView(tabs->getHWnd(), Contact::ref(new Contact("test@server","resource",""))));
             //tabs->addWindow(chatSample);
             //logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
             //tabs->addWindow(logWnd);
@@ -492,16 +492,8 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 
     rc->jabberStanzaDispatcherRT->addListener(rc->roster);
 
-
-	JabberDataBlock presence("presence");
-	presence.addChild("status", 
-		"please, don't send any messages here! \n"
-		"they will be dropped because it is debug version" );
-
-    presence.addChild(EntityCaps::presenceEntityCaps());
-    //c->setAttribute("ext", "none");
-    
-    rc->jabberStream->sendStanza(presence);
+    rosterWnd->setIcon(rc->status);
+    rc->sendPresence();
 
     /*presence.setAttribute("to","devil@conference.jabber.ru/evgs-bng");
     rc->jabberStream->sendStanza(presence);*/
@@ -684,6 +676,7 @@ int initJabber() {
     //TODO: roster caching
     rc->roster=RosterRef(new Roster());
     rc->roster->bindWindow(rosterWnd);
+    rosterWnd->setIcon(icons::ICON_PROGRESS_INDEX);
     rosterWnd->roster=rc->roster;
 
     rc->jabberStream=JabberStreamRef(new JabberStream(rc, JabberListenerRef(new JabberStreamEvents(rc))));

@@ -10,18 +10,36 @@
 #include "DlgStatus.h"
 #include "DlgUtils.h"
 
+#include "JabberDataBlockListener.h"
+#include "Roster.h"
+
 #include "..\vs2005\ui\resourceppc.h"
 
 
 #include "utf8.hpp"
 
+extern HINSTANCE	g_hInst;			// current instance
+extern RosterView::ref rosterWnd;
 
-INT_PTR CALLBACK DlgStatusWndProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
+
+void streamShutdown();
+int initJabber();
+
+wchar_t *statusNames []= { 
+    TEXT("Online"),         TEXT("Free for chat"),  TEXT("Away"), 
+    TEXT("Extended Away"),  TEXT("DND"),            TEXT("Offline") 
+};
+
+
+INT_PTR CALLBACK DlgStatus::dialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+    DlgStatus *p=(DlgStatus *) GetWindowLong(hDlg, GWL_USERDATA);
+
+	switch (message) {
+
 	case WM_INITDIALOG:
 		{
+            p=(DlgStatus *) lParam;
+            SetWindowLong(hDlg, GWL_USERDATA, (LONG) p );
 			// Create a Done button and size it.  
 			SHINITDLGINFO shidi;
 			shidi.dwMask = SHIDIM_FLAGS;
@@ -29,13 +47,15 @@ INT_PTR CALLBACK DlgStatusWndProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 			shidi.hDlg = hDlg;
 			SHInitDialog(&shidi);
 
-            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) TEXT("Online"));
-            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) TEXT("Free for chat"));
-            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) TEXT("Away"));
-            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) TEXT("Extended Away"));
-            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) TEXT("DND"));
-            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) TEXT("Invisible"));
-            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) TEXT("Offline"));
+            for (int i=0; i<6; i++)
+                SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) statusNames[i]);
+            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_SETCURSEL, p->rc->status, 0);
+
+            SetDlgItemText(hDlg, IDC_E_STATUS, p->rc->presenceMessage);
+
+            SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_SETRANGE32, -128, 128);
+            SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_SETPOS, 0, p->rc->priority);
+
             /*SetDlgItemText(hDlg, IDC_E_JID, dlgAccountParam->getBareJid());
             SetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
             SetDlgItemText(hDlg, IDC_E_RESOURCE, dlgAccountParam->getResource());
@@ -52,6 +72,23 @@ INT_PTR CALLBACK DlgStatusWndProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK)
 		{
+
+            presence::PresenceIndex status=(presence::PresenceIndex) SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_GETCURSEL, 0,0);
+            p->rc->status=status;
+            GetDlgItemText(hDlg, IDC_E_STATUS, p->rc->presenceMessage);
+
+            p->rc->priority=SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_GETPOS, 0, 0);
+
+            //TODO: direct presences
+
+            // Broadcast presence
+            rosterWnd->setIcon(p->rc->status);
+            p->rc->sendPresence();
+            if (status==presence::OFFLINE) {
+                streamShutdown();
+            } else {
+                initJabber();
+            }
             /*
             dlgAccountParam->setBareJid(GetDlgItemText(hDlg, IDC_E_JID));
             GetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
@@ -69,24 +106,31 @@ INT_PTR CALLBACK DlgStatusWndProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
             */
 
 			EndDialog(hDlg, LOWORD(wParam));
+            delete p;
 			return TRUE;
 		}
 		if (LOWORD(wParam) == IDCANCEL)
 		{
 			EndDialog(hDlg, LOWORD(wParam));
+            delete p;
 			return TRUE;
 		}
 		break;
 
 	case WM_CLOSE:
 		EndDialog(hDlg, message);
+        delete p;
 		return TRUE;
 	}
 	return (INT_PTR)FALSE;
 }
 
-void DialogStatus(HINSTANCE g_hInst, HWND parent, ResourceContextRef rc) {
+void DlgStatus::createDialog(HWND parent, ResourceContextRef rc) {
     /*dlgAccountParam=accnt;*/
-    DialogBoxParam(g_hInst, (LPCTSTR)IDD_STATUS, parent, DlgStatusWndProc, NULL);
+    DlgStatus *p=new DlgStatus();
+    p->parent=parent;
+    p->rc=rc;
+
+    DialogBoxParam(g_hInst, (LPCTSTR)IDD_STATUS, parent, dialogProc, (LPARAM)p);
 }
 

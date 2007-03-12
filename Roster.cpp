@@ -320,7 +320,7 @@ HMENU RosterView::getContextMenu() {
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
         if (type==RosterGroup::ROSTER) {
-            AppendMenu(hmenu, MF_STRING, RosterView::EDITCONTACT,          TEXT("Edit contact"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::EDITCONTACT,          TEXT("Edit contact"));
             AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::SUBSCR,               TEXT("Subscription"));
         }
 
@@ -342,7 +342,9 @@ HMENU RosterView::getContextMenu() {
 }
 
 void RosterView::OnCommand( int cmdId, LONG lParam ) {
-    Contact::ref focusedContact = boost::dynamic_pointer_cast<Contact>(cursorPos); // <<< Yes, I did it :))
+    Contact::ref focusedContact = boost::dynamic_pointer_cast<Contact>(cursorPos);
+    ResourceContextRef rc=roster.lock()->rc;
+
     if (focusedContact) {
     switch (cmdId) {
         case RosterView::OPENCHAT: 
@@ -356,8 +358,16 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 tabs->switchByWndRef(chat);
                 break;
             }
+
         case RosterView::LOGON: 
+            //
         case RosterView::LOGOFF: 
+            rc->sendPresence(
+                focusedContact->jid.getJid().c_str(), 
+                (cmdId==RosterView::LOGON)? presence::ONLINE: presence::OFFLINE, 
+                rc->presenceMessage, rc->priority );
+            break;
+
         case RosterView::RESOLVENICKNAMES:
         case RosterView::VCARD: 
         case RosterView::CLIENTINFO: 

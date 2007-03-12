@@ -17,10 +17,13 @@
 #include "TabCtrl.h"
 #include "ChatView.h"
 
+#include "DlgStatus.h"
+
 extern TabsCtrlRef tabs;
 
-Roster::Roster(){
+Roster::Roster(ResourceContextRef rc){
     roster=VirtualListView::ref();
+    this->rc=rc;
     createGroup("Self-Contact", RosterGroup::SELF_CONTACT);
     createGroup("Transports", RosterGroup::TRANSPORTS);
     createGroup("Not-In-List", RosterGroup::NOT_IN_LIST);
@@ -293,7 +296,7 @@ HMENU RosterView::getContextMenu() {
     RosterGroup *rg = dynamic_cast<RosterGroup *>(cursorPos.get());
     if (rg) {
         if (rg->type==RosterGroup::ROSTER)
-            AppendMenu(hmenu, MF_STRING , RosterView::RENAMEGRP,           TEXT("Rename"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::RENAMEGRP,           TEXT("Rename"));
     }
 
     Contact * c = dynamic_cast<Contact *>(cursorPos.get());
@@ -303,35 +306,35 @@ HMENU RosterView::getContextMenu() {
         if (type==RosterGroup::TRANSPORTS) {
             AppendMenu(hmenu, MF_STRING, RosterView::LOGON,                TEXT("Logon"));
             AppendMenu(hmenu, MF_STRING, RosterView::LOGOFF,               TEXT("Logoff"));
-            AppendMenu(hmenu, MF_STRING, RosterView::RESOLVENICKNAMES,     TEXT("Resolve Nicknames"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::RESOLVENICKNAMES,     TEXT("Resolve Nicknames"));
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
         }
         AppendMenu(hmenu, MF_STRING , RosterView::OPENCHAT,                TEXT("Open chat"));
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
-        AppendMenu(hmenu, MF_STRING, RosterView::VCARD,                    TEXT("VCard"));
-        AppendMenu(hmenu, MF_STRING, RosterView::CLIENTINFO,               TEXT("Client Info"));
-        AppendMenu(hmenu, MF_STRING, RosterView::COMMANDS,                 TEXT("Commands"));
+        AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::VCARD,                    TEXT("VCard"));
+        AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::CLIENTINFO,               TEXT("Client Info"));
+        AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::COMMANDS,                 TEXT("Commands"));
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
         if (type==RosterGroup::ROSTER) {
             AppendMenu(hmenu, MF_STRING, RosterView::EDITCONTACT,          TEXT("Edit contact"));
-            AppendMenu(hmenu, MF_STRING, RosterView::SUBSCR,               TEXT("Subscription"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::SUBSCR,               TEXT("Subscription"));
         }
 
         if (type==RosterGroup::NOT_IN_LIST)
-            AppendMenu(hmenu, MF_STRING, RosterView::ADDCONTACT,           TEXT("Add contact"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::ADDCONTACT,           TEXT("Add contact"));
 
-        AppendMenu(hmenu, MF_STRING, RosterView::DELETECONTACT,            TEXT("Delete"));
+        AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::DELETECONTACT,            TEXT("Delete"));
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
         AppendMenu(hmenu, MF_STRING, RosterView::SENDSTATUS,               TEXT("Send status"));
         if (type!=RosterGroup::TRANSPORTS) {
-            AppendMenu(hmenu, MF_STRING, RosterView::SENDFILE,             TEXT("Send file"));
-            AppendMenu(hmenu, MF_STRING, RosterView::INVITE,               TEXT("Invite"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::SENDFILE,             TEXT("Send file"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::INVITE,               TEXT("Invite"));
         }
     }
 
@@ -364,6 +367,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
         case RosterView::ADDCONTACT:
         case RosterView::DELETECONTACT:
         case RosterView::SENDSTATUS:
+            DlgStatus::createDialog(getHWnd(), roster.lock()->rc, focusedContact); break;
         case RosterView::SENDFILE: 
         case RosterView::INVITE:
         //case RosterView::RENAMEGRP:

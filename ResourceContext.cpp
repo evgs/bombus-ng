@@ -15,10 +15,13 @@ char *statusVals []= {
 };
 
 
-void ResourceContext::sendPresence( presence::PresenceIndex status, std::string &message, int priority ) {
+void ResourceContext::sendPresence(const char *to, presence::PresenceIndex status, const std::string &message, int priority) {
     if (!isLoggedIn()) return;
 
     JabberDataBlock presenceStanza("presence");
+
+    if (to) presenceStanza.setAttribute("to",to);
+
     switch (status) {
     case presence::OFFLINE:
         presenceStanza.setAttribute("type", "unavailable"); break;

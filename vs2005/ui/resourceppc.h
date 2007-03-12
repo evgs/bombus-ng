@@ -4,6 +4,9 @@
 //
 #define IDS_APP_TITLE                   1
 #define IDC_UI                          2
+#define ID_VCARD                        3
+#define ID_VCARD2                       4
+#define ID_VCARD_NICK                   4
 #define IDS_JABBER                      101
 #define IDR_MENU                        102
 #define IDS_WINDOWS                     102
@@ -16,6 +19,7 @@
 #define IDS_VERSION                     108
 #define IDD_DIRECT_PRESENCE             108
 #define IDS_REVDATE                     109
+#define IDD_ADD_CONTACT                 109
 #define IDM_SEND                        110
 #define IDI_BOMBUS                      130
 #define IDC_STATIC_2                    202
@@ -41,6 +45,7 @@
 #define IDC_SPIN_PRIORITY               1021
 #define IDC_EDIT1                       1022
 #define IDC_JID                         1022
+#define IDC_EDIT2                       1023
 #define IDM_JABBER_ONLINE               32772
 #define IDM_JABBER                      32775
 #define IDM_JABBER_STREAMINFO           32777

@@ -13,6 +13,8 @@ public:
 	virtual int read(char * buf, int len);
 	virtual int write(const char * buf, int len);
 	virtual const std::string getStatistics();
+
+    virtual void close();
 	//int write(const StringRef buf);
 	//int write(std::string &buf);
 

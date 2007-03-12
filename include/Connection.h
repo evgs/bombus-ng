@@ -11,6 +11,8 @@ public:
 
 	virtual const std::string getStatistics()=0;
 
+    virtual void close()=0;
+
 	virtual int write(const StringRef buf);
 	virtual int write(std::string &buf);
 };

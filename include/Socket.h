@@ -14,6 +14,8 @@ public:
 	//int write(const StringRef buf);
 	//int write(std::string &buf);
 
+    virtual void close();
+
     SOCKET getSocket(){ return sock; }
 
 protected:

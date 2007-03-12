@@ -61,7 +61,7 @@ void JabberAccount::serialize( Serialize &s, bool read )
     // login settings
     s.streamBool(plainTextPassword);
     s.streamBool(useSASL);
-    s.streamBool(useEncryption);
+    s.streamBool(useEncryption); useEncryption=false;
     s.streamBool(legacySSL);
     s.streamBool(useCompression);
 

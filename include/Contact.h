@@ -28,6 +28,7 @@ public:
     std::string subscr;
 
     presence::PresenceIndex status;
+    int offlineIcon;
 
     ODRListRef messageList;
 

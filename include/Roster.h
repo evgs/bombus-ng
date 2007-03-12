@@ -47,7 +47,7 @@ private:
 class Roster : public JabberDataBlockListener{
 private:
     typedef std::map<std::string, Contact::ref> ContactMap;
-    typedef std::list<Contact::ref> ContactList;
+    typedef std::vector<Contact::ref> ContactList;
 
     typedef std::vector<RosterGroup::ref> GroupList;
 

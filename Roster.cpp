@@ -74,33 +74,56 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
             group="Transports";
 
         std::string subscr=item->getAttribute("subscription");
-        if (item->hasAttribute("ask")) {
+        
+        int offlineIcon=presence::OFFLINE;
+        if (item->hasAttribute("ask")) if (subscr!="remove"){
             subscr+=',';
             subscr+="ask";
+            offlineIcon=presence::ASK;
         }
 
-        //todo: разное поведение для roster request и roster push
-        //при push модифицировать ВСЕ экземпляры по bareJid
-        Contact::ref contact;
-        if (rosterPush) {
-            contact=findContact(jid);
-        } 
-        if (contact==NULL) { 
-            contact=Contact::ref(new Contact(jid, "", name));
-            //std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
-            //roster->addODR(contact, (i==query->getChilds()->end()));
-        }   
         if (!findGroup(group)) {
             createGroup(group, RosterGroup::ROSTER);
             std::stable_sort(groups.begin(), groups.end(), RosterGroup::compare );
         }
 
-        contact->subscr=subscr;
-        contact->group=group;
+        //при push модифицировать ВСЕ экземпляры по bareJid
+        Contact::ref contact;
+        if (rosterPush) {
+            int i=0;
+            while (i!=contacts.size()) {
+                Contact::ref right=contacts[i];
+                if (right->rosterJid==jid) {
+                    if (subscr=="remove") {
+                        contacts.erase(contacts.begin()+i);
+                        //todo: bareJidMap[contact->jid.getBareJid()]=contact; // now it is null
+                        continue;
+                    } else {
+                        right->subscr=subscr;
+                        right->nickname=name;
+                        right->group=group;
+                        right->offlineIcon=offlineIcon;
+                        right->update();
+                    }
 
-        bareJidMap[contact->jid.getBareJid()]=contact;
-        contacts.push_back(contact);
-        //todo: subscription=remove
+                }
+                i++;
+            }
+            //contact=findContact(jid);
+        } else {
+            if (contact==NULL) { 
+                contact=Contact::ref(new Contact(jid, "", name));
+                //std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
+                //roster->addODR(contact, (i==query->getChilds()->end()));
+            }   
+
+            contact->subscr=subscr;
+            contact->group=group;
+            contact->offlineIcon=offlineIcon;
+
+            bareJidMap[contact->jid.getBareJid()]=contact;
+            contacts.push_back(contact);
+        }
     }
     //std::stable_sort(contacts.begin(), contacts.end(), Contact::compare);
     makeViewList();
@@ -143,6 +166,7 @@ void Roster::processPresence( JabberDataBlockRef block ) {
     Contact::ref contact=getContactEntry(from);
 
     contact->status=typeIndex;
+    if (type2!=presence::NOCHANGE) contact->offlineIcon=type2;
     contact->update();
     makeViewList();
 }
@@ -173,6 +197,7 @@ Contact::ref Roster::getContactEntry(const std::string & from){
                 std::string group="Not-In-List";
 
                 contact->subscr="NIL";
+                contact->offlineIcon=presence::ASK;
                 contact->group=group;
                 //bareJidMap[contact->jid.getBareJid()]=contact;
                 contacts.push_back(contact);

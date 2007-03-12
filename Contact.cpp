@@ -24,6 +24,7 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     this->rosterJid=jid;
     this->nickname=nickname;
     this->status=presence::OFFLINE;
+    offlineIcon=presence::OFFLINE;
 
     nUnread=0;
 
@@ -37,6 +38,7 @@ Contact::ref Contact::clone() {
     Contact::ref c=Contact::ref(new Contact(jid.getBareJid(), jid.getResource(), nickname));
     c->subscr=subscr;
     c->group=group;
+    c->offlineIcon=offlineIcon;
     return c;
 }
 
@@ -54,7 +56,9 @@ Contact::ref Contact::clone() {
 int Contact::getColor() const{ return 0; }
 int Contact::getIconIndex() const{ 
     if (nUnread>0) return icons::ICON_MESSAGE_INDEX;
-    return status+transpIndex; 
+    int icon=(status==presence::OFFLINE)? offlineIcon: status;
+    if (icon<=presence::OFFLINE) return icon+transpIndex; 
+    return icon;
 }
 
 const wchar_t * Contact::getText() const{ return wjid.c_str(); }

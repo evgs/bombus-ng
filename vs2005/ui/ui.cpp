@@ -677,7 +677,7 @@ int initJabber() {
     rc->jabberStanzaDispatcher2=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 
     //TODO: roster caching
-    rc->roster=RosterRef(new Roster());
+    rc->roster=RosterRef(new Roster(rc));
     rc->roster->bindWindow(rosterWnd);
     rosterWnd->setIcon(icons::ICON_PROGRESS_INDEX);
     rosterWnd->roster=rc->roster;

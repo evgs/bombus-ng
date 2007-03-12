@@ -51,6 +51,8 @@ INT_PTR CALLBACK DlgStatus::dialogProc(HWND hDlg, UINT message, WPARAM wParam, L
                 SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) statusNames[i]);
             SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_SETCURSEL, p->rc->status, 0);
 
+            if (p->contact) SetDlgItemText(hDlg, IDC_E_JID, p->contact->jid.getJid());
+
             SetDlgItemText(hDlg, IDC_E_STATUS, p->rc->presenceMessage);
 
             SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_SETRANGE32, -128, 128);
@@ -74,21 +76,31 @@ INT_PTR CALLBACK DlgStatus::dialogProc(HWND hDlg, UINT message, WPARAM wParam, L
 		{
 
             presence::PresenceIndex status=(presence::PresenceIndex) SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_GETCURSEL, 0,0);
-            p->rc->status=status;
-            GetDlgItemText(hDlg, IDC_E_STATUS, p->rc->presenceMessage);
-
-            p->rc->priority=SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_GETPOS, 0, 0);
-
+            int priority=SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_GETPOS, 0, 0);
+            std::string pmessage;
+            GetDlgItemText(hDlg, IDC_E_STATUS, pmessage);
+            
             //TODO: direct presences
-
-            // Broadcast presence
-            rosterWnd->setIcon(p->rc->status);
-            p->rc->sendPresence();
-            if (status==presence::OFFLINE) {
-                streamShutdown();
+            if (p->contact) {
+                std::string to;
+                GetDlgItemText(hDlg, IDC_E_JID, to);
+                p->rc->sendPresence(to.c_str(), status, pmessage, priority);
             } else {
-                initJabber();
+                //store selected presence
+                p->rc->status=status;
+                p->rc->presenceMessage=pmessage;
+                p->rc->priority=priority;
+
+                // Broadcast presence
+                rosterWnd->setIcon(p->rc->status);
+                p->rc->sendPresence();
+                if (status==presence::OFFLINE) {
+                    streamShutdown();
+                } else {
+                    initJabber();
+                }
             }
+
             /*
             dlgAccountParam->setBareJid(GetDlgItemText(hDlg, IDC_E_JID));
             GetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
@@ -126,11 +138,16 @@ INT_PTR CALLBACK DlgStatus::dialogProc(HWND hDlg, UINT message, WPARAM wParam, L
 }
 
 void DlgStatus::createDialog(HWND parent, ResourceContextRef rc) {
+    createDialog(parent, rc, Contact::ref());
+}
+
+void DlgStatus::createDialog( HWND parent, ResourceContextRef rc, Contact::ref contact ) {
     /*dlgAccountParam=accnt;*/
     DlgStatus *p=new DlgStatus();
     p->parent=parent;
     p->rc=rc;
+    p->contact=contact;
 
-    DialogBoxParam(g_hInst, (LPCTSTR)IDD_STATUS, parent, dialogProc, (LPARAM)p);
+    DialogBoxParam(g_hInst, 
+        (contact)? (LPCTSTR)IDD_DIRECT_PRESENCE : (LPCTSTR)IDD_STATUS, parent, dialogProc, (LPARAM)p);
 }
-

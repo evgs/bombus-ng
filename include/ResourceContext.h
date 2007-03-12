@@ -33,8 +33,8 @@ public:
 
     bool isLoggedIn() { return jabberStream; }
 
-    void sendPresence() { sendPresence(status, presenceMessage, priority); }
-    void sendPresence(presence::PresenceIndex status, std::string &message, int priority);
+    void sendPresence() { sendPresence(NULL, status, presenceMessage, priority); }
+    void sendPresence(const char *to, presence::PresenceIndex status, const std::string &message, int priority);
 };
 
 typedef boost::shared_ptr <ResourceContext> ResourceContextRef;

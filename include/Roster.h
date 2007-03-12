@@ -56,7 +56,7 @@ private:
     GroupList groups;
 
 public:
-    Roster();
+    Roster(ResourceContextRef rc);
 
     //void addContact(Contact::ref contact);
     Contact::ref findContact (const std::string &jid) const;
@@ -76,6 +76,7 @@ public:
     void processPresence(JabberDataBlockRef block);
     typedef boost::shared_ptr<Roster> ref;
 
+    ResourceContextRef rc;
 private:
     VirtualListView::ref roster;
 

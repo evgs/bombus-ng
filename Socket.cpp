@@ -14,7 +14,7 @@ static int wsCount=0;
 
 
 Socket::~Socket(void){
-	closesocket(sock);
+	close();
 	wsCount--;
 	if (wsCount==0) WSACleanup();
 }
@@ -66,6 +66,7 @@ int Socket::write(const char * buf, int len) {
 	//for (int i=0; i<len; i++)	std::cout << buf[i];
 	//std::cout<<"("<<len<<")"<<std::endl;
 	int sb=send(sock, buf, len, 0);
+    if (sb==SOCKET_ERROR) throwSocketError();
 	bytesSent+=sb;
 	return sb;
 }
@@ -103,6 +104,10 @@ long Socket::resolveUrl() {
     if (host!=NULL) return  *((unsigned long *)host->h_addr_list[0]);
     throwSocketError();
     return NULL;
+}
+
+void Socket::close() {
+    closesocket(sock);
 }
 
 const char * errorWSAText(int code) {

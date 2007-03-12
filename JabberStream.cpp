@@ -105,11 +105,21 @@ JabberStream::~JabberStream(void){
 }
 
 void JabberStream::sendStanza(JabberDataBlockRef stanza){
-	connection->write( stanza->toXML() );
+    try {
+	    connection->write( stanza->toXML() );
+    } catch (std::exception ex) {
+        jabberListener->endConversation(&ex);
+        connection->close();
+    }
 }
 
 void JabberStream::sendStanza(JabberDataBlock &stanza){
-	connection->write( stanza.toXML() );
+    try {
+	    connection->write( stanza.toXML() );
+    } catch (std::exception ex) {
+        jabberListener->endConversation(&ex);
+        connection->close();
+    }
 }
 
 void JabberStream::sendXmlVersion(void){

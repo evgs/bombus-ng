@@ -93,3 +93,5 @@ int CompressedSocket::write(const char *buf, int len){
 	BOOST_ASSERT(ostr.avail_in == 0);
 	return len;
 }
+
+void CompressedSocket::close(){}

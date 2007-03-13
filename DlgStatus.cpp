@@ -80,7 +80,7 @@ INT_PTR CALLBACK DlgStatus::dialogProc(HWND hDlg, UINT message, WPARAM wParam, L
             std::string pmessage;
             GetDlgItemText(hDlg, IDC_E_STATUS, pmessage);
             
-            //TODO: direct presences
+            //direct presences
             if (p->contact) {
                 std::string to;
                 GetDlgItemText(hDlg, IDC_E_JID, to);

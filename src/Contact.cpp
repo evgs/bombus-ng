@@ -57,7 +57,7 @@ int Contact::getColor() const{ return 0; }
 int Contact::getIconIndex() const{ 
     if (nUnread>0) return icons::ICON_MESSAGE_INDEX;
     int icon=(status==presence::OFFLINE)? offlineIcon: status;
-    if (icon<=presence::OFFLINE) return icon+transpIndex; 
+    if (icon<=presence::UNKNOWN) return icon+transpIndex; 
     return icon;
 }
 

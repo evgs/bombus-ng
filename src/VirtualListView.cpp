@@ -151,7 +151,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
     case WM_LBUTTONDOWN:
         {
             SetFocus(hWnd);
-            if (!(p->moveCursorTo(LOWORD(lParam), HIWORD(lParam)))) break;
+            if (!(p->moveCursorTo(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))) break;
             InvalidateRect(p->getHWnd(), NULL, true);
 
             SHRGINFO    shrg;

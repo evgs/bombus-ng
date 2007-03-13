@@ -82,6 +82,8 @@ enum IconDef {
 
     ICON_PROFILE_INDEX = 0x30,
 
+    ICON_CLOSE = 0x35,
+
     ICON_PRIVACY_ALLOW = 0x36,
 
     ICON_PRIVACY_BLOCK = 0x37,

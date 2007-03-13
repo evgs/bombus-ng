@@ -21,6 +21,11 @@ public:
     WndRef getWindowByODR(ODRRef const &title);
 
     void fwdWMCommand(int wmId);
+
+    enum WmCommands {
+        CLOSETAB=41000
+    };
+
 protected:
     HWND tabScrollHWnd;
 
@@ -43,14 +48,13 @@ protected:
 
     HMENU getContextMenu();
 
-private:
 
     enum actions {
-        CLOSETAB=41000,
         TAB_BEGIN_INDEX=40000,
         TAB_END_INDEX=40200
     };
 
+private:
 
     static ATOM windowClass;
     ATOM RegisterWindowClass();

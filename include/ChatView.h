@@ -35,6 +35,7 @@ protected:
     VirtualListView::ref msgList;
     HWND		editWnd;
     int editHeight;
+    int width;
 
     Contact::ref contact;
 

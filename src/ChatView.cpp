@@ -6,11 +6,14 @@
 
 #include "ResourceContext.h"
 #include "JabberStream.h"
+#include "TabCtrl.h"
 
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern HWND	g_hWndMenuBar;		// menu bar handle
 extern ResourceContextRef rc;
+extern ImgListRef skin;
+
 //////////////////////////////////////////////////////////////////////////
 ATOM ChatView::RegisterWindowClass() {
     WNDCLASS wc;
@@ -151,16 +154,20 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
         {
             //p->contact->nUnread=0;
-            RECT rc = {0, 0, tabHeight, 100};
+            RECT rc = {0, 0, 200, tabHeight};
+            SetBkMode(hdc, TRANSPARENT);
+            SetTextColor(hdc, p->contact->getColor());
             p->contact->draw(hdc, rc);
+
+            skin->drawElement(hdc, icons::ICON_CLOSE, p->width-2-skin->getElementWidth(), 0);
+
+            
 
             /*SetBkMode(hdc, TRANSPARENT);
             LPCTSTR t=p->title.c_str();
             DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
             DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);*/
         }
-
-        // TODO: Add any drawing code here...
 
         EndPaint(hWnd, &ps);
         break;
@@ -171,6 +178,8 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             RECT rc; 
 
             int height=GET_Y_LPARAM(lParam);
+            p->width=GET_X_LPARAM(lParam);
+
             int ySplit=height-p->editHeight;
             // Calculate the display rectangle, assuming the 
             // tab control is the size of the client area. 
@@ -225,6 +234,14 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
         return (BOOL) GetStockObject(GRAY_BRUSH);
         break;
         }*/
+
+    case WM_LBUTTONDOWN:
+        SetFocus(hWnd);
+        if ((GET_Y_LPARAM(lParam))>tabHeight) break;
+        if (GET_X_LPARAM(lParam) > p->width-2-skin->getElementWidth()) {
+            PostMessage(GetParent(hWnd), WM_COMMAND, TabsCtrl::CLOSETAB, 0);
+        }
+        break;
 
     case WM_DESTROY:
         //TODO: Destroy all child data associated eith this window
@@ -304,7 +321,7 @@ void ChatView::sendJabberMessage() {
     int len=SendMessage(editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
     if (len==0) return;
     std::string body=utf8::wchar_utf8(buf);
-    //TODO: xml escaping
+
     Message::ref msg=Message::ref(new Message(body, "", Message::SENT));
     contact->messageList->push_back(msg);
     showWindow(true);

@@ -23,12 +23,14 @@
 
 extern TabsCtrlRef tabs;
 
+char *NIL="Not-In-List";
+
 Roster::Roster(ResourceContextRef rc){
     roster=VirtualListView::ref();
     this->rc=rc;
     createGroup("Self-Contact", RosterGroup::SELF_CONTACT);
     createGroup("Transports", RosterGroup::TRANSPORTS);
-    createGroup("Not-In-List", RosterGroup::NOT_IN_LIST);
+    createGroup(NIL, RosterGroup::NOT_IN_LIST);
 }
 
 /*void Roster::addContact(Contact::ref contact) {
@@ -196,11 +198,11 @@ Contact::ref Roster::getContactEntry(const std::string & from){
                 //finally - based on NOT-IN-LIST policy
                 contact=Contact::ref(new Contact(jid.getBareJid(), jid.getResource(), ""));
 
-                std::string group="Not-In-List";
+                //std::string group="Not-In-List";
 
                 contact->subscr="NIL";
                 contact->offlineIcon=presence::ASK;
-                contact->group=group;
+                contact->group=NIL;
                 //bareJidMap[contact->jid.getBareJid()]=contact;
                 contacts.push_back(contact);
             }

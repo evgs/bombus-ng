@@ -30,6 +30,9 @@ std::string GetDlgItemText(HWND hDlg, int itemId) {
 void SetDlgItemText(HWND hDlg, int itemId, const std::string &data) {
     ::SetDlgItemText(hDlg, itemId, utf8::utf8_wchar(data).c_str());
 }
+void AddComboString(HWND hDlg, int itemId, const std::string &data) {
+    SendDlgItemMessage(hDlg, itemId, CB_ADDSTRING, 0, (LPARAM) utf8::utf8_wchar(data).c_str());
+}
 
 INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {

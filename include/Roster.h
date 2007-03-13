@@ -7,6 +7,8 @@
 #include "Contact.h"
 #include "VirtualListView.h"
 
+#include "basetypes.h"
+
 //////////////////////////////////////////////////////////////////////////
 class RosterGroup: public IconTextElement {
 public:
@@ -29,6 +31,8 @@ public:
     
     static bool compare( RosterGroup::ref left, RosterGroup::ref right);
 
+    std::string & getName(){ return groupName; }
+
     Type type;
 
 protected:
@@ -40,6 +44,7 @@ private:
     std::string groupName;
     bool expanded;
 };
+
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -72,6 +77,8 @@ public:
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
     void bindWindow(VirtualListView::ref roster){ this->roster=roster; }
+
+    StringVectorRef getRosterGroups();
 
     void processPresence(JabberDataBlockRef block);
     typedef boost::shared_ptr<Roster> ref;

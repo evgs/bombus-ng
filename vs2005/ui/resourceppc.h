@@ -5,7 +5,6 @@
 #define IDS_APP_TITLE                   1
 #define IDC_UI                          2
 #define ID_VCARD                        3
-#define ID_VCARD2                       4
 #define ID_VCARD_NICK                   4
 #define IDS_JABBER                      101
 #define IDR_MENU                        102
@@ -45,7 +44,10 @@
 #define IDC_SPIN_PRIORITY               1021
 #define IDC_EDIT1                       1022
 #define IDC_JID                         1022
-#define IDC_EDIT2                       1023
+#define IDC_E_NICK                      1023
+#define IDC_C_SERVICE                   1024
+#define IDC_C_GROUP                     1025
+#define IDC_X_SUBSCR                    1026
 #define IDM_JABBER_ONLINE               32772
 #define IDM_JABBER                      32775
 #define IDM_JABBER_STREAMINFO           32777
@@ -55,6 +57,12 @@
 #define IDM_JABBER_ACCOUNT              32785
 #define ID_JABBER_STATUS                32786
 #define IDM_JABBER_STATUS               32787
+#define ID_JABBER_ADDACONTACT           32788
+#define ID_JABBER_TOOLS                 32789
+#define ID_TOOLS_SERVICEDISCOVERY       32790
+#define ID_JABBER_JOINCONFERENCE        32791
+#define ID_TOOLS_FILETRANSFERS          32792
+#define ID_JABBER_OPTIONS               32793
 #define IDM_EXIT                        40000
 #define IDM_HELP_ABOUT                  40002
 #define IDC_STATIC                      -1
@@ -65,8 +73,8 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         32788
-#define _APS_NEXT_CONTROL_VALUE         1023
+#define _APS_NEXT_COMMAND_VALUE         32794
+#define _APS_NEXT_CONTROL_VALUE         1027
 #define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

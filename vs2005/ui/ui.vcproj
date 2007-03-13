@@ -226,6 +226,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\DlgAddEditContact.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\DlgStatus.cpp"
 				>
 			</File>
@@ -400,7 +404,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\DlgAddEditContact.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\DlgStatus.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\DlgUtils.h"
 				>
 			</File>
 			<File

@@ -2,6 +2,7 @@
 
 #include "jid.h"
 #include "JabberDataBlockListener.h"
+#include "..\vs2005\ui\resourceppc.h"
 #include "Roster.h"
 
 #include <commctrl.h>
@@ -18,6 +19,7 @@
 #include "ChatView.h"
 
 #include "DlgStatus.h"
+#include "DlgAddEditContact.h"
 
 extern TabsCtrlRef tabs;
 
@@ -240,6 +242,17 @@ void Roster::makeViewList() {
     PostMessage(roster->getHWnd(), WM_USER+1, 0, (LPARAM)list); //ÀÕÒÓÍÃ ¹2
     //roster->notifyListUpdate(false);
 }
+
+StringVectorRef Roster::getRosterGroups() {
+    StringVectorRef result=StringVectorRef(new StringVector());
+
+    for (GroupList::const_iterator gi=groups.begin(); gi!=groups.end(); gi++) {
+        RosterGroup::ref group=*gi;
+        if (group->type==RosterGroup::ROSTER) result->push_back(group->getName());
+    }
+    return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 RosterGroup::ref Roster::findGroup( const std::string &name ) {
     for (GroupList::const_iterator i=groups.begin(); i!=groups.end(); i++) {
@@ -256,7 +269,6 @@ RosterGroup::ref Roster::createGroup( const std::string &name, RosterGroup::Type
     groups.push_back(newGrp);
     return newGrp;
 }
-
 
 RosterGroup::RosterGroup( const std::string &name, Type type ) {
     groupName=name;
@@ -345,12 +357,12 @@ HMENU RosterView::getContextMenu() {
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
         if (type==RosterGroup::ROSTER) {
-            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::EDITCONTACT,          TEXT("Edit contact"));
+            AppendMenu(hmenu, MF_STRING, RosterView::EDITCONTACT,          TEXT("Edit contact"));
             AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::SUBSCR,               TEXT("Subscription"));
         }
 
         if (type==RosterGroup::NOT_IN_LIST)
-            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::ADDCONTACT,           TEXT("Add contact"));
+            AppendMenu(hmenu, MF_STRING, RosterView::ADDCONTACT,           TEXT("Add contact"));
 
         AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::DELETECONTACT,            TEXT("Delete"));
 
@@ -368,6 +380,7 @@ HMENU RosterView::getContextMenu() {
 
 void RosterView::OnCommand( int cmdId, LONG lParam ) {
     Contact::ref focusedContact = boost::dynamic_pointer_cast<Contact>(cursorPos);
+    if (roster.expired()) return;
     ResourceContextRef rc=roster.lock()->rc;
 
     if (focusedContact) {
@@ -397,18 +410,26 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
         case RosterView::VCARD: 
         case RosterView::CLIENTINFO: 
         case RosterView::COMMANDS:
-        case RosterView::EDITCONTACT:
         case RosterView::SUBSCR: 
+
+        case RosterView::EDITCONTACT:
         case RosterView::ADDCONTACT:
+            DlgAddEditContact::createDialog(getHWnd(), roster.lock()->rc, focusedContact); break;
+
         case RosterView::DELETECONTACT:
         case RosterView::SENDSTATUS:
             DlgStatus::createDialog(getHWnd(), roster.lock()->rc, focusedContact); break;
+
         case RosterView::SENDFILE: 
         case RosterView::INVITE:
         //case RosterView::RENAMEGRP:
         default:
             break;
     }
+    }
+
+    if (cmdId==ID_JABBER_ADDACONTACT){
+        DlgAddEditContact::createDialog(getHWnd(), roster.lock()->rc, Contact::ref());
     }
 }
 void RosterView::showWindow( bool show ) {

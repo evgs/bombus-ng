@@ -133,6 +133,11 @@ void DlgAddEditContact::createDialog( HWND parent, ResourceContextRef rc, Contac
     p->rc=rc;
     p->contact=contact;
 
-    DialogBoxParam(g_hInst, (LPCTSTR)IDD_ADD_CONTACT , parent, dialogProc, (LPARAM)p);
-
+    bool edit=false;
+    if (contact) {
+        if (contact->subscr!="NIL") edit=true;
+    }
+    DialogBoxParam(g_hInst, 
+        (edit)? (LPCTSTR)IDD_EDIT_CONTACT : (LPCTSTR)IDD_ADD_CONTACT ,
+        parent, dialogProc, (LPARAM)p);
 }

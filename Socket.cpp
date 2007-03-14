@@ -56,6 +56,17 @@ Socket::Socket(const std::string &url, const int port) {
 }
 
 int Socket::read(char * buf, int len) {
+    int sel=0;
+    do {
+        timeval t={200, 0};
+        fd_set fds;
+        fds.fd_count=1;
+        fds.fd_array[0]=sock;
+
+        sel=select(0, &fds, NULL, NULL, &t);
+        if (sel==SOCKET_ERROR) throwSocketError();
+    } while (!sel);
+
 	int rb=recv(sock, buf, len, 0);
     if (rb==SOCKET_ERROR) throwSocketError();
 	bytesRecvd+=rb;

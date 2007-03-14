@@ -1,12 +1,80 @@
 //#include "stdafx.h"
 
 #include <CeTLSSocket.h>
-#include <sslsock.h>
+
 #include <boost/assert.hpp>
 #include <string>
 #include "utf8.hpp"
 
-static int wsCount;
+#include <wincrypt.h>
+#include <sslsock.h>
+#include <schnlsp.h>
+
+// load SslCrackCertificate and SslFreeCertificate
+#define SSL_CRACK_CERTIFICATE_NAME TEXT("SslCrackCertificate")
+#define SSL_FREE_CERTIFICATE_NAME TEXT("SslFreeCertificate")
+
+//////////////////////////////////////////////////////////////////////////
+SSL_CRACK_CERTIFICATE_FN gSslCrackCertificate;
+SSL_FREE_CERTIFICATE_FN gSslFreeCertificate;
+HINSTANCE hSchannelDLL;
+
+HRESULT LoadSSL()
+{
+    // already loaded?
+    if (hSchannelDLL) return S_OK;
+    if (gSslCrackCertificate && gSslFreeCertificate) return S_OK;
+
+    hSchannelDLL = LoadLibrary(TEXT("schannel.dll"));
+    if (!hSchannelDLL) {
+        // error logging
+        return E_FAIL;
+    }
+
+    gSslCrackCertificate = (SSL_CRACK_CERTIFICATE_FN)GetProcAddress(hSchannelDLL, SSL_CRACK_CERTIFICATE_NAME);
+    gSslFreeCertificate = (SSL_FREE_CERTIFICATE_FN)GetProcAddress(hSchannelDLL, SSL_FREE_CERTIFICATE_NAME);
+
+    if (!gSslCrackCertificate || !gSslFreeCertificate) {
+        // error logging
+        gSslCrackCertificate = NULL;
+        gSslFreeCertificate = NULL;
+        FreeLibrary(hSchannelDLL);
+        hSchannelDLL = NULL;
+        return E_FAIL;
+    } else {
+        return S_OK;
+    }
+}
+
+HRESULT FreeSSL()
+{
+    if (hSchannelDLL) {
+        FreeLibrary(hSchannelDLL);
+        hSchannelDLL = NULL;
+        gSslCrackCertificate=NULL;
+        gSslFreeCertificate=NULL;
+    }
+    return S_OK;
+}
+
+
+void strAppendInt(std::string &s, int n){
+    char tmpbuf[10];
+    sprintf(tmpbuf, "%d", n);
+    s+=tmpbuf;
+}
+
+std::string fileTimeToDate(FILETIME * time) {
+    SYSTEMTIME stime;
+    FileTimeToSystemTime(time, &stime);
+    std::string result;
+    strAppendInt(result, stime.wDay); result+=".";
+    strAppendInt(result, stime.wMonth); result+=".";
+    strAppendInt(result, stime.wYear);
+
+    return result;
+}
+
 
 int CeTLSSocket::SslValidate (
                  DWORD  dwType,
@@ -16,12 +84,39 @@ int CeTLSSocket::SslValidate (
                  DWORD  dwFlags
                  ) 
 {
-    if (dwFlags==SSL_CERT_FLAG_ISSUER_UNKNOWN) {
+    if (dwFlags!=SSL_CERT_X509) return SSL_ERR_CERT_UNKNOWN;
+
+    if (pCertChain==NULL) return SSL_ERR_CERT_UNKNOWN;
+
+    X509Certificate* pCert = NULL;
+
+    if (dwFlags & SSL_CERT_FLAG_ISSUER_UNKNOWN) {
         //TODO: ask for accept/decline certificate
         CeTLSSocket * s=(CeTLSSocket *)pvArg;
+
+        if (s->ignoreSSLWarnings) return SSL_ERR_OKAY;
+
         std::wstring url=utf8::utf8_wchar(s->url);
 
-        //int result=
+        if (!gSslCrackCertificate || !gSslFreeCertificate) return SSL_ERR_CERT_UNKNOWN;
+
+        // crack X.509 Certificate
+        if (!gSslCrackCertificate(pCertChain->pBlobData, pCertChain->cbSize, TRUE, &pCert)) return SSL_ERR_BAD_DATA;
+
+        std::string certInfo="Certificate Issuer unknown";
+        certInfo+="\nIssuer: "; certInfo+=pCert->pszIssuer;
+        certInfo+="\nSubject: "; certInfo+=pCert->pszSubject;
+        certInfo+="\nValid from: "; certInfo+=fileTimeToDate(&(pCert->ValidFrom));
+        certInfo+="\nValid until: "; certInfo+=fileTimeToDate(&(pCert->ValidUntil));
+
+        certInfo+="\n\nAccept this certificate?";
+
+        gSslFreeCertificate(pCert);
+
+        std::wstring wcertInfo=utf8::utf8_wchar(certInfo);
+
+        int result=MessageBox(NULL, wcertInfo.c_str(), TEXT("SSL handshake Error"), MB_OKCANCEL | MB_ICONEXCLAMATION );
+        if (result==IDCANCEL) return SSL_ERR_CERT_UNKNOWN;
     }
 
     return SSL_ERR_OKAY;
@@ -31,6 +126,7 @@ int CeTLSSocket::SslValidate (
 
 CeTLSSocket::CeTLSSocket(const std::string & url, const int port){
     bytesSent=bytesRecvd=0;
+    ignoreSSLWarnings=false;
 
     initWinsocks();
     this->url=url;
@@ -66,17 +162,16 @@ CeTLSSocket::CeTLSSocket(const std::string & url, const int port){
 
 };
 
+CeTLSSocket::~CeTLSSocket(){
+    FreeSSL();
+}
+
 bool CeTLSSocket::startTls(){
+    BOOST_ASSERT(LoadSSL()==S_OK);
     int ioctlresult=WSAIoctl(sock, SO_SSL_PERFORM_HANDSHAKE, (LPVOID)url.c_str(), url.length(), 0, 0, 0, 0, 0);
     return true;
 };
 
-
-void strAppendInt(std::string &s, int n){
-    char tmpbuf[10];
-    sprintf(tmpbuf, "%d", n);
-    s+=tmpbuf;
-}
 
 //////////////////////////////////////////////////////////////////////////
 const std::string CeTLSSocket::getStatistics(){

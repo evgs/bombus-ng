@@ -366,7 +366,7 @@ HMENU RosterView::getContextMenu() {
         if (type==RosterGroup::NOT_IN_LIST)
             AppendMenu(hmenu, MF_STRING, RosterView::ADDCONTACT,           TEXT("Add contact"));
 
-        AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::DELETECONTACT,            TEXT("Delete"));
+        AppendMenu(hmenu, MF_STRING, RosterView::DELETECONTACT,            TEXT("Delete"));
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
@@ -416,11 +416,16 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
 
         case RosterView::EDITCONTACT:
         case RosterView::ADDCONTACT:
-            DlgAddEditContact::createDialog(getHWnd(), roster.lock()->rc, focusedContact); break;
+            DlgAddEditContact::createDialog(getHWnd(), rc, focusedContact); break;
 
         case RosterView::DELETECONTACT:
+            {
+                int result=MessageBox(getHWnd(), TEXT("Sure?"), TEXT("Delete contact"), MB_YESNO | MB_ICONWARNING);
+                if (result==IDYES) {/*TODO: Delete contact*/}
+                break;
+            }
         case RosterView::SENDSTATUS:
-            DlgStatus::createDialog(getHWnd(), roster.lock()->rc, focusedContact); break;
+            DlgStatus::createDialog(getHWnd(), rc, focusedContact); break;
 
         case RosterView::SENDFILE: 
         case RosterView::INVITE:
@@ -431,7 +436,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
     }
 
     if (cmdId==ID_JABBER_ADDACONTACT){
-        DlgAddEditContact::createDialog(getHWnd(), roster.lock()->rc, Contact::ref());
+        DlgAddEditContact::createDialog(getHWnd(), rc, Contact::ref());
     }
 }
 void RosterView::showWindow( bool show ) {

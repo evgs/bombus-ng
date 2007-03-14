@@ -6,7 +6,7 @@ class Socket : public Connection
 {
 public:
 	Socket(const std::string & url, const int port);
-	~Socket(void);
+	virtual ~Socket(void);
 
 	virtual int read(char * buf, int len);
 	virtual int write(const char * buf, int len);

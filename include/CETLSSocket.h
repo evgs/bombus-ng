@@ -5,9 +5,10 @@ class CeTLSSocket : public Socket
 {
 public:
     CeTLSSocket(const std::string & url, const int port);
-
+    virtual ~CeTLSSocket(void);
     virtual const std::string getStatistics();
 
+    bool ignoreSSLWarnings;
 public:
     bool startTls();
 

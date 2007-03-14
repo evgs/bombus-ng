@@ -6,6 +6,8 @@
 class Connection
 {
 public:
+    virtual ~Connection(void){}
+
 	virtual int read(char * buf, int len)=0;
 	virtual int write(const char * buf, int len)=0;
 

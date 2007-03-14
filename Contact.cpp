@@ -62,6 +62,10 @@ int Contact::getIconIndex() const{
 }
 
 const wchar_t * Contact::getText() const{ return wjid.c_str(); }
+const std::string Contact::getFullName() const{
+    if (nickname.length()==0) return rosterJid;
+    return nickname+" <"+rosterJid+">";
+}
 //////////////////////////////////////////////////////////////////////////
 bool Contact::compare( Contact::ref left, Contact::ref right ) {
     if (left->status < right->status) return true;

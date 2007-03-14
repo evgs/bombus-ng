@@ -169,16 +169,13 @@ const char * errorWSAText(int code) {
         { WSAESTALE, "Stale NFS file handle" },
         { WSAEREMOTE, "Too many levels of remote in path" },
         { WSASYSNOTREADY, "Network subsystem is unvailable" },
-        { WSAVERNOTSUPPORTED, "WinSock version is not "
-        "supported" },
-        { WSANOTINITIALISED, "Successful WSAStartup() not yet "
-        "performed" },
+        { WSAVERNOTSUPPORTED, "WinSock version is not supported" },
+        { WSANOTINITIALISED, "Successful WSAStartup() not yet performed" },
         { WSAEDISCON, "Graceful shutdown in progress" },
         /* Resolver errors */
         { WSAHOST_NOT_FOUND, "No such host is known" },
         { WSATRY_AGAIN, "Host not found, or server failed" },
-        { WSANO_RECOVERY, "Unexpected server error "
-        "encountered" },
+        { WSANO_RECOVERY, "Unexpected server error encountered" },
         { WSANO_DATA, "Valid name without requested data" },
         { WSANO_ADDRESS, "No address, look for MX record" },
         { 0, NULL }

@@ -116,7 +116,7 @@ int CeTLSSocket::SslValidate (
         std::wstring wcertInfo=utf8::utf8_wchar(certInfo);
 
         int result=MessageBox(NULL, wcertInfo.c_str(), TEXT("SSL handshake Error"), MB_OKCANCEL | MB_ICONEXCLAMATION );
-        if (result==IDCANCEL) return SSL_ERR_CERT_UNKNOWN;
+        if (result!=IDOK) return SSL_ERR_CERT_UNKNOWN;
     }
 
     return SSL_ERR_OKAY;
@@ -169,6 +169,7 @@ CeTLSSocket::~CeTLSSocket(){
 bool CeTLSSocket::startTls(){
     BOOST_ASSERT(LoadSSL()==S_OK);
     int ioctlresult=WSAIoctl(sock, SO_SSL_PERFORM_HANDSHAKE, (LPVOID)url.c_str(), url.length(), 0, 0, 0, 0, 0);
+    if (ioctlresult==SOCKET_ERROR) throwSocketError();
     return true;
 };
 

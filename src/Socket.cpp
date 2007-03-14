@@ -124,14 +124,14 @@ void Socket::close() {
 const char * errorWSAText(int code) {
     static char buf[10];
     static struct { int no; const char *msg; } *msgp, msgs[] = {
+        { 10, "SSL Certificate Issuer unknown" },
         { WSAEINTR, "Interrupted system call" },
         { WSAEBADF, "Bad file descriptor" },
         { WSAEACCES, "Permission denied" },
         { WSAEFAULT, "Bad address" },
         { WSAEINVAL, "Invalid argument" },
         { WSAEMFILE, "Too many open files" },
-        { WSAEWOULDBLOCK, "Another winsock call while a "
-        "blocking function was in progress" },
+        { WSAEWOULDBLOCK, "Another winsock call while a blocking function was in progress" },
         { WSAEINPROGRESS, "Operation now in progress" },
         { WSAEALREADY, "Operation already in progress" },
         { WSAENOTSOCK, "Socket operation on non-socket" },
@@ -155,8 +155,7 @@ const char * errorWSAText(int code) {
         { WSAEISCONN, "Socket is already connected" },
         { WSAENOTCONN, "Socket is not connected" },
         { WSAESHUTDOWN, "Can't send after socket shutdown" },
-        { WSAETOOMANYREFS, "Too many references: "
-        "can't splice" },
+        { WSAETOOMANYREFS, "Too many references: can't splice" },
         { WSAETIMEDOUT, "Operation timed out" },
         { WSAECONNREFUSED, "Connection refused" },
         { WSAELOOP, "Too many levels of symbolic links" },

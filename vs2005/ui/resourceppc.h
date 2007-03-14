@@ -18,8 +18,9 @@
 #define IDS_VERSION                     108
 #define IDD_DIRECT_PRESENCE             108
 #define IDS_REVDATE                     109
-#define IDD_ADD_CONTACT                 109
+#define IDD_EDIT_CONTACT                109
 #define IDM_SEND                        110
+#define IDD_ADD_CONTACT                 110
 #define IDI_BOMBUS                      130
 #define IDC_STATIC_2                    202
 #define IDC_STATIC_3                    203

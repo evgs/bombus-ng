@@ -13,6 +13,7 @@
 #include <algorithm>
 
 #include "Image.h"
+#include "JabberStream.h"
 #include "Presence.h"
 
 #include "TabCtrl.h"
@@ -20,6 +21,8 @@
 
 #include "DlgStatus.h"
 #include "DlgAddEditContact.h"
+
+#include "utf8.hpp"
 
 extern TabsCtrlRef tabs;
 
@@ -173,6 +176,39 @@ void Roster::processPresence( JabberDataBlockRef block ) {
     if (type2!=presence::NOCHANGE) contact->offlineIcon=type2;
     contact->update();
     makeViewList();
+}
+
+void Roster::deleteContact(Contact::ref contact) {
+    int i=0;
+    while (i!=contacts.size()) {
+        Contact::ref right=contacts[i];
+        if (right->rosterJid==contact->rosterJid) {
+            if (right->subscr=="NIL") {
+                contacts.erase(contacts.begin()+i);
+                //todo: bareJidMap[contact->jid.getBareJid()]=contact; // now it is null
+                continue;
+            } else {
+                right->status=(presence::PresenceIndex) icons::ICON_TRASHCAN_INDEX;
+                right->update();
+            }
+
+        }
+        i++;
+    }
+    makeViewList();
+
+    if (contact->subscr!="NIL") {
+        JabberDataBlock killerStanza("iq");
+        killerStanza.setAttribute("type","set");
+        killerStanza.setAttribute("id","roster_del");
+        JabberDataBlock *qry=killerStanza.addChild("query", NULL);
+        qry->setAttribute("xmlns","jabber:iq:roster");
+        JabberDataBlock *item=qry->addChild("item", NULL);
+        item->setAttribute("jid", contact->rosterJid.c_str());
+        item->setAttribute("subscription","remove");
+
+        rc->jabberStream->sendStanza(killerStanza);
+    }
 }
 //////////////////////////////////////////////////////////////////////////
 Contact::ref Roster::getContactEntry(const std::string & from){
@@ -420,8 +456,11 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
 
         case RosterView::DELETECONTACT:
             {
-                int result=MessageBox(getHWnd(), TEXT("Sure?"), TEXT("Delete contact"), MB_YESNO | MB_ICONWARNING);
-                if (result==IDYES) {/*TODO: Delete contact*/}
+                std::wstring name=utf8::utf8_wchar(focusedContact->getFullName());
+                int result=MessageBox(getHWnd(), name.c_str(), TEXT("Delete contact ?"), MB_YESNO | MB_ICONWARNING);
+                if (result==IDYES) {
+                    roster.lock()->deleteContact(focusedContact);
+                }
                 break;
             }
         case RosterView::SENDSTATUS:

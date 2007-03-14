@@ -81,6 +81,9 @@ public:
     StringVectorRef getRosterGroups();
 
     void processPresence(JabberDataBlockRef block);
+
+    void deleteContact(Contact::ref contact);
+
     typedef boost::shared_ptr<Roster> ref;
 
     ResourceContextRef rc;

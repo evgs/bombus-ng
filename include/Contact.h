@@ -38,6 +38,7 @@ public:
 
     static bool compare(Contact::ref left, Contact::ref right);
 
+    const std::string getFullName() const;
     //////////////////////////////////////////////////////////////////////////
 
     virtual int getColor() const;

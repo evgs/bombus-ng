@@ -10,7 +10,7 @@ public:
 
 	virtual int read(char * buf, int len);
 	virtual int write(const char * buf, int len);
-	const std::string getStatistics();
+	virtual const std::string getStatistics();
 	//int write(const StringRef buf);
 	//int write(std::string &buf);
 
@@ -29,8 +29,9 @@ protected:
 
     void throwSocketError();
 
+    long bytesSent;
+    long bytesRecvd;
+
 private:
-	long bytesSent;
-	long bytesRecvd;
 };
 

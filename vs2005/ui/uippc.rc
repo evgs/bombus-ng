@@ -41,6 +41,7 @@ BEGIN
         BEGIN
             MENUITEM "Service Discovery",           ID_TOOLS_SERVICEDISCOVERY, GRAYED
             MENUITEM "File transfers",              ID_TOOLS_FILETRANSFERS, GRAYED
+            MENUITEM "Stream Info",                 IDM_JABBER_STREAMINFO
         END
         MENUITEM SEPARATOR
         MENUITEM "Options",                     ID_JABBER_OPTIONS, GRAYED

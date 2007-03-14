@@ -63,6 +63,7 @@
 #define ID_JABBER_JOINCONFERENCE        32791
 #define ID_TOOLS_FILETRANSFERS          32792
 #define ID_JABBER_OPTIONS               32793
+#define ID_TOOLS_STREAMINFO             32794
 #define IDM_EXIT                        40000
 #define IDM_HELP_ABOUT                  40002
 #define IDC_STATIC                      -1
@@ -73,7 +74,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        133
-#define _APS_NEXT_COMMAND_VALUE         32794
+#define _APS_NEXT_COMMAND_VALUE         32795
 #define _APS_NEXT_CONTROL_VALUE         1027
 #define _APS_NEXT_SYMED_VALUE           111
 #endif

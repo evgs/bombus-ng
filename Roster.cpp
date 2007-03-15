@@ -83,6 +83,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         std::string subscr=item->getAttribute("subscription");
         
         int offlineIcon=presence::OFFLINE;
+        if (subscr=="none") offlineIcon=presence::UNKNOWN;
         if (item->hasAttribute("ask")) if (subscr!="remove"){
             subscr+=',';
             subscr+="ask";
@@ -198,18 +199,25 @@ void Roster::deleteContact(Contact::ref contact) {
     makeViewList();
 
     if (contact->subscr!="NIL") {
-        JabberDataBlock killerStanza("iq");
-        killerStanza.setAttribute("type","set");
-        killerStanza.setAttribute("id","roster_del");
-        JabberDataBlock *qry=killerStanza.addChild("query", NULL);
-        qry->setAttribute("xmlns","jabber:iq:roster");
-        JabberDataBlock *item=qry->addChild("item", NULL);
-        item->setAttribute("jid", contact->rosterJid.c_str());
-        item->setAttribute("subscription","remove");
-
-        rc->jabberStream->sendStanza(killerStanza);
+        rosterSet(NULL, contact->rosterJid.c_str(), NULL, "remove");
     }
 }
+
+void Roster::rosterSet(const char * nick, const char *jid, const char *group, const char *subscr ) {
+    JabberDataBlock iqSet("iq");
+    iqSet.setAttribute("type","set");
+    iqSet.setAttribute("id","roster_set");
+    JabberDataBlock *qry=iqSet.addChild("query", NULL);
+    qry->setAttribute("xmlns","jabber:iq:roster");
+    JabberDataBlock *item=qry->addChild("item", NULL);
+
+    item->setAttribute("jid", jid);
+    if (nick) item->setAttribute("name", nick);
+    if (group) item->addChild("group", group);
+    if (subscr) item->setAttribute("subscription", subscr);
+
+    rc->jabberStream->sendStanza(iqSet);
+};
 //////////////////////////////////////////////////////////////////////////
 Contact::ref Roster::getContactEntry(const std::string & from){
 

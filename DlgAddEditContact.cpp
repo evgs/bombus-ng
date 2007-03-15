@@ -115,50 +115,18 @@ INT_PTR CALLBACK DlgAddEditContact::dialogProc(HWND hDlg, UINT message, WPARAM w
             p->rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(getNick));
             getNick->doRequest(p->rc);
         }
+
 		if (LOWORD(wParam) == IDOK)
 		{
+            std::string jid; GetDlgItemText(hDlg, IDC_E_JID, jid);
+            std::string group; GetDlgItemText(hDlg, IDC_C_GROUP, group);
+            std::string nick; GetDlgItemText(hDlg, IDC_E_NICK, nick);
 
-            /*presence::PresenceIndex status=(presence::PresenceIndex) SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_GETCURSEL, 0,0);
-            int priority=SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_GETPOS, 0, 0);
-            std::string pmessage;
-            GetDlgItemText(hDlg, IDC_E_STATUS, pmessage);
-            
-            //direct presences
-            if (p->contact) {
-                std::string to;
-                GetDlgItemText(hDlg, IDC_E_JID, to);
-                p->rc->sendPresence(to.c_str(), status, pmessage, priority);
-            } else {
-                //store selected presence
-                p->rc->status=status;
-                p->rc->presenceMessage=pmessage;
-                p->rc->priority=priority;
+            p->rc->roster->rosterSet(nick.c_str(), jid.c_str(), group.c_str(), NULL);
 
-                // Broadcast presence
-                rosterWnd->setIcon(p->rc->status);
-                p->rc->sendPresence();
-                if (status==presence::OFFLINE) {
-                    streamShutdown();
-                } else {
-                    initJabber();
-                }
-            }
-
-            /*
-            dlgAccountParam->setBareJid(GetDlgItemText(hDlg, IDC_E_JID));
-            GetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
-            dlgAccountParam->setResource(GetDlgItemText(hDlg, IDC_E_RESOURCE));
-            GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);
-
-            dlgAccountParam->port=GetDlgItemInt(hDlg, IDC_E_PORT, NULL, false);
-
-            dlgAccountParam->useEncryption=IsDlgButtonChecked(hDlg, IDC_X_SSL)==BST_CHECKED;
-            dlgAccountParam->plainTextPassword=IsDlgButtonChecked(hDlg, IDC_X_PLAIN)==BST_CHECKED;
-            dlgAccountParam->useSASL=IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_CHECKED;
-            dlgAccountParam->useCompression=IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED;
-
-            dlgAccountParam->saveAccount(TEXT("defAccount.bin"));
-            */
+            if (p->edit) 
+                if (IsDlgButtonChecked(hDlg, IDC_X_SUBSCR)==BST_CHECKED)
+                    p->rc->sendPresence(jid.c_str(), presence::PRESENCE_AUTH_ASK, std::string(), 0);
 
 			EndDialog(hDlg, LOWORD(wParam));
             delete p;
@@ -191,11 +159,11 @@ void DlgAddEditContact::createDialog( HWND parent, ResourceContextRef rc, Contac
     p->rc=rc;
     p->contact=contact;
 
-    bool edit=false;
+    p->edit=false;
     if (contact) {
-        if (contact->subscr!="NIL") edit=true;
+        if (contact->subscr!="NIL") p->edit=true;
     }
     DialogBoxParam(g_hInst, 
-        (edit)? (LPCTSTR)IDD_EDIT_CONTACT : (LPCTSTR)IDD_ADD_CONTACT ,
+        (p->edit)? (LPCTSTR)IDD_EDIT_CONTACT : (LPCTSTR)IDD_ADD_CONTACT ,
         parent, dialogProc, (LPARAM)p);
 }

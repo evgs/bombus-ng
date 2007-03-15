@@ -23,6 +23,16 @@ void ResourceContext::sendPresence(const char *to, presence::PresenceIndex statu
     if (to) presenceStanza.setAttribute("to",to);
 
     switch (status) {
+    case presence::PRESENCE_AUTH_ASK: 
+        presenceStanza.setAttribute("type", "subscribe");
+        jabberStream->sendStanza(presenceStanza);
+        return;
+    case presence::PRESENCE_AUTH: 
+        presenceStanza.setAttribute("type", "subscribed");
+        jabberStream->sendStanza(presenceStanza);
+        return;
+    //TODO: unsubscribe, unsubscribed
+
     case presence::OFFLINE:
         presenceStanza.setAttribute("type", "unavailable"); break;
     case presence::INVISIBLE:

@@ -83,6 +83,7 @@ public:
     void processPresence(JabberDataBlockRef block);
 
     void deleteContact(Contact::ref contact);
+    void rosterSet(const char * nick, const char *jid, const char *group, const char *subscr );
 
     typedef boost::shared_ptr<Roster> ref;
 

@@ -13,5 +13,6 @@ private:
     HWND parent;
     ResourceContextRef rc;
     Contact::ref contact;
+    bool edit;
 };
 

@@ -54,13 +54,6 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
 
     const std::string & blockTagName=block->getTagName();
 
-    if (blockTagName=="presence") {
-        processPresence(block);
-        return BLOCK_PROCESSED;
-    }
-
-    if (blockTagName!="iq") return BLOCK_REJECTED;
-
     bool rosterPush=(block->getAttribute("type"))=="set";
 
     JabberDataBlockRef query=block->getChildByName("query");
@@ -145,45 +138,6 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
 }
 
 //////////////////////////////////////////////////////////////////////////
-void Roster::processPresence( JabberDataBlockRef block ) {
-    std::string from=block->getAttribute("from");
-    std::string type=block->getAttribute("type");
-
-    presence::PresenceIndex typeIndex=presence::OFFLINE;
-    presence::PresenceIndex type2=presence::NOCHANGE; //no change
-    if (type=="unavailable") { 
-        typeIndex=presence::OFFLINE;
-    } else if (type=="subscribe") { 
-        //TODO:
-    } else if (type=="subscribed") {
-        //TODO:
-    } else if (type=="unsubscribe") {
-        //TODO:
-    } else if (type=="unsubscribed") {
-        //TODO:
-    } else if (type=="error") {
-        typeIndex=presence::OFFLINE;
-        type2=presence::PRESENCE_ERROR;
-        //todo: extract error text here
-    } else {
-        typeIndex=presence::ONLINE;
-        type=block->getChildText("show");
-        if (type=="chat") typeIndex=presence::CHAT;
-        if (type=="away") typeIndex=presence::AWAY;
-        if (type=="xa") typeIndex=presence::XA;
-        if (type=="dnd") typeIndex=presence::DND;
-    }
-
-    std::string priority=block->getChildText("priority");
-    std::string status=block->getChildText("status");
-
-    Contact::ref contact=getContactEntry(from);
-
-    contact->status=typeIndex;
-    if (type2!=presence::NOCHANGE) contact->offlineIcon=type2;
-    contact->update();
-    makeViewList();
-}
 
 void Roster::deleteContact(Contact::ref contact) {
     int i=0;

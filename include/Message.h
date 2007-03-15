@@ -35,7 +35,8 @@ public:
         INCOMING=2,
         PRESENCE=10,
         PRESENCE_ASK_SUBSCR=11,
-        PRESENCE_SUBSCRIBED=12
+        PRESENCE_SUBSCRIBED=12,
+        PRESENCE_UNSUBSCRIBED=13
     };
 
     typedef boost::shared_ptr<Message> ref;

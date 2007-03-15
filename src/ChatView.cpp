@@ -304,10 +304,16 @@ void ChatView::showWindow( bool show ) {
     if (show) contact->nUnread=0;
 
     if (show) msgList->notifyListUpdate(true);
-    if (show) InvalidateRect(msgList->getHWnd(), NULL, false);
+    //if (show) InvalidateRect(msgList->getHWnd(), NULL, false);
 
     if (show) SetFocus(editWnd);
 
+}
+
+void ChatView::redraw(){
+    InvalidateRect(getHWnd(), NULL, TRUE);
+    msgList->notifyListUpdate(true);
+    //InvalidateRect(msgList->getHWnd(), NULL, false);
 }
 
 void ChatView::moveUnread() {

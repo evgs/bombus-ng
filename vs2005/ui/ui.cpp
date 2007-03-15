@@ -549,7 +549,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     std::string from=block->getAttribute("from");
     std::string body=block->getChildText("body");
 
-    StringRef orig=block->toXML();
+    //StringRef orig=block->toXML();
 	Log::getInstance()->msg("Message from ", from.c_str()); 
 
     Contact::ref c = rc->roster->getContactEntry(from);
@@ -570,14 +570,102 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
     if(cv) {
         cv->moveUnread();
+        cv->redraw();
     }
 
-    tabs->switchByODR(c);
+    //tabs->switchByODR(c);
 
     InvalidateRect(rosterWnd->getHWnd(),NULL, FALSE);
 
 	return BLOCK_PROCESSED;
 }
+
+//////////////////////////////////////////////////////////////
+class PresenceRecv : public JabberDataBlockListener {
+public:
+    PresenceRecv() {}
+    ~PresenceRecv(){};
+    virtual const char * getType() const{ return NULL; }
+    virtual const char * getId() const{ return NULL; }
+    virtual const char * getTagName() const { return "presence"; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+};
+ProcessResult PresenceRecv::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+    std::string from=block->getAttribute("from");
+    std::string type=block->getAttribute("type");
+    std::string priority=block->getChildText("priority");
+    std::string status=block->getChildText("status");
+
+    presence::PresenceIndex typeIndex=presence::OFFLINE;
+    presence::PresenceIndex type2=presence::NOCHANGE; //no change
+    Message::MsgType msgType=Message::PRESENCE;
+
+    if (type=="unavailable") { 
+        typeIndex=presence::OFFLINE;
+        type="offline";
+    } else if (type=="subscribe") { 
+        msgType=Message::PRESENCE_ASK_SUBSCR;
+        //TODO:
+    } else if (type=="subscribed") {
+        msgType=Message::PRESENCE_SUBSCRIBED;
+        //TODO:
+    } else if (type=="unsubscribe") {
+        //TODO:
+    } else if (type=="unsubscribed") {
+        msgType=Message::PRESENCE_UNSUBSCRIBED;
+        //TODO:
+    } else if (type=="error") {
+        typeIndex=presence::OFFLINE;
+        type2=presence::PRESENCE_ERROR;
+        //todo: extract error text here
+    } else {
+        type=block->getChildText("show");
+        if (type=="chat") typeIndex=presence::CHAT; else
+        if (type=="away") typeIndex=presence::AWAY; else
+        if (type=="xa") typeIndex=presence::XA; else
+        if (type=="dnd") typeIndex=presence::DND; else {
+            typeIndex=presence::ONLINE;
+            type="online";
+        }
+    }
+
+
+    Contact::ref contact=rc->roster->getContactEntry(from);
+
+    contact->status=typeIndex;
+    if (type2!=presence::NOCHANGE) contact->offlineIcon=type2;
+    contact->update();
+    rc->roster->makeViewList();
+
+    std::string body=type;
+    body+=" (";
+    body+=status;
+    body+=") [#]";
+
+    Message::ref msg=Message::ref(new Message(body, from, msgType));
+
+    //std::wstring soundName(appRootPath);
+    //soundName+=TEXT("message.wav");
+    //Notify::PlayNotify();
+    //PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
+
+    //c->nUnread++;
+    if (contact->messageList->size()==1) {
+        //TODO: verify if it is presence;
+        contact->messageList->erase( contact->messageList->begin());
+    }
+    contact->messageList->push_back(msg);
+
+
+    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(contact).get());
+    if(cv) {
+        cv->moveUnread();
+        cv->redraw();
+    }
+
+    return BLOCK_PROCESSED;
+}
+
 
 class JabberStreamEvents : public JabberListener{
 public:
@@ -611,9 +699,10 @@ void JabberStreamEvents::loginSuccess(){
     Log::getInstance()->msg("Login ok");
 
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new PresenceRecv() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new EntityCaps() ));
-    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv() ));
 
     JabberDataBlock getRoster("iq");
     getRoster.setAttribute("type","get");

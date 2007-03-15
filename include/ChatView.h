@@ -31,6 +31,8 @@ public:
 
     virtual void showWindow(bool show);
 
+    void ChatView::redraw();
+
 protected:
     VirtualListView::ref msgList;
     HWND		editWnd;

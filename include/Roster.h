@@ -73,14 +73,12 @@ public:
 
     virtual const char * getType() const{ return NULL; /* result/set */ }
     virtual const char * getId() const{ return NULL; }
-    virtual const char * getTagName() const { return NULL/*"iq"*/; }
+    virtual const char * getTagName() const { return "iq"; }
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
     void bindWindow(VirtualListView::ref roster){ this->roster=roster; }
 
     StringVectorRef getRosterGroups();
-
-    void processPresence(JabberDataBlockRef block);
 
     void deleteContact(Contact::ref contact);
     void rosterSet(const char * nick, const char *jid, const char *group, const char *subscr );

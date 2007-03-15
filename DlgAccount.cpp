@@ -53,6 +53,7 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             SetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);
             SetDlgItemInt(hDlg, IDC_E_PORT, dlgAccountParam->port, false);
             CheckDlgButton(hDlg, IDC_X_SSL, (dlgAccountParam->useEncryption)?BST_CHECKED:BST_UNCHECKED);
+            CheckDlgButton(hDlg, IDC_X_SSL_WARNINGS, (dlgAccountParam->ignoreSslWarnings)?BST_CHECKED:BST_UNCHECKED);
             CheckDlgButton(hDlg, IDC_X_PLAIN, (dlgAccountParam->plainTextPassword)?BST_CHECKED:BST_UNCHECKED);
             CheckDlgButton(hDlg, IDC_X_SASL, (dlgAccountParam->useSASL)?BST_CHECKED:BST_UNCHECKED);
             CheckDlgButton(hDlg, IDC_X_ZLIB, (dlgAccountParam->useCompression)?BST_CHECKED:BST_UNCHECKED);
@@ -70,6 +71,7 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             dlgAccountParam->port=GetDlgItemInt(hDlg, IDC_E_PORT, NULL, false);
 
             dlgAccountParam->useEncryption=IsDlgButtonChecked(hDlg, IDC_X_SSL)==BST_CHECKED;
+            dlgAccountParam->ignoreSslWarnings=IsDlgButtonChecked(hDlg, IDC_X_SSL_WARNINGS)==BST_CHECKED;
             dlgAccountParam->plainTextPassword=IsDlgButtonChecked(hDlg, IDC_X_PLAIN)==BST_CHECKED;
             dlgAccountParam->useSASL=IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_CHECKED;
             dlgAccountParam->useCompression=IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED;

@@ -166,7 +166,8 @@ CeTLSSocket::~CeTLSSocket(){
     FreeSSL();
 }
 
-bool CeTLSSocket::startTls(){
+bool CeTLSSocket::startTls(bool ignoreSSLWarnings){
+    this->ignoreSSLWarnings=ignoreSSLWarnings;
     BOOST_ASSERT(LoadSSL()==S_OK);
     int ioctlresult=WSAIoctl(sock, SO_SSL_PERFORM_HANDSHAKE, (LPVOID)url.c_str(), url.length(), 0, 0, 0, 0, 0);
     if (ioctlresult==SOCKET_ERROR) throwSocketError();

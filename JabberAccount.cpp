@@ -6,7 +6,7 @@ JabberAccount::JabberAccount(){
     init();
 }
 void JabberAccount::init(){
-    version=1;
+    version=2;
 
 	password="";
 
@@ -18,6 +18,7 @@ void JabberAccount::init(){
 	plainTextPassword=false;
 	useSASL=true;
 	useEncryption=false;
+    ignoreSslWarnings=false;
     legacySSL=false;
 	useCompression=false;
 	useProxy=false;
@@ -64,6 +65,8 @@ void JabberAccount::serialize( Serialize &s, bool read )
     s.streamBool(useEncryption); //useEncryption=false;
     s.streamBool(legacySSL);
     s.streamBool(useCompression);
+
+    if (version>=2) s.streamBool(ignoreSslWarnings);
 
     // proxy
     s.streamBool(useProxy);

@@ -5,6 +5,7 @@
 #include <aygshell.h>
 
 #include "ResourceContext.h"
+#include "JabberStream.h"
 
 #include "DlgAddEditContact.h"
 #include "DlgUtils.h"
@@ -21,8 +22,59 @@ extern HINSTANCE	g_hInst;			// current instance
 extern RosterView::ref rosterWnd;
 
 
-void streamShutdown();
-int initJabber();
+//////////////////////////////////////////////////////////////////////////
+class GetVcardNick : public JabberDataBlockListener {
+public:
+    GetVcardNick(std::string &jid, HWND targetDlg, int targetCtrl);
+    ~GetVcardNick(){};
+    virtual const char * getType() const{ return NULL; }
+    virtual const char * getId() const{ return id.c_str(); }
+    virtual const char * getTagName() const { return "iq"; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+    void doRequest(ResourceContextRef rc);
+private:
+    std::string jid;
+    std::string id;
+    HWND targetDlg;
+    int targetCtrl;
+    ResourceContextRef rc;
+};
+
+GetVcardNick::GetVcardNick(std::string &jid, HWND targetDlg, int targetCtrl) {
+    this->jid=jid;
+    this->targetDlg=targetDlg;
+    this->targetCtrl=targetCtrl;
+    id="cf#";
+    id+=jid;
+}
+
+void GetVcardNick::doRequest(ResourceContextRef rc) {
+    JabberDataBlock req("iq");
+    req.setAttribute("to", jid);
+    req.setAttribute("type", "get");
+    req.setAttribute("id", id);
+
+    req.addChild("vCard", NULL)->setAttribute("xmlns","vcard-temp");
+
+    rc->jabberStream->sendStanza(req);
+}
+
+ProcessResult GetVcardNick::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+    std::string &type=block->getAttribute("type");
+    std::string nick;
+    if (type=="result") {
+        JabberDataBlockRef vcard=block->getChildByName("vCard");
+        if (vcard) {
+            nick=vcard->getChildText("NICKNAME");
+        }
+
+        SetDlgItemText(targetDlg, targetCtrl, nick);
+    }
+
+    return LAST_BLOCK_PROCESSED;
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 INT_PTR CALLBACK DlgAddEditContact::dialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     DlgAddEditContact *p=(DlgAddEditContact *) GetWindowLong(hDlg, GWL_USERDATA);
@@ -57,6 +109,12 @@ INT_PTR CALLBACK DlgAddEditContact::dialogProc(HWND hDlg, UINT message, WPARAM w
 		return (INT_PTR)TRUE;
 
 	case WM_COMMAND:
+        if (LOWORD(wParam==ID_VCARD_NICK)) {
+            std::string jid; GetDlgItemText(hDlg, IDC_E_JID, jid);
+            GetVcardNick *getNick=new GetVcardNick(jid, hDlg, IDC_E_NICK);
+            p->rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(getNick));
+            getNick->doRequest(p->rc);
+        }
 		if (LOWORD(wParam) == IDOK)
 		{
 

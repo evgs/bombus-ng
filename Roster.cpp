@@ -97,8 +97,10 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
 
         //при push модифицировать ВСЕ экземпляры по bareJid
         Contact::ref contact;
+
         if (rosterPush) {
             int i=0;
+            bool found=false;
             while (i!=contacts.size()) {
                 Contact::ref right=contacts[i];
                 if (right->rosterJid==jid) {
@@ -107,6 +109,7 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
                         //todo: bareJidMap[contact->jid.getBareJid()]=contact; // now it is null
                         continue;
                     } else {
+                        found=true;
                         right->subscr=subscr;
                         right->nickname=name;
                         right->group=group;
@@ -117,21 +120,24 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
                 }
                 i++;
             }
-            //contact=findContact(jid);
-        } else {
-            if (contact==NULL) { 
-                contact=Contact::ref(new Contact(jid, "", name));
-                //std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
-                //roster->addODR(contact, (i==query->getChilds()->end()));
-            }   
 
-            contact->subscr=subscr;
-            contact->group=group;
-            contact->offlineIcon=offlineIcon;
+            if (subscr=="remove") break;
+            if (found) break;
+        } 
 
-            bareJidMap[contact->jid.getBareJid()]=contact;
-            contacts.push_back(contact);
-        }
+        contact=findContact(jid);
+        if (contact==NULL) { 
+            contact=Contact::ref(new Contact(jid, "", name));
+            //std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
+            //roster->addODR(contact, (i==query->getChilds()->end()));
+        }   
+
+        contact->subscr=subscr;
+        contact->group=group;
+        contact->offlineIcon=offlineIcon;
+
+        bareJidMap[contact->jid.getBareJid()]=contact;
+        contacts.push_back(contact);
     }
     //std::stable_sort(contacts.begin(), contacts.end(), Contact::compare);
     makeViewList();

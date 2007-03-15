@@ -17,6 +17,7 @@ namespace presence {
         TRASH=icons::ICON_TRASHCAN_INDEX,
         NOCHANGE=-1,
         PRESENCE_AUTH=-1,
-        PRESENCE_AUTH_ASK=-2
+        PRESENCE_AUTH_ASK=-2,
+        PRESENCE_AUTH_REMOVE=-3
     };
 }

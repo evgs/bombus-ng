@@ -364,7 +364,13 @@ HMENU RosterView::getContextMenu() {
 
         if (type==RosterGroup::ROSTER) {
             AppendMenu(hmenu, MF_STRING, RosterView::EDITCONTACT,          TEXT("Edit contact"));
-            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::SUBSCR,               TEXT("Subscription"));
+
+            HMENU subscrMenu=CreatePopupMenu();
+            AppendMenu(subscrMenu, MF_STRING, RosterView::SUBSCRIBE, TEXT("Ask subscription"));
+            AppendMenu(subscrMenu, MF_STRING, RosterView::SUBSCRIBED, TEXT("Grant subscription"));
+            AppendMenu(subscrMenu, MF_STRING, RosterView::UNSUBSCRIBED, TEXT("Revoke subscription"));
+
+            AppendMenu(hmenu, MF_POPUP, (LPARAM)subscrMenu,               TEXT("Subscription"));
         }
 
         if (type==RosterGroup::NOT_IN_LIST)
@@ -416,7 +422,19 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
         case RosterView::VCARD: 
         case RosterView::CLIENTINFO: 
         case RosterView::COMMANDS:
-        case RosterView::SUBSCR: 
+            break;
+        //case RosterView::SUBSCR: 
+        case RosterView::SUBSCRIBE:
+        case RosterView::SUBSCRIBED: 
+        case RosterView::UNSUBSCRIBED: 
+            {
+                presence::PresenceIndex subscr=presence::PRESENCE_AUTH_ASK;
+                if (cmdId==RosterView::SUBSCRIBED) subscr=presence::PRESENCE_AUTH;
+                if (cmdId==RosterView::UNSUBSCRIBED) subscr=presence::PRESENCE_AUTH_REMOVE;
+                rc->sendPresence(focusedContact->jid.getJid().c_str(),
+                    subscr, std::string(), 0);
+                break;
+            }
 
         case RosterView::EDITCONTACT:
         case RosterView::ADDCONTACT:

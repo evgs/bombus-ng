@@ -10,7 +10,7 @@ public:
 
     bool ignoreSSLWarnings;
 public:
-    bool startTls();
+    bool startTls(bool ignoreSSLWarnings);
 
 protected:
     CeTLSSocket(){};

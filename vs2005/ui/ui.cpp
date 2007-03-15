@@ -638,7 +638,7 @@ bool JabberStreamEvents::connect(){
     if (rc->account->useEncryption) {
         ConnectionRef tlsCon=ConnectionRef( new CeTLSSocket(host, rc->account->port));
         rc->jabberStream->connection=tlsCon;
-        if (rc->account->legacySSL) ((CeTLSSocket*)(tlsCon.get()))->startTls();
+        if (rc->account->legacySSL) ((CeTLSSocket*)(tlsCon.get()))->startTls(rc->account->ignoreSslWarnings);
     }
     else
         rc->jabberStream->connection=ConnectionRef( new Socket(host, rc->account->port));

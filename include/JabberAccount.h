@@ -45,6 +45,7 @@ public:
 	bool plainTextPassword;
 	bool useSASL;
 	bool useEncryption;
+    bool ignoreSslWarnings;
     bool legacySSL;
 	bool useCompression;
 	bool useProxy;

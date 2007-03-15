@@ -122,7 +122,11 @@ INT_PTR CALLBACK DlgAddEditContact::dialogProc(HWND hDlg, UINT message, WPARAM w
             std::string group; GetDlgItemText(hDlg, IDC_C_GROUP, group);
             std::string nick; GetDlgItemText(hDlg, IDC_E_NICK, nick);
 
-            p->rc->roster->rosterSet(nick.c_str(), jid.c_str(), group.c_str(), NULL);
+            p->rc->roster->rosterSet(
+                (nick.length()==0)? NULL : nick.c_str(), 
+                jid.c_str(), 
+                (group.length()==0)? NULL: group.c_str(), 
+                NULL);
 
             if (p->edit) 
                 if (IsDlgButtonChecked(hDlg, IDC_X_SUBSCR)==BST_CHECKED)

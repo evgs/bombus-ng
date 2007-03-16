@@ -279,7 +279,8 @@ RosterGroup::ref Roster::createGroup( const std::string &name, RosterGroup::Type
 RosterGroup::RosterGroup( const std::string &name, Type type ) {
     groupName=name;
     this->type=type;
-    wstr=utf8::utf8_wchar((name.length()==0)? "General" : name);
+    sortKey=utf8::utf8_wchar(name);
+    wstr=TEXT("General");    if ((name.length()!=0) wstr=sortKey;
     expanded=true;
     init();
 }
@@ -296,7 +297,7 @@ int RosterGroup::getIconIndex() const {
 bool RosterGroup::compare( RosterGroup::ref left, RosterGroup::ref right ) {
     if (left->type < right->type) return true;
     if (left->type > right->type) return false;
-    return (_wcsicmp(left->getText(), right->getText()) < 0);
+    return (_wcsicmp(left->sortKey.c_str(), right->sortKey.c_str()) < 0);
 }
 
 

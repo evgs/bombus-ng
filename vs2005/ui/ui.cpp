@@ -500,8 +500,6 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
     rosterWnd->setIcon(rc->status);
     rc->sendPresence();
 
-    ProcessMuc::initMuc("bombus_im@conference.jabber.ru/evgs-ng","", rc);
-
     /*presence.setAttribute("to","devil@conference.jabber.ru/evgs-bng");
     rc->jabberStream->sendStanza(presence);*/
 

@@ -75,6 +75,11 @@ MucRoom::MucRoom( const std::string &jid ) {
     update();
     messageList=ODRListRef(new ODRList);
 }
+
+void MucRoom::update() {
+    wjid=utf8::utf8_wchar( jid.getBareJid() );
+    init();
+}
 //////////////////////////////////////////////////////////////////////////
 MucContact::MucContact( const std::string &jid ) 
 {

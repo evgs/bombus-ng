@@ -7,6 +7,7 @@
 #include "ResourceContext.h"
 #include "JabberStream.h"
 #include "TabCtrl.h"
+#include "ProcessMUC.h"
 
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
@@ -329,11 +330,18 @@ void ChatView::sendJabberMessage() {
     std::string body=utf8::wchar_utf8(buf);
 
     Message::ref msg=Message::ref(new Message(body, "", Message::SENT));
-    contact->messageList->push_back(msg);
-    showWindow(true);
-    msgList->moveCursorEnd();
+    bool muc=boost::dynamic_pointer_cast<MucRoom>(contact);
 
-    JabberDataBlockRef out=msg->constructStanza(contact->jid.getJid());
+    if (!muc) contact->messageList->push_back(msg);
+
+    redraw();
+
+    if (!muc) msgList->moveCursorEnd();
+
+    std::string to=(muc)?contact->jid.getBareJid() : contact->jid.getJid();
+    JabberDataBlockRef out=msg->constructStanza(to);
+    if (muc) out->setAttribute("type","groupchat");
+
     //Reset form
     rc->jabberStream->sendStanza(*out);
 

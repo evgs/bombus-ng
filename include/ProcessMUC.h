@@ -23,6 +23,7 @@ class MucRoom : public Contact {
 public:
     MucRoom(const std::string &jid);
     typedef boost::shared_ptr<MucRoom> ref;
+    virtual void update();
 };
 
 class MucGroup : public RosterGroup {

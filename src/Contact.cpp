@@ -70,7 +70,7 @@ const std::string Contact::getFullName() const{
 bool Contact::compare( Contact::ref left, Contact::ref right ) {
     if (left->status < right->status) return true;
     if (left->status > right->status) return false;
-    return (left->wjid < right->wjid);
+    return (_wcsicmp(left->getText(), right->getText()) < 0);
 }
 void Contact::update() {
     std::string s=(nickname.empty())? jid.getBareJid():nickname;

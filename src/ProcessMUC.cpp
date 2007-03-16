@@ -77,7 +77,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
         //if (affiliation.equals("none")) affiliationCode=AFFILIATION_NONE;
 
         boolean roleChanged= c->role != role;
-        boolean affiliationChanged= c->role !=affiliation;
+        boolean affiliationChanged= c->affiliation !=affiliation;
     
         c->role=role;
         c->affiliation=affiliation;
@@ -160,7 +160,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
                 if (affiliation!="none") {
                     message+=" and ";
-                    message+="affiliation";
+                    message+=affiliation;
 
                     const std::string & status=block->getChildText("status");
                     message+=" (";
@@ -190,6 +190,9 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
             }
         }
     }
+
+    c->processPresence(block);
+    rc->roster->makeViewList();
 
     Message::ref msg=Message::ref(new Message(message, from, Message::PRESENCE));
 

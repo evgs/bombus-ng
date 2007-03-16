@@ -500,8 +500,7 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
     rosterWnd->setIcon(rc->status);
     rc->sendPresence();
 
-    /*presence.setAttribute("to","devil@conference.jabber.ru/evgs-bng");
-    rc->jabberStream->sendStanza(presence);*/
+    ProcessMuc::initMuc("bombus_im@conference.jabber.ru/evgs-ng","", rc);
 
 	return LAST_BLOCK_PROCESSED;
 }
@@ -609,69 +608,11 @@ public:
 };
 ProcessResult PresenceRecv::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     std::string from=block->getAttribute("from");
-    std::string type=block->getAttribute("type");
-    std::string priority=block->getChildText("priority");
-    std::string status=block->getChildText("status");
-
-    presence::PresenceIndex typeIndex=presence::OFFLINE;
-    presence::PresenceIndex type2=presence::NOCHANGE; //no change
-    Message::MsgType msgType=Message::PRESENCE;
-
-    if (type=="unavailable") { 
-        typeIndex=presence::OFFLINE;
-        type="offline";
-    } else if (type=="subscribe") { 
-        msgType=Message::PRESENCE_ASK_SUBSCR;
-        //TODO:
-    } else if (type=="subscribed") {
-        msgType=Message::PRESENCE_SUBSCRIBED;
-        //TODO:
-    } else if (type=="unsubscribe") {
-        //TODO:
-    } else if (type=="unsubscribed") {
-        msgType=Message::PRESENCE_UNSUBSCRIBED;
-        //TODO:
-    } else if (type=="error") {
-        typeIndex=presence::OFFLINE;
-        type2=presence::PRESENCE_ERROR;
-        //todo: extract error text here
-    } else {
-        type=block->getChildText("show");
-        if (type=="chat") typeIndex=presence::CHAT; else
-        if (type=="away") typeIndex=presence::AWAY; else
-        if (type=="xa") typeIndex=presence::XA; else
-        if (type=="dnd") typeIndex=presence::DND; else {
-            typeIndex=presence::ONLINE;
-            type="online";
-        }
-    }
-
 
     Contact::ref contact=rc->roster->getContactEntry(from);
+    contact->processPresence(block);
 
-    contact->status=typeIndex;
-    if (type2!=presence::NOCHANGE) contact->offlineIcon=type2;
-    contact->update();
     rc->roster->makeViewList();
-
-    std::string body=type;
-    body+=" (";
-    body+=status;
-    body+=") [#]";
-
-    Message::ref msg=Message::ref(new Message(body, from, msgType));
-
-    //std::wstring soundName(appRootPath);
-    //soundName+=TEXT("message.wav");
-    //Notify::PlayNotify();
-    //PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
-
-    //c->nUnread++;
-    if (contact->messageList->size()==1) {
-        //TODO: verify if it is presence;
-        contact->messageList->erase( contact->messageList->begin());
-    }
-    contact->messageList->push_back(msg);
 
 
     ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(contact).get());

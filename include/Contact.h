@@ -40,6 +40,8 @@ public:
     static bool compare(Contact::ref left, Contact::ref right);
 
     const std::string getFullName() const;
+
+    virtual void processPresence(JabberDataBlockRef block);
     //////////////////////////////////////////////////////////////////////////
 
     virtual int getColor() const;

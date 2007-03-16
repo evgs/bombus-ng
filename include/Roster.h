@@ -41,6 +41,7 @@ protected:
 
 private:
     std::wstring wstr;
+    std::wstring sortKey;
     std::string groupName;
     bool expanded;
 };

@@ -296,7 +296,7 @@ int RosterGroup::getIconIndex() const {
 bool RosterGroup::compare( RosterGroup::ref left, RosterGroup::ref right ) {
     if (left->type < right->type) return true;
     if (left->type > right->type) return false;
-    return left->groupName < right ->groupName;
+    return (_wcsicmp(left->getText(), right->getText()) < 0);
 }
 
 

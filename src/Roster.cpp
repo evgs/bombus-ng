@@ -232,6 +232,8 @@ void Roster::makeViewList() {
 
         if (!group->isExpanded()) continue;
 
+        group->addContacts(list);
+
         for (ContactList::const_iterator ci=contacts.begin(); ci!=contacts.end(); ci++) {
             Contact::ref contact=*ci;
             if (group->equals(contact->group)) {
@@ -268,19 +270,26 @@ RosterGroup::ref Roster::findGroup( const std::string &name ) {
     return RosterGroup::ref();
 }
 
-RosterGroup::ref Roster::createGroup( const std::string &name, RosterGroup::Type type ) 
-{
-    
+RosterGroup::ref Roster::createGroup( const std::string &name, RosterGroup::Type type ) {
+
     RosterGroup::ref newGrp=RosterGroup::ref(new RosterGroup(name, type));
     groups.push_back(newGrp);
     return newGrp;
+}
+
+void Roster::addGroup( RosterGroup::ref group ) {
+    groups.push_back(group);
+}
+
+void Roster::addContact( Contact::ref contact ) {
+    contacts.push_back(contact);
 }
 
 RosterGroup::RosterGroup( const std::string &name, Type type ) {
     groupName=name;
     this->type=type;
     sortKey=utf8::utf8_wchar(name);
-    wstr=TEXT("General");    if ((name.length()!=0) wstr=sortKey;
+    wstr=TEXT("General");    if (name.length()!=0) wstr=sortKey;
     expanded=true;
     init();
 }

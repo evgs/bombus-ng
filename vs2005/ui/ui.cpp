@@ -27,6 +27,8 @@
 #include "EntityCaps.h"
 #include "Roster.h"
 
+#include "ProcessMUC.h"
+
 #include "DlgAccount.h"
 #include "DlgStatus.h"
 #include "VirtualListView.h"
@@ -459,9 +461,11 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 //////////////////////////////////////////////////////////////////////////
-class MTForwarder: public JabberDataBlockListener {
+/*class MTForwarder: public JabberDataBlockListener {
 public:
-    MTForwarder(ResourceContextRef rc) {  /*this->rc=rc;*/  };
+    MTForwarder(ResourceContextRef rc) {
+        //this->rc=rc;
+    };
     ~MTForwarder(){};
     virtual const char * getTagName() const { return NULL; }
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
@@ -472,7 +476,7 @@ ProcessResult MTForwarder::blockArrived(JabberDataBlockRef block, const Resource
     PostMessage(mainWnd, WM_USER+2, 0, (LPARAM)p);
 
     return BLOCK_PROCESSED;
-}
+}*/
 //////////////////////////////////////////////////////////////
 class GetRoster : public JabberDataBlockListener {
 public:
@@ -495,6 +499,8 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 
     rosterWnd->setIcon(rc->status);
     rc->sendPresence();
+
+    ProcessMuc::initMuc("bombus_im@conference.jabber.ru/evgs-ng","", rc);
 
     /*presence.setAttribute("to","devil@conference.jabber.ru/evgs-bng");
     rc->jabberStream->sendStanza(presence);*/
@@ -552,7 +558,21 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     //StringRef orig=block->toXML();
 	Log::getInstance()->msg("Message from ", from.c_str()); 
 
-    Contact::ref c = rc->roster->getContactEntry(from);
+    bool mucMessage= block->getAttribute("type")=="groupchat";
+    Contact::ref c;
+    if (mucMessage) {
+        Jid roomNode;
+        roomNode.setJid(from);
+
+        MucGroup::ref roomGrp;
+        roomGrp=boost::dynamic_pointer_cast<MucGroup> (rc->roster->findGroup(roomNode.getBareJid()));
+        BOOST_ASSERT(roomGrp);
+        if (!roomGrp) return BLOCK_PROCESSED;
+        c=roomGrp->room;
+
+        body=roomNode.getResource()+">"+body;
+
+    } else c=rc->roster->getContactEntry(from);
 
     Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING));
 
@@ -565,7 +585,6 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
 
     c->nUnread++;
     c->messageList->push_back(msg);
-
 
     ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
     if(cv) {
@@ -699,6 +718,7 @@ void JabberStreamEvents::loginSuccess(){
     Log::getInstance()->msg("Login ok");
 
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new ProcessMuc(rc) ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new PresenceRecv() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version() ));

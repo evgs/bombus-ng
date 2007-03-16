@@ -290,6 +290,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\ProcessMUC.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ResourceContext.cpp"
 				>
 			</File>
@@ -489,6 +493,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\Presence.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\ProcessMUC.h"
 				>
 			</File>
 			<File

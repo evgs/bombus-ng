@@ -17,6 +17,7 @@ class Contact : public IconTextElement {
 public:
     typedef boost::shared_ptr<Contact> ref;
     Contact(const std::string &jid, const std::string &resource, const std::string &nickname);
+    Contact(){}
 
     Contact::ref clone();
 
@@ -45,9 +46,10 @@ public:
     virtual int getIconIndex() const;
     virtual const wchar_t * getText() const;
 
-    void update();
-private:
+    virtual void update();
+
     std::wstring wjid;
     int transpIndex;
+private:
 };
 

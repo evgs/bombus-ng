@@ -45,6 +45,8 @@ public:
 	JabberDataBlock * addChild(const char *_tagName, const char *_text);
 
 	JabberDataBlockRef getChildByName(const char * tagName) const;
+    JabberDataBlockRef findChildNamespace(const char *tagName, const char *xmlns);
+
     const std::string getChildText(const char * tagName) const;
 
 	bool hasChildByValue(const char * text);

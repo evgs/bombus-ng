@@ -12,14 +12,15 @@
 //////////////////////////////////////////////////////////////////////////
 class RosterGroup: public IconTextElement {
 public:
-
     enum Type {
         SELF_CONTACT=0,
         ROSTER,
         NOT_IN_LIST,
-        TRANSPORTS
+        TRANSPORTS,
+        MUC
     };
 
+    RosterGroup(){};
     RosterGroup(const std::string &name, Type type);
     virtual int getColor() const;
 
@@ -35,15 +36,16 @@ public:
 
     Type type;
 
+    virtual void addContacts(ODRList *list){};
+
 protected:
     virtual const wchar_t * getText() const;
     virtual int getIconIndex() const;
-
-private:
     std::wstring wstr;
     std::wstring sortKey;
     std::string groupName;
     bool expanded;
+private:
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -68,8 +70,10 @@ public:
     Contact::ref findContact (const std::string &jid) const;
     Contact::ref getContactEntry(const std::string & jid);
 
+    void addGroup( RosterGroup::ref group );
     RosterGroup::ref findGroup(const std::string &name);
     RosterGroup::ref createGroup(const std::string &name, RosterGroup::Type type);
+
     void makeViewList();
 
     virtual const char * getType() const{ return NULL; /* result/set */ }
@@ -81,9 +85,9 @@ public:
 
     StringVectorRef getRosterGroups();
 
+    void addContact(Contact::ref contact);
     void deleteContact(Contact::ref contact);
     void rosterSet(const char * nick, const char *jid, const char *group, const char *subscr );
-
     typedef boost::shared_ptr<Roster> ref;
 
     ResourceContextRef rc;

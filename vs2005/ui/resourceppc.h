@@ -21,6 +21,7 @@
 #define IDD_EDIT_CONTACT                109
 #define IDM_SEND                        110
 #define IDD_ADD_CONTACT                 110
+#define IDD_CONFERENCE                  111
 #define IDI_BOMBUS                      130
 #define IDC_STATIC_2                    202
 #define IDC_STATIC_3                    203
@@ -46,6 +47,12 @@
 #define IDC_C_SERVICE                   1024
 #define IDC_C_GROUP                     1025
 #define IDC_X_SUBSCR                    1026
+#define IDC_SAVE                        1028
+#define IDC_DELETE                      1029
+#define IDC_EDIT1                       1030
+#define IDC_EDIT2                       1031
+#define IDC_EDIT3                       1032
+#define IDC_COMBO1                      1033
 #define IDM_JABBER                      32775
 #define IDM_JABBER_STREAMINFO           32777
 #define IDM_WINDOWS_ROSTER              32782
@@ -70,7 +77,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32795
-#define _APS_NEXT_CONTROL_VALUE         1027
+#define _APS_NEXT_CONTROL_VALUE         1034
 #define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

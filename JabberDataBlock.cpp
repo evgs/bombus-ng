@@ -124,3 +124,13 @@ void JabberDataBlock::setText( const std::string &_text ) {
 void JabberDataBlock::setText( const char *_text ) {
     setText(string(_text));
 }
+
+JabberDataBlockRef JabberDataBlock::findChildNamespace( const char *tagName, const char *xmlns ) {
+    for (JabberDataBlockRefList::const_iterator c=childs.begin(); c!=childs.end(); c++) {
+        JabberDataBlockRef child=*c;
+        if (tagName)   if ( child->tagName!=tagName) continue;
+        std::string a;
+        if (child->getAttribute("xmlns").find(xmlns)==0) return child;
+    }
+    return JabberDataBlockRef();
+}

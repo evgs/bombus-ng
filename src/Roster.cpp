@@ -123,14 +123,14 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
             contact=Contact::ref(new Contact(jid, "", name));
             //std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
             //roster->addODR(contact, (i==query->getChilds()->end()));
+            bareJidMap[contact->jid.getBareJid()]=contact;
+            contacts.push_back(contact);
         }   
 
         contact->subscr=subscr;
         contact->group=group;
         contact->offlineIcon=offlineIcon;
 
-        bareJidMap[contact->jid.getBareJid()]=contact;
-        contacts.push_back(contact);
     }
     //std::stable_sort(contacts.begin(), contacts.end(), Contact::compare);
     makeViewList();

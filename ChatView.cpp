@@ -145,6 +145,7 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             p->msgList=VirtualListView::ref(new VirtualListView(hWnd, std::string("Chat")));
             p->msgList->setParent(hWnd);
             p->msgList->showWindow(true);
+            p->msgList->wrapList=false;
             p->editWnd=DoCreateEditControl(hWnd);
             p->msgList->bindODRList(p->contact->messageList);
             break;

@@ -39,7 +39,7 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
             std::string room="bombus";
             std::string server="conference.jabber.ru";
             std::string pass="";
-            std::string nick="evgs";
+            std::string nick; //="evgs";
 
             /*for (int i=0; i<6; i++)
                 SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) statusNames[i]);
@@ -80,6 +80,8 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
             roomNode.setUserName(room);
             roomNode.setServer(server);
             roomNode.setResource(nick);
+
+            if (room.length()==0 || server.length()==0 || nick.length()==0) return TRUE;
 
             ProcessMuc::initMuc(roomNode.getJid(), pass, p->rc);
 

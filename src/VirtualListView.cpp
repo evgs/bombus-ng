@@ -399,9 +399,15 @@ void VirtualListView::moveCursor( int direction ) {
         if (r.get()==cursorPos.get()) {
             if (direction>0) {
                 i++;
-                if (i==odrlist->end()) i=odrlist->begin();
+                if (i==odrlist->end()) {
+                    if (wrapList) i=odrlist->begin();
+                    else i--;
+                }
             } else {
-                if (i==odrlist->begin()) i=odrlist->end();
+                if (i==odrlist->begin()) {
+                    if (wrapList) i=odrlist->end(); 
+                    else return;
+                }
                 i--;
             }
             cursorPos=*i;

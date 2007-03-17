@@ -28,6 +28,7 @@ public:
 
     std::string subscr;
 
+    int sortKey;
     presence::PresenceIndex status;
     int offlineIcon;
 

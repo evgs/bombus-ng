@@ -41,6 +41,8 @@ public:
     typedef boost::shared_ptr<VirtualListView> ref;
 
 
+    bool wrapList;
+
 protected:
 
     int winTop;
@@ -59,7 +61,6 @@ private:
         SCROLLWIDTH=14
     };
 
-    bool wrapList;
     bool moveCursorTo(int x, int y);
     void moveCursor(int direction);
     void cursorFit();

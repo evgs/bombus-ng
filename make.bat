@@ -9,3 +9,4 @@ mkdir dist
 xcopy /y "vs2005\ui\Pocket PC 2003 (ARMV4)\Release\Bombus.exe" dist\
 xcopy /s /y resources\*.* dist\
 pkzipc -add -rec -path=relative "dist\bombus-%REVN% [%REVDATE%].zip" dist\*.*
+xcopy "dist\bombus-%REVN% [%REVDATE%].zip" "dist\bombus-ng.zip"

@@ -21,6 +21,7 @@
 
 #include "DlgStatus.h"
 #include "DlgAddEditContact.h"
+#include "VcardForm.h"
 
 #include "utf8.hpp"
 
@@ -377,7 +378,7 @@ HMENU RosterView::getContextMenu() {
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
-        AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::VCARD,                    TEXT("VCard"));
+        AppendMenu(hmenu, MF_STRING, RosterView::VCARD,                    TEXT("VCard"));
         AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::CLIENTINFO,               TEXT("Client Info"));
         AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::COMMANDS,                 TEXT("Commands"));
 
@@ -440,7 +441,14 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
             break;
 
         case RosterView::RESOLVENICKNAMES:
+            break;
+
         case RosterView::VCARD: 
+            {
+                WndRef vc=VcardForm::ref(new VcardForm(tabs->getHWnd(), focusedContact->rosterJid, rc));
+                tabs->addWindow(vc);
+                tabs->switchByWndRef(vc);
+            }
         case RosterView::CLIENTINFO: 
         case RosterView::COMMANDS:
             break;

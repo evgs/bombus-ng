@@ -1,6 +1,7 @@
 #include "HtmlView.h"
 
-#include <commctrl.h>
+#include <sipapi.h>
+#include <htmlctrl.h>
 #include <windowsx.h>
 #include <aygshell.h>
 #include "utf8.hpp"
@@ -34,10 +35,41 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             p=(HtmlView *) (((CREATESTRUCT *)lParam)->lpCreateParams);
             SetWindowLong(hWnd, GWL_USERDATA, (LONG) p );
 
-            //p->listScrollHWND=CreateWindow(_T("SCROLLBAR"), NULL, 
-            //    SBS_VERT | WS_VISIBLE | WS_CHILD,
-            //    0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
-            //    hWnd, NULL, g_hInst, NULL); 
+
+            RECT rc;
+
+            GetClientRect (hWnd, &rc);
+
+            p->htmlHWnd = CreateWindow (
+                DISPLAYCLASS, 
+                NULL, 
+                WS_CHILD | WS_VISIBLE | /*WS_VSCROLL |*/ WS_CLIPSIBLINGS, 
+                rc.left, rc.top,
+                rc.right - rc.left, rc.bottom - rc.top, 
+                hWnd, 
+                0, //(HMENU)IDC_HTMLVIEW, 
+                g_hInst, 
+                NULL);
+
+            SetFocus(p->htmlHWnd);
+
+            HWND hwndHTML=p->htmlHWnd;
+            bool   fFitToPage = TRUE;
+            PostMessage(hwndHTML, DTM_ENABLESHRINK, 0, fFitToPage);
+
+            SendMessage(hwndHTML, WM_SETTEXT, 0, (LPARAM)"");
+            SendMessage(hwndHTML, DTM_ADDTEXTW, FALSE, 
+                (LPARAM)TEXT("<HTML><TITLE>Test</TITLE><BODY><P>Loading...<BR></BODY></HTML>"));
+            SendMessage(hwndHTML, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);
+
+
+            /*SendMessage(hwndHTML, WM_SETTEXT, 0, (LPARAM)"");
+            SendMessage(hwndHTML, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<HTML><TITLE>Test</TITLE>"));
+            SendMessage(hwndHTML, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<BODY><P>"));
+            SendMessage(hwndHTML, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<h1>Heading</h1>Normal Text<BR>"));
+            SendMessage(hwndHTML, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<A HREF=\"www.voscorp.com\"><IMG SRC=\"\\Pic.gif\"></A>"));
+            SendMessage(hwndHTML, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("</BODY></HTML>"));
+            SendMessage(hwndHTML, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);*/
 
             break;
 
@@ -47,7 +79,6 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
         {
             PAINTSTRUCT ps;
-            HDC hdc;
             HDC wnd;
             wnd = BeginPaint(hWnd, &ps);
 
@@ -66,6 +97,8 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             // tab control is the size of the client area. 
             SetRect(&(p->clientRect), 0, 0, width, height ); 
 
+            if(IsWindow(p->htmlHWnd))
+                SetWindowPos(p->htmlHWnd, 0, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
             /*hdwp = BeginDeferWindowPos(1);
 
             DeferWindowPos(hdwp, p->listScrollHWND, HWND_TOP, width-SCROLLWIDTH, tabHeight, 
@@ -93,9 +126,18 @@ HtmlView::HtmlView() { /*init(); - MUST NOT be called before setting up parentHW
 void HtmlView::init() {
     BOOST_ASSERT(parentHWnd);
 
-    if (windowClass==0)
+    if (htmlViewInstance==0) 
+        htmlViewInstance=LoadLibrary(L"htmlview.dll");
+
+    if (htmlViewInstance==0) throw std::exception("Unable to initialize HTML control");
+
+    if(!InitHTMLControl( g_hInst )) throw std::exception("Unable to initialize HTML control");
+
+    if (windowClass==0) 
         windowClass=RegisterWindowClass();
+
     if (windowClass==0) throw std::exception("Can't create window class");
+
     thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentHWnd, NULL, g_hInst, (LPVOID)this);
 
@@ -121,4 +163,4 @@ HtmlView::~HtmlView() {}
 const ODR * HtmlView::getODR() const { return wt.get(); }
 
 ATOM HtmlView::windowClass=0;
-
+HINSTANCE HtmlView::htmlViewInstance=0;

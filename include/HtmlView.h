@@ -23,6 +23,8 @@ public:
 
 protected:
 
+    HWND htmlHWnd;
+
     std::wstring title;
     WndTitleRef  wt;    
 
@@ -30,6 +32,8 @@ protected:
 
 private:
     static ATOM windowClass;
+    static HINSTANCE htmlViewInstance;
+
     ATOM RegisterWindowClass();
 };
 

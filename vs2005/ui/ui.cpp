@@ -35,6 +35,7 @@
 #include "VirtualListView.h"
 #include "ChatView.h"
 #include "TabCtrl.h"
+#include "HtmlView.h"
 
 #include "Auth.h"
 
@@ -57,6 +58,7 @@ TabsCtrlRef tabs;
 RosterView::ref rosterWnd;
 ChatView::ref chatSample;
 ResourceContextRef rc;
+HtmlView::ref htmlWnd;
 
 ImgListRef skin;
 
@@ -310,6 +312,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             rosterWnd=RosterView::ref(new RosterView(tabs->getHWnd(), std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
+            htmlWnd=HtmlView::ref(new HtmlView(tabs->getHWnd(), std::string("html test")));
+            tabs->addWindow(htmlWnd);
             //chatSample=ChatView::ref(new ChatView(tabs->getHWnd(), Contact::ref(new Contact("test@server","resource",""))));
             //tabs->addWindow(chatSample);
             //logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));

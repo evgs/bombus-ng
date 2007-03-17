@@ -123,7 +123,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
             case 307: //kick
             case 301: //ban
-                message+=(statusCode==301)?" was kicked " : " was banned ";
+                message+=(statusCode==307)?" was kicked " : " was banned ";
                 message+="(";
                 message+=reason;
                 message+=")";

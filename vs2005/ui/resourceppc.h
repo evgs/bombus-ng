@@ -49,10 +49,14 @@
 #define IDC_X_SUBSCR                    1026
 #define IDC_SAVE                        1028
 #define IDC_DELETE                      1029
-#define IDC_EDIT1                       1030
-#define IDC_EDIT2                       1031
+#define IDC_E_ROOM                      1030
+#define IDC_E_SERVER                    1031
 #define IDC_EDIT3                       1032
-#define IDC_COMBO1                      1033
+#define IDC_C_NICK                      1033
+#define IDC_E_HISTSZ                    1034
+#define IDC_SPIN_HIST_SZ                1035
+#define IDC_C_BOOKMARK                  1036
+#define IDC_X_AUTOJOIN                  1037
 #define IDM_JABBER                      32775
 #define IDM_JABBER_STREAMINFO           32777
 #define IDM_WINDOWS_ROSTER              32782
@@ -77,7 +81,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32795
-#define _APS_NEXT_CONTROL_VALUE         1034
+#define _APS_NEXT_CONTROL_VALUE         1038
 #define _APS_NEXT_SYMED_VALUE           111
 #endif
 #endif

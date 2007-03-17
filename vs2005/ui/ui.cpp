@@ -31,6 +31,7 @@
 
 #include "DlgAccount.h"
 #include "DlgStatus.h"
+#include "DlgMucJoin.h"
 #include "VirtualListView.h"
 #include "ChatView.h"
 #include "TabCtrl.h"
@@ -269,6 +270,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     streamShutdown();
                     break;*/
 
+                case ID_JABBER_JOINCONFERENCE:
+                    if (rc->isLoggedIn())
+                        DlgMucJoin::createDialog(hWnd, rc);
+                    break;
+
 				case IDM_JABBER_STREAMINFO:
                     Log::getInstance()->msg(
 						rc->jabberStream->connection->getStatistics().c_str()
@@ -500,7 +506,7 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
     rosterWnd->setIcon(rc->status);
     rc->sendPresence();
 
-    ProcessMuc::initMuc("bombus_im@conference.jabber.ru/evgs-ng","", rc);
+    //ProcessMuc::initMuc("bombus_im@conference.jabber.ru/evgs-ng","", rc);
 
 	return LAST_BLOCK_PROCESSED;
 }

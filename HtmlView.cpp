@@ -143,7 +143,7 @@ void HtmlView::init() {
 
     if (windowClass==0) throw std::exception("Can't create window class");
 
-    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("HtmlView"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
+    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("HtmlView"), WS_CHILD | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentHWnd, NULL, g_hInst, (LPVOID)this);
 
 }

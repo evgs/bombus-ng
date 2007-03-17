@@ -18,6 +18,12 @@ MucContact::ref getMucContactEntry(const std::string &jid, ResourceContextRef rc
     return c;
 }
 
+enum MPA {
+    NONE=0,
+    ENTER=1,
+    LEAVE=2
+};
+
 //////////////////////////////////////////////////////////////////////////
 ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 
@@ -40,11 +46,14 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
     MucContact::ref c=getMucContactEntry(from, rc);
 
+    MPA action=NONE;
+
     if (type=="error") {
         JabberDataBlockRef error=block->getChildByName("error");
         int errCode=atoi(error->getAttribute("code").c_str());
 
         //todo: if (status>=Presence.PRESENCE_OFFLINE) testMeOffline();
+        action=LEAVE;
         
         //todo: if (errCode!=409 || status>=Presence.PRESENCE_OFFLINE)  setStatus(presenceType);
 
@@ -66,9 +75,9 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
         JabberDataBlockRef item=xmuc->getChildByName("item");   
 
         std::string role=item->getAttribute("role");
-        //if (role.equals("visitor")) roleCode=ROLE_VISITOR;
-        //if (role.equals("participant")) roleCode=ROLE_PARTICIPANT;   
-        //if (role.equals("moderator")) roleCode=ROLE_MODERATOR;
+        if (role=="visitor") c->sortKey=2;
+        if (role=="participant") c->sortKey=1;   
+        if (role=="moderator") c->sortKey=0;
         
         std::string affiliation=item->getAttribute("affiliation");
         //if (affiliation.equals("owner")) affiliationCode=AFFILIATION_OWNER;
@@ -99,6 +108,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
         message=c->jid.getResource(); // nick
 
         if (type=="unavailable") {
+            action=LEAVE;
             std::string reason=item->getChildText("reason");
 
             switch (statusCode) {
@@ -108,6 +118,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                 c->jid.setResource(item->getAttribute("nick"));
                 c->rosterJid=c->jid.getJid(); //for vCard
                 c->update();
+                action=NONE;
                 break;
 
             case 307: //kick
@@ -121,17 +132,14 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                     message+=" - ";
                     message+=c->realJid;
                 }
-                //todo:   testMeOffline();
                 break;
 
             case 321:
                 message+=" has been unaffiliated and kicked from members-only room";
-                //todo:   testMeOffline();
                 break;
 
             case 322:
                 message+=" has been kicked because room became members-only";
-                //todo:   testMeOffline();
                 break;
 
             default:
@@ -141,11 +149,10 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                     message+="(";
                     message+=status;
                     message+=")";
-                    //todo:   testMeOffline();
                 }
             }
         } else { //onlines
-            
+            action=ENTER;
             if (c->status>=presence::OFFLINE) {
                 // first online
                 std::string realJid=item->getAttribute("jid");
@@ -188,6 +195,21 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
                 }
             }
+        }
+    }
+
+    if (c.get()==roomGrp->selfContact.get()) {
+        switch (action) {
+            case ENTER:
+                // room contact is online
+                roomGrp->room->status=presence::ONLINE;
+                break;
+            case LEAVE:
+                // room contact is offline
+                roomGrp->room->status=presence::OFFLINE;
+                // make all occupants offline
+                rc->roster->setStatusByFilter(roomNode.getBareJid(), presence::OFFLINE);
+                break;
         }
     }
 

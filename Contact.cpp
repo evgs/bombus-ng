@@ -27,6 +27,7 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     offlineIcon=presence::OFFLINE;
 
     nUnread=0;
+    sortKey=0;
 
     transpIndex=identifyTransport(jid);
 
@@ -68,8 +69,12 @@ const std::string Contact::getFullName() const{
 }
 //////////////////////////////////////////////////////////////////////////
 bool Contact::compare( Contact::ref left, Contact::ref right ) {
-    if (left->status < right->status) return true;
-    if (left->status > right->status) return false;
+    Contact *l=left.get();
+    Contact *r=right.get();
+    if (l->sortKey < r->sortKey) return true;
+    if (l->sortKey > r->sortKey) return false;
+    if (l->status < r->status) return true;
+    if (l->status > r->status) return false;
     return (_wcsicmp(left->getText(), right->getText()) < 0);
 }
 void Contact::update() {

@@ -285,6 +285,17 @@ void Roster::addContact( Contact::ref contact ) {
     contacts.push_back(contact);
 }
 
+void Roster::setStatusByFilter( const std::string & bareJid, int status ) {
+    int i=0;
+    while (i!=contacts.size()) {
+        Contact::ref right=contacts[i];
+        if (right->jid.getBareJid()==bareJid) {
+            right->status=(presence::PresenceIndex)status;
+        }
+        i++;
+    }
+}
+
 RosterGroup::RosterGroup( const std::string &name, Type type ) {
     groupName=name;
     this->type=type;

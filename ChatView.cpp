@@ -360,7 +360,7 @@ void ChatView::sendJabberMessage() {
 
 void MessageElement::init() {
     HDC tmp=CreateCompatibleDC(NULL);
-    RECT r={0,0,240,10};
+    RECT r={0,0,230,10}; //todo: fix width detection
     DrawText(tmp, getText(), -1, &r, DT_CALCRECT | DT_LEFT | DT_TOP |DT_WORDBREAK);
     width=r.right;
     height=r.bottom;  

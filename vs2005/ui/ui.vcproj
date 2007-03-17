@@ -242,6 +242,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\HtmlView.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\IconTextElement.cpp"
 				>
 			</File>
@@ -429,6 +433,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\EntityCaps.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\HtmlView.h"
 				>
 			</File>
 			<File

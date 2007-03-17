@@ -354,6 +354,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\VcardForm.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\VirtualListView.cpp"
 				>
 			</File>
@@ -561,6 +565,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\utf8.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\VcardForm.h"
 				>
 			</File>
 			<File

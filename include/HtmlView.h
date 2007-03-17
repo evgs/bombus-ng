@@ -17,6 +17,7 @@ public:
     virtual const wchar_t * getWindowTitle() const;
     virtual const ODR * getODR() const;
 
+    virtual void update();
 
     typedef boost::shared_ptr<HtmlView> ref;
 

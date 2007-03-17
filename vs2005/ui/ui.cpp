@@ -312,8 +312,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             rosterWnd=RosterView::ref(new RosterView(tabs->getHWnd(), std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
-            htmlWnd=HtmlView::ref(new HtmlView(tabs->getHWnd(), std::string("html test")));
-            tabs->addWindow(htmlWnd);
             //chatSample=ChatView::ref(new ChatView(tabs->getHWnd(), Contact::ref(new Contact("test@server","resource",""))));
             //tabs->addWindow(chatSample);
             //logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
@@ -324,6 +322,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 tabs->addWindow(odrLog);
                 Log::getInstance()->bindLV(odrLog); 
             }
+
+            /*htmlWnd=HtmlView::ref(new HtmlView(tabs->getHWnd(), std::string("html test")));
+            tabs->addWindow(htmlWnd);*/
 
             /*tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 1"))));
             tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 2"))));

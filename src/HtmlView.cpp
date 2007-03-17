@@ -110,6 +110,11 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             break; 
         } 
 
+    case WM_USER:
+        {
+            p->update();
+            break;
+        }
     case WM_DESTROY:
         //TODO: Destroy all child data associated eith this window
 
@@ -138,7 +143,7 @@ void HtmlView::init() {
 
     if (windowClass==0) throw std::exception("Can't create window class");
 
-    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
+    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("HtmlView"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentHWnd, NULL, g_hInst, (LPVOID)this);
 
 }
@@ -161,6 +166,8 @@ const wchar_t * HtmlView::getWindowTitle() const{
 HtmlView::~HtmlView() {}
 
 const ODR * HtmlView::getODR() const { return wt.get(); }
+
+void HtmlView::update() {}
 
 ATOM HtmlView::windowClass=0;
 HINSTANCE HtmlView::htmlViewInstance=0;

@@ -69,3 +69,8 @@ void Jid::updateJid(void){
 bool Jid::operator==(const Jid &right) const {
     return this->jid==right.jid;
 };
+
+bool Jid::isValid() {
+    if (getUserName().length()==0) return false;
+    if (getServer().length()==0) return false;
+}

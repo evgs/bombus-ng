@@ -25,6 +25,7 @@ public:
 
     bool operator==(const Jid &right) const;
     bool isTransport() { return userName.length()==0; }
+    bool isValid();
 
 private:
 	std::string userName;

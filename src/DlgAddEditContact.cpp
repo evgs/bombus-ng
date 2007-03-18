@@ -111,14 +111,18 @@ INT_PTR CALLBACK DlgAddEditContact::dialogProc(HWND hDlg, UINT message, WPARAM w
 	case WM_COMMAND:
         if (LOWORD(wParam==ID_VCARD_NICK)) {
             std::string jid; GetDlgItemText(hDlg, IDC_E_JID, jid);
+            if (!verifyJid(hDlg, jid)) return TRUE;
+
             GetVcardNick *getNick=new GetVcardNick(jid, hDlg, IDC_E_NICK);
             p->rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(getNick));
             getNick->doRequest(p->rc);
+            return TRUE;
         }
 
 		if (LOWORD(wParam) == IDOK)
 		{
             std::string jid; GetDlgItemText(hDlg, IDC_E_JID, jid);
+            if (!verifyJid(hDlg, jid)) return TRUE;
             std::string group; GetDlgItemText(hDlg, IDC_C_GROUP, group);
             std::string nick; GetDlgItemText(hDlg, IDC_E_NICK, nick);
 
@@ -170,4 +174,13 @@ void DlgAddEditContact::createDialog( HWND parent, ResourceContextRef rc, Contac
     DialogBoxParam(g_hInst, 
         (p->edit)? (LPCTSTR)IDD_EDIT_CONTACT : (LPCTSTR)IDD_ADD_CONTACT ,
         parent, dialogProc, (LPARAM)p);
+}
+
+bool verifyJid( HWND hwnd, const std::string &jid ) {
+    Jid j(jid);
+    if (!j.isValid()) {
+        MessageBox(hwnd, L"Please enter valid JID, like user@jabber.ru", L"Invalid Jabber ID", MB_OK | MB_ICONINFORMATION);
+        return FALSE;
+    }
+    return true;
 }

@@ -8,6 +8,7 @@
 #include "JabberAccount.h"
 
 #include "DlgAccount.h"
+#include "DlgUtils.h"
 
 #include "..\vs2005\ui\resourceppc.h"
 
@@ -63,7 +64,9 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK)
 		{
-            dlgAccountParam->setBareJid(GetDlgItemText(hDlg, IDC_E_JID));
+            const std::string &myjid=GetDlgItemText(hDlg, IDC_E_JID);
+            if (!verifyJid(hDlg, myjid)) return TRUE;
+            dlgAccountParam->setBareJid(myjid);
             GetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
             dlgAccountParam->setResource(GetDlgItemText(hDlg, IDC_E_RESOURCE));
             GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);

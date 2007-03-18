@@ -51,7 +51,26 @@ void VcardForm::update() {
     SendMessage(htmlHWnd, DTM_CLEAR, 0, 0);
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<HTML><TITLE>Test</TITLE>"));
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<BODY><P>"));
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)(xml3.c_str()));
+
+    addHtmlField("FN", NULL,        L"Full Name");
+    addHtmlField("NICKNAME", NULL,  L"Nickname");
+    addHtmlField("BDAY", NULL,      L"Birthday");
+    addHtmlField("ADR", "STREET",   L"Street");
+    addHtmlField("ADR", "EXTADR",   L"Street2");
+    addHtmlField("ADR", "LOCALITY", L"City");
+    addHtmlField("ADR", "REGION",   L"State");
+    addHtmlField("ADR", "PCODE",    L"Post code");
+    addHtmlField("ADR", "CTRY",     L"Country");
+    addHtmlField("TEL", "HOME",     L"Home Phone Number");
+    addHtmlField("TEL", "NUMBER",   L"Phone Number");
+    addHtmlField("EMAIL", "USERID", L"E-Mail");
+    addHtmlField("TITLE", NULL,     L"Position");
+    addHtmlField("ROLE", NULL,      L"Role");
+    addHtmlField("ORG", "ORGNAME",  L"Organization");
+    addHtmlField("ORG", "ORGUNIT",  L"Dept");
+    addHtmlField("URL", NULL,       L"Url");
+    addHtmlField("DESC", NULL,      L"About");
+
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("</BODY></HTML>"));
     SendMessage(htmlHWnd, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);
 }
@@ -93,4 +112,18 @@ void VcardForm::vcardArrivedNotify(JabberDataBlockRef vcard){
     this->vcard=vcard;
 
     PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
+}
+
+void VcardForm::addHtmlField( const char *ns1, const char *ns2, const wchar_t* description ) {
+    if (!vcard) return;
+    JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return;
+    JabberDataBlockRef field=vcardTemp->getChildByName(ns1);     if (!field) return;
+    if (ns2) field=field->getChildByName(ns2);     if (!field) return;
+    const std::wstring value=utf8::utf8_wchar(XMLStringPrep(field->getText()));
+    if (value.length()==0) return;
+
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) description);
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L": ");
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<BR>");
 }

@@ -16,6 +16,8 @@ public:
     static VcardForm::ref createVcardForm(HWND parent, const std::string &jid, ResourceContextRef rc);
 
 protected:
+    void addHtmlField(const char *ns1, const char *ns2, const wchar_t* description);
+
     boost::weak_ptr<VcardForm> formRef;
 
     JabberDataBlockRef vcard;

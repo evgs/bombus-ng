@@ -71,7 +71,7 @@ VcardForm::VcardForm(HWND parent, const std::string &jid, ResourceContextRef rc)
 
     this->title=utf8::utf8_wchar(jid);
 
-    wt=WndTitleRef(new WndTitle(this, icons::ICON_PRIVACY_ACTIVE));
+    wt=WndTitleRef(new WndTitle(this, icons::ICON_VCARD));
 
     this->rc=rc;
 

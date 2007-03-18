@@ -6,6 +6,10 @@
 #include "JabberStream.h"
 
 #include "utf8.hpp"
+#include "base64.h"
+
+extern std::wstring appRootPath;
+
 
 class GetVcard : public JabberDataBlockListener {
 public:
@@ -48,9 +52,11 @@ void VcardForm::update() {
 
     //SendMessage(hwndHTML, WM_SETTEXT, 0, (LPARAM)"");
 
+    loadPhoto();
+
     SendMessage(htmlHWnd, DTM_CLEAR, 0, 0);
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<HTML><TITLE>Test</TITLE>"));
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<BODY><P>"));
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<BODY><P><IMG SRC=\"\\vcard\"><BR>"));
 
     addHtmlField("FN", NULL,        L"Full Name");
     addHtmlField("NICKNAME", NULL,  L"Nickname");
@@ -63,12 +69,12 @@ void VcardForm::update() {
     addHtmlField("ADR", "CTRY",     L"Country");
     addHtmlField("TEL", "HOME",     L"Home Phone Number");
     addHtmlField("TEL", "NUMBER",   L"Phone Number");
-    addHtmlField("EMAIL", "USERID", L"E-Mail");
+    addHtmlField("EMAIL", "USERID", L"E-Mail", URL);
     addHtmlField("TITLE", NULL,     L"Position");
     addHtmlField("ROLE", NULL,      L"Role");
     addHtmlField("ORG", "ORGNAME",  L"Organization");
     addHtmlField("ORG", "ORGUNIT",  L"Dept");
-    addHtmlField("URL", NULL,       L"Url");
+    addHtmlField("URL", NULL,       L"Url", URL);
     addHtmlField("DESC", NULL,      L"About");
 
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("</BODY></HTML>"));
@@ -114,7 +120,8 @@ void VcardForm::vcardArrivedNotify(JabberDataBlockRef vcard){
     PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
 }
 
-void VcardForm::addHtmlField( const char *ns1, const char *ns2, const wchar_t* description ) {
+void VcardForm::addHtmlField( const char *ns1, const char *ns2, const wchar_t* description, int flags ) 
+{
     if (!vcard) return;
     JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return;
     JabberDataBlockRef field=vcardTemp->getChildByName(ns1);     if (!field) return;
@@ -124,6 +131,51 @@ void VcardForm::addHtmlField( const char *ns1, const char *ns2, const wchar_t* d
 
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) description);
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L": ");
+    if (flags & URL)   {
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<A HREF=\"");
+        //SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str()); 
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"\">");
+    }
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
+    if (flags & URL)   SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"</A>");
+
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<BR>");
+}
+
+HBITMAP VcardForm::getImage( LPCTSTR url ) {
+    if (img) return img->getHBmp();
+    return NULL;
+}
+
+void VcardForm::loadPhoto() {
+    if (!vcard) return;
+    JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return;
+    JabberDataBlockRef photo=vcardTemp->getChildByName("PHOTO");    if (!photo) return;
+    JabberDataBlockRef binval=photo->getChildByName("BINVAL");
+    const std::string &data=binval->getText();
+
+    int dstLen=base64::base64DecodeGetLength(data.length());
+    char *dst=new char[dstLen];
+
+    dstLen=base64::base64Decode2(dst, data.c_str(), data.length());
+
+    std::wstring imgFile=appRootPath+L"$tmpimg.jpg";
+
+
+    HANDLE file=CreateFile(imgFile.c_str(), 
+        GENERIC_WRITE, 
+        FILE_SHARE_READ, NULL, 
+        CREATE_ALWAYS,
+        0, NULL);
+
+    DWORD dwProcessed;
+    if (file==INVALID_HANDLE_VALUE) {
+        delete dst; return;
+    }
+    WriteFile(file, dst, dstLen, &dwProcessed, NULL);
+    CloseHandle(file);
+
+    img=ImageRef(new Image(imgFile.c_str()));
+
+    delete dst;
 }

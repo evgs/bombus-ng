@@ -3,6 +3,7 @@
 #include "base64.h"
 
 #include <stdexcept> //for std::runtime_error
+#include <string>
 #include <assert.h> //for assert()
 
 typedef unsigned char BYTE, *LPBYTE;
@@ -138,8 +139,8 @@ unsigned long base64::base64DecodeGetLength( unsigned long size )
     // 3 = --1111XX =          ----1111 XX------
     // 4 = --111111 =                   --111111
 
-    if (size % BASE64_6BIT != 0)
-        throw std::runtime_error( c_pszErrorNotMultipleOf4 );
+    /*if (size % BASE64_6BIT != 0)
+        throw std::runtime_error( c_pszErrorNotMultipleOf4 );*/
 
     return (((size + BASE64_6BIT - 1) / BASE64_6BIT) * BASE64_8BIT);
 }
@@ -232,4 +233,39 @@ const std::string base64::base64Decode(const std::string &inbuf) {
     std::string result(buf);
     delete buf;
     return result;
+
+    
+}
+
+unsigned long base64::base64Decode2( void* dest, const void* src, unsigned long size ) {
+    LPBYTE pSrc = (LPBYTE)src;
+    LPBYTE pDest = (LPBYTE)dest;
+    DWORD dwSrcSize = size;
+    DWORD dwDestSize = 0;
+
+    int padding=0;
+
+    int ibuf=1;
+    while (dwSrcSize>0) {
+        int nextChar = *pSrc++; dwSrcSize--; 
+        int base64=-1;
+        if (nextChar>'A'-1 && nextChar<'Z'+1) base64=nextChar-'A';
+        else if (nextChar>'a'-1 && nextChar<'z'+1) base64=nextChar+26-'a';
+        else if (nextChar>'0'-1 && nextChar<'9'+1) base64=nextChar+52-'0';
+        else if (nextChar=='+') base64=62;
+        else if (nextChar=='/') base64=63;
+        else if (nextChar=='=') {base64=0; padding++;}
+        else if (nextChar=='<') break;
+        if (base64>=0) ibuf=(ibuf<<6)+base64;
+        
+        if (ibuf>=0x01000000){
+            *pDest++=((ibuf>>16) &0xff); dwDestSize++;
+            if (padding<2) { *pDest++=((ibuf>>8) &0xff); dwDestSize++; }
+            if (padding==0) { *pDest++=(ibuf &0xff); dwDestSize++; }
+            //len+=3;
+            ibuf=1;
+        }
+
+    }
+    return dwDestSize;
 }

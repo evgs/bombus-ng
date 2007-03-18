@@ -110,6 +110,35 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             break; 
         } 
 
+    case WM_NOTIFY:
+        //if (wParam!=IDC_HTMLVIEW) break;
+        {
+            NM_HTMLVIEW* pnm = (NM_HTMLVIEW*)lParam;
+
+            switch(pnm->hdr.code) 
+            {
+            case NM_INLINE_IMAGE:
+                {
+                    HBITMAP bmp=p->getImage(pnm->szTarget);
+                    if(bmp) {
+                        BITMAP bm;
+                        GetObject(bmp, sizeof(bm), &bm);
+
+                        INLINEIMAGEINFO      imgInfo;
+                        imgInfo.dwCookie = pnm->dwCookie;
+                        imgInfo.iOrigHeight = bm.bmHeight;
+                        imgInfo.iOrigWidth = bm.bmWidth;
+                        imgInfo.hbm = bmp;    
+                        imgInfo.bOwnBitmap = FALSE;
+                        SendMessage(p->htmlHWnd, DTM_SETIMAGE, 0, (LPARAM)&imgInfo);   
+                    }
+                    else SendMessage(p->htmlHWnd, DTM_IMAGEFAIL, 0, pnm->dwCookie);
+                    break;
+                } // end case NM_INLINE_IMAGE:
+            } // end switch(pnm->hdr.code)
+        } // End case IDC_HTMLVIEW:
+        break;
+
     case WM_USER:
         {
             p->update();
@@ -168,6 +197,11 @@ HtmlView::~HtmlView() {}
 const ODR * HtmlView::getODR() const { return wt.get(); }
 
 void HtmlView::update() {}
+
+HBITMAP HtmlView::getImage( LPCTSTR url ) 
+{
+    return NULL;
+}
 
 ATOM HtmlView::windowClass=0;
 HINSTANCE HtmlView::htmlViewInstance=0;

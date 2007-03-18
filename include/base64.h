@@ -12,6 +12,7 @@ namespace base64{
 	// Base64 Decoding
 	unsigned long base64DecodeGetLength( unsigned long size );
 	unsigned long base64Decode( void* dest, const void* src, unsigned long size );
+    unsigned long base64Decode2( void* dest, const void* src, unsigned long size );
     const std::string base64Decode(const std::string &inbuf);
 }
 

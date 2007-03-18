@@ -15,8 +15,16 @@ public:
 
     static VcardForm::ref createVcardForm(HWND parent, const std::string &jid, ResourceContextRef rc);
 
+    virtual HBITMAP getImage(LPCTSTR url);
+
 protected:
-    void addHtmlField(const char *ns1, const char *ns2, const wchar_t* description);
+    void loadPhoto();
+    ImageRef img;
+
+    enum FieldType {
+        URL=1
+    };
+    void addHtmlField(const char *ns1, const char *ns2, const wchar_t* description, int flags=0);
 
     boost::weak_ptr<VcardForm> formRef;
 

@@ -11,8 +11,9 @@
 extern std::wstring skinRootPath;
 
 Image::Image( LPCTSTR path ) {
-    std::wstring bmpPath=skinRootPath+path;
-    bmp=SHLoadImageFile(bmpPath.c_str());  
+    //std::wstring bmpPath=skinRootPath+path;
+    //bmp=SHLoadImageFile(bmpPath.c_str());  
+    bmp=SHLoadImageFile(path);  
 
     HDC hdcImage=CreateCompatibleDC(NULL);
     SelectObject(hdcImage, bmp);

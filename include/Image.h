@@ -11,8 +11,8 @@ public:
     virtual ~Image();
 
     virtual void drawImage(HDC hdc, int x, int y) const;
+    HBITMAP getHBmp() {return bmp; }
 protected:
-    void createMask();
     HBITMAP bmp;
     //HBITMAP mask;
     COLORREF transparentColor;

@@ -21,6 +21,7 @@ public:
 
     typedef boost::shared_ptr<HtmlView> ref;
 
+    virtual HBITMAP getImage(LPCTSTR url);
 
 protected:
 

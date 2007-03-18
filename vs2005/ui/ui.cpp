@@ -176,10 +176,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     wchar_t * skinRelPath;
     if (sysinfo::screenIsVGA()) {
         skinRelPath=TEXT("vga\\");
-        tabHeight=32; //TODO: remove hardcode
+        tabHeight=34; //TODO: remove hardcode
     } else {
         skinRelPath=TEXT("qvga\\");
-        tabHeight=16; //TODO: remove hardcode
+        tabHeight=18; //TODO: remove hardcode
     }
     skinRootPath=appRootPath+skinRelPath;
 

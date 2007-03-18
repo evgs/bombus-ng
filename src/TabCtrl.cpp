@@ -280,7 +280,7 @@ void TabsCtrl::drawTab( HDC hdc, int offset, TabInfoRef tab, bool active ) {
     SelectObject(hdc, old);
 
     SetBkMode(hdc, TRANSPARENT);
-    r.left+=2; r.right-=2;
+    r.left+=2; r.right-=2; r.top+=1;
     const ODR * odr=tab->wndChild->getODR();
     if (odr) {
         odr->draw(hdc, r);

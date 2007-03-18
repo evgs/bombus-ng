@@ -9,7 +9,7 @@
 
 class GetVcard : public JabberDataBlockListener {
 public:
-    GetVcard(const std::string &jid, VcardForm  * form);
+    GetVcard(const std::string &jid, VcardForm::ref form);
     ~GetVcard(){};
     virtual const char * getType() const{ return NULL; }
     virtual const char * getId() const{ return id.c_str(); }
@@ -20,10 +20,10 @@ private:
     std::string jid;
     std::string id;
     ResourceContextRef rc;
-    VcardForm *vf;
+    boost::weak_ptr<VcardForm> vf;
 };
 
-GetVcard::GetVcard(const std::string &jid, VcardForm * form){
+GetVcard::GetVcard(const std::string &jid, VcardForm::ref form){
     this->jid=jid;
     this->vf=form;
     id="vf#";
@@ -57,27 +57,36 @@ void VcardForm::update() {
 }
 
 ProcessResult GetVcard::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-    vf->vcardArrivedNotify(block);
+    VcardForm::ref vfRef=vf.lock();
+
+    if (vfRef)
+        vfRef->vcardArrivedNotify(block);
 
     return LAST_BLOCK_PROCESSED;
 }
 
 //////////////////////////////////////////////////////////////////////////
-VcardForm::VcardForm(HWND parent, const std::string &jid, ResourceContextRef rc){
-    parentHWnd=parent;
-    init();
+VcardForm::ref VcardForm::createVcardForm(HWND parent, const std::string &jid, ResourceContextRef rc){
+    VcardForm *vf=new VcardForm();
 
-    SetParent(thisHWnd, parent);
+    vf->parentHWnd=parent;
+    vf->init();
+    
+    SetParent(vf->thisHWnd, parent);
 
-    this->title=utf8::utf8_wchar(jid);
+    vf->title=utf8::utf8_wchar(jid);
 
-    wt=WndTitleRef(new WndTitle(this, icons::ICON_VCARD));
+    vf->wt=WndTitleRef(new WndTitle(vf, icons::ICON_VCARD));
 
-    this->rc=rc;
+    vf->rc=rc;
 
-    GetVcard *getv=new GetVcard(jid, this);
+    VcardForm::ref vfRef=VcardForm::ref(vf);
+
+    GetVcard *getv=new GetVcard(jid, vfRef);
     rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(getv));
     getv->doRequest(rc);
+
+    return vfRef;
 }
 
 void VcardForm::vcardArrivedNotify(JabberDataBlockRef vcard){

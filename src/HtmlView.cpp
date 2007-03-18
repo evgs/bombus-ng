@@ -131,8 +131,10 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                         imgInfo.hbm = bmp;    
                         imgInfo.bOwnBitmap = FALSE;
                         SendMessage(p->htmlHWnd, DTM_SETIMAGE, 0, (LPARAM)&imgInfo);   
+                        return TRUE;
                     }
                     else SendMessage(p->htmlHWnd, DTM_IMAGEFAIL, 0, pnm->dwCookie);
+                    return TRUE;
                     break;
                 } // end case NM_INLINE_IMAGE:
             } // end switch(pnm->hdr.code)

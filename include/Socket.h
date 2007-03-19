@@ -18,12 +18,13 @@ public:
 
     SOCKET getSocket(){ return sock; }
 
+    static void networkUp();
+
 protected:
     Socket(){};
     std::string url;
     SOCKET sock;
 
-    void networkUp();
     long resolveUrl();
 
     static void initWinsocks();

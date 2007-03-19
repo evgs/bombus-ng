@@ -148,7 +148,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ws2.lib Htmlview.lib"
+				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"

@@ -128,7 +128,11 @@ void Socket::networkUp() {
     CONNMGR_CONNECTIONINFO rq;
     memset(&rq, 0, sizeof(rq));
     rq.cbSize=sizeof(rq);
-    rq.dwPriority=CONNMGR_PRIORITY_USERINTERACTIVE;
+    rq.dwPriority=CONNMGR_PRIORITY_HIPRIBKGND;
+    rq.dwParams=CONNMGR_PARAM_GUIDDESTNET;
+
+    ConnMgrMapURL(L"http://jabber.org", &rq.guidDestNet, NULL);
+
 
     HANDLE hconn;
     DWORD status;

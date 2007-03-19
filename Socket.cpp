@@ -8,7 +8,9 @@
  */
 
 #include <Socket.h>
+#include <connmgr.h>
 #include <boost/assert.hpp>
+#include <memory.h>
 
 static int wsCount=0;
 
@@ -40,6 +42,7 @@ void Socket::initWinsocks(){
 Socket::Socket(const std::string &url, const int port) {
     bytesSent=bytesRecvd=0;
     initWinsocks();
+    networkUp();
     this->url=url;
 
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -120,6 +123,18 @@ long Socket::resolveUrl() {
 void Socket::close() {
     closesocket(sock);
 }
+
+void Socket::networkUp() {
+    CONNMGR_CONNECTIONINFO rq;
+    memset(&rq, 0, sizeof(rq));
+    rq.cbSize=sizeof(rq);
+    rq.dwPriority=CONNMGR_PRIORITY_USERINTERACTIVE;
+
+    HANDLE hconn;
+    DWORD status;
+    ConnMgrEstablishConnectionSync(&rq, &hconn, 60000, &status);
+}
+
 
 const char * errorWSAText(int code) {
     static char buf[10];

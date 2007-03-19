@@ -460,7 +460,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 presence::PresenceIndex subscr=presence::PRESENCE_AUTH_ASK;
                 if (cmdId==RosterView::SUBSCRIBED) subscr=presence::PRESENCE_AUTH;
                 if (cmdId==RosterView::UNSUBSCRIBED) subscr=presence::PRESENCE_AUTH_REMOVE;
-                rc->sendPresence(focusedContact->rosterJid().c_str(),
+                rc->sendPresence(focusedContact->rosterJid.c_str(),
                     subscr, std::string(), 0);
                 break;
             }

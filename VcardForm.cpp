@@ -46,9 +46,9 @@ void GetVcard::doRequest(ResourceContextRef rc) {
 }
 
 void VcardForm::update() {
-    std::string xml=*(vcard->toXML());
-    const std::string &xml2=XMLStringPrep(xml);
-    const std::wstring xml3=utf8::utf8_wchar(xml2);
+    //std::string xml=*(vcard->toXML());
+    //const std::string &xml2=XMLStringPrep(xml);
+    //const std::wstring xml3=utf8::utf8_wchar(xml2);
 
     //SendMessage(hwndHTML, WM_SETTEXT, 0, (LPARAM)"");
 
@@ -151,7 +151,7 @@ void VcardForm::loadPhoto() {
     if (!vcard) return;
     JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return;
     JabberDataBlockRef photo=vcardTemp->getChildByName("PHOTO");    if (!photo) return;
-    JabberDataBlockRef binval=photo->getChildByName("BINVAL");
+    JabberDataBlockRef binval=photo->getChildByName("BINVAL"); if (!binval) return;
     const std::string &data=binval->getText();
 
     int dstLen=base64::base64DecodeGetLength(data.length());

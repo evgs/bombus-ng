@@ -23,6 +23,7 @@ protected:
     std::string url;
     SOCKET sock;
 
+    void networkUp();
     long resolveUrl();
 
     static void initWinsocks();

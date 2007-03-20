@@ -585,7 +585,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING));
 
     std::wstring soundName(appRootPath);
-    soundName+=TEXT("sounds\message.wav");
+    soundName+=TEXT("sounds\\message.wav");
     
     Notify::PlayNotify();
     
@@ -600,7 +600,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
         cv->redraw();
     }
 
-    //tabs->switchByODR(c);
+    //tabs->switchByODR(c); 
 
     InvalidateRect(rosterWnd->getHWnd(),NULL, FALSE);
 

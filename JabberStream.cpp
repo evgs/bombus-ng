@@ -48,34 +48,50 @@ void JabberStream::tagStart(const std::string & tagname, const StringMap &attr) 
 	}
 
 	// stanzas
-	stanzaStack.push( blk);
+	xmlStack.push( blk);
 }
 
 bool JabberStream::tagEnd(const std::string & tagname) {
-    if (stanzaStack.empty()) {
+    if (xmlStack.empty()) {
         return (tagname=="stream:stream");
     }
-	JabberDataBlockRef element=stanzaStack.top();
-	stanzaStack.pop();
-	if (stanzaStack.empty()) {
-		//todo: block arrived
+	JabberDataBlockRef stanza=xmlStack.top();
+	xmlStack.pop();
+	if (xmlStack.empty()) {
+		//full stanza arrived
         
-        if (element->getTagName()!=tagname) {
+        if (stanza->getTagName()!=tagname) {
             throw std::exception("XML: Tag mismatch");
         }
 
 		JabberStanzaDispatcher * dispatcher= rc->jabberStanzaDispatcherRT.get();
-		if (dispatcher!=NULL) dispatcher->dispatchDataBlock(element);
+		if (dispatcher!=NULL) 
+            if (! dispatcher->dispatchDataBlock(stanza)) {
+                //all lesteners rejected this stanza
+                if (tagname=="iq") {
+                    //client sould reject unknown iq-stanza
+                    JabberDataBlock iqError("iq");
+                    iqError.setAttribute("type", "error");
+                    iqError.setAttribute("to", stanza->getAttribute("from"));
+                    iqError.setAttribute("id", stanza->getAttribute("id"));
+                    //todo: optional iq child blocks
+                    JabberDataBlock *err=iqError.addChild("error", NULL);
+                        err->setAttribute("type","cancel");
+                        err->addChild("feature-not-implemented", NULL)
+                            ->setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-stanzas");
+                    sendStanza(iqError);
+                }
+            }
 
 		//puts(element->toXML()->c_str());
 	} else {
-		stanzaStack.top()->addChild(element);
+		xmlStack.top()->addChild(stanza);
 	}
     return false;
 }
 
 void JabberStream::plainTextEncountered(const std::string & body){
-	stanzaStack.top()->_setText(body);
+	xmlStack.top()->_setText(body);
 }
 
 #ifdef _WIN32_WCE

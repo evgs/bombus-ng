@@ -73,4 +73,5 @@ bool Jid::operator==(const Jid &right) const {
 bool Jid::isValid() {
     if (getUserName().length()==0) return false;
     if (getServer().length()==0) return false;
+    return true;
 }

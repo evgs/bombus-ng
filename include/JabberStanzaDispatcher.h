@@ -12,7 +12,7 @@ public:
 	JabberStanzaDispatcher(ResourceContextRef resourceContext);
 	~JabberStanzaDispatcher();
 
-	void dispatchDataBlock(JabberDataBlockRef block);
+	BOOL dispatchDataBlock(JabberDataBlockRef block);
 
 	void addListener(JabberDataBlockListenerRef listener);
 	void removeListener(const std::string& id);

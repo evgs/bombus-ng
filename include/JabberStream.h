@@ -42,7 +42,7 @@ private:
 
 	bool isRunning;
 
-	std::stack<JabberDataBlockRef> stanzaStack;
+	std::stack<JabberDataBlockRef> xmlStack;
 
 public:
 	static void run(JabberStream * _stream); 

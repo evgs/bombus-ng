@@ -8,7 +8,7 @@ JabberStanzaDispatcher::JabberStanzaDispatcher(ResourceContextRef resourceContex
 
 JabberStanzaDispatcher::~JabberStanzaDispatcher(){};
 
-void JabberStanzaDispatcher::dispatchDataBlock(JabberDataBlockRef block){
+BOOL JabberStanzaDispatcher::dispatchDataBlock(JabberDataBlockRef block){
 
     //StringRef sdebug=block->toXML();
 
@@ -32,12 +32,14 @@ void JabberStanzaDispatcher::dispatchDataBlock(JabberDataBlockRef block){
 
 		ProcessResult result=i->get()->blockArrived(block, rc);
 
-		if (result==BLOCK_PROCESSED) return;
+		if (result==BLOCK_PROCESSED) return true;
 		
-		if (result==LAST_BLOCK_PROCESSED) { listeners.erase(i); return; }
+		if (result==LAST_BLOCK_PROCESSED) { listeners.erase(i); return true; }
 
 		//if (result==BLOCK_REJECTED) continue;
 	}
+
+    return false;
 };
 
 void JabberStanzaDispatcher::addListener(JabberDataBlockListenerRef listener){

@@ -585,7 +585,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING));
 
     std::wstring soundName(appRootPath);
-    soundName+=TEXT("message.wav");
+    soundName+=TEXT("sounds\message.wav");
     
     Notify::PlayNotify();
     

@@ -8,5 +8,6 @@ del /s /q dist\
 mkdir dist
 xcopy /y "vs2005\ui\Pocket PC 2003 (ARMV4)\Release\Bombus.exe" dist\
 xcopy /s /y resources\*.* dist\
+xcopy /y copying.txt dist\
 pkzipc -add -rec -path=relative "dist\bombus-%REVN% [%REVDATE%].zip" dist\*.*
 echo F | xcopy "dist\bombus-%REVN% [%REVDATE%].zip" "dist\bombus-ng.zip"

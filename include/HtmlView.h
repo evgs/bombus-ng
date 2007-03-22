@@ -2,6 +2,7 @@
 
 #include "Wnd.h"
 #include "OwnerDrawRect.h"
+#include "basetypes.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +32,7 @@ protected:
     WndTitleRef  wt;    
 
     void init();
+    static StringMapRef splitHREFtext(LPCTSTR ht);
 
 private:
     static ATOM windowClass;

@@ -84,6 +84,18 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 			EndDialog(hDlg, LOWORD(wParam));
 			return TRUE;
 		}
+
+        /*if (HIWORD(wParam)==BN_CLICKED) {
+            if (LOWORD(wParam)==IDC_X_SASL) { 
+                if (IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_UNCHECKED) 
+                    CheckDlgButton(hDlg, IDC_X_ZLIB, BST_UNCHECKED);
+            };
+            if (LOWORD(wParam)==IDC_X_ZLIB) { 
+                if (IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED) 
+                    CheckDlgButton(hDlg, IDC_X_SASL, BST_CHECKED);
+            };
+        }*/
+
 		if (LOWORD(wParam) == IDCANCEL)
 		{
 			EndDialog(hDlg, LOWORD(wParam));

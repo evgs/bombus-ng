@@ -58,26 +58,34 @@ void VcardForm::update() {
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<HTML><TITLE>Test</TITLE>"));
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<BODY><P><IMG SRC=\"\\vcard\"><BR>"));
 
-    addHtmlField("FN", NULL,        L"Full Name");
-    addHtmlField("NICKNAME", NULL,  L"Nickname");
-    addHtmlField("BDAY", NULL,      L"Birthday");
-    addHtmlField("ADR", "STREET",   L"Street");
-    addHtmlField("ADR", "EXTADR",   L"Street2");
-    addHtmlField("ADR", "LOCALITY", L"City");
-    addHtmlField("ADR", "REGION",   L"State");
-    addHtmlField("ADR", "PCODE",    L"Post code");
-    addHtmlField("ADR", "CTRY",     L"Country");
-    addHtmlField("TEL", "HOME",     L"Home Phone Number");
-    addHtmlField("TEL", "NUMBER",   L"Phone Number");
-    addHtmlField("EMAIL", "USERID", L"E-Mail", URL);
-    addHtmlField("TITLE", NULL,     L"Position");
-    addHtmlField("ROLE", NULL,      L"Role");
-    addHtmlField("ORG", "ORGNAME",  L"Organization");
-    addHtmlField("ORG", "ORGUNIT",  L"Dept");
-    addHtmlField("URL", NULL,       L"Url", URL);
-    addHtmlField("DESC", NULL,      L"About");
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<form name=\"vcard\" action=\"rf.html\" method=\"post\">"));
 
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("</BODY></HTML>"));
+    int ltxt=TXT;
+    int lurl=URL;
+    if (editForm) ltxt=lurl=TEXTBOX;
+
+    addHtmlField("FN", NULL,        L"Full Name", ltxt);
+    addHtmlField("NICKNAME", NULL,  L"Nickname", ltxt);
+    addHtmlField("BDAY", NULL,      L"Birthday", ltxt);
+    addHtmlField("ADR", "STREET",   L"Street", ltxt);
+    addHtmlField("ADR", "EXTADR",   L"Street2", ltxt);
+    addHtmlField("ADR", "LOCALITY", L"City", ltxt);
+    addHtmlField("ADR", "REGION",   L"State", ltxt);
+    addHtmlField("ADR", "PCODE",    L"Post code", ltxt);
+    addHtmlField("ADR", "CTRY",     L"Country", ltxt);
+    addHtmlField("TEL", "HOME",     L"Home Phone Number", ltxt);
+    addHtmlField("TEL", "NUMBER",   L"Phone Number", ltxt);
+    addHtmlField("EMAIL", "USERID", L"E-Mail", lurl);
+    addHtmlField("TITLE", NULL,     L"Position", ltxt);
+    addHtmlField("ROLE", NULL,      L"Role", ltxt);
+    addHtmlField("ORG", "ORGNAME",  L"Organization", ltxt);
+    addHtmlField("ORG", "ORGUNIT",  L"Dept", ltxt);
+    addHtmlField("URL", NULL,       L"Url", lurl);
+    addHtmlField("DESC", NULL,      L"About", ltxt);
+
+    if (editForm) SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<input type=\"submit\" value=\"Refresh\"/>"));
+
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("</form></BODY></HTML>"));
     SendMessage(htmlHWnd, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);
 }
 
@@ -91,9 +99,10 @@ ProcessResult GetVcard::blockArrived(JabberDataBlockRef block, const ResourceCon
 }
 
 //////////////////////////////////////////////////////////////////////////
-VcardForm::ref VcardForm::createVcardForm(HWND parent, const std::string &jid, ResourceContextRef rc){
+VcardForm::ref VcardForm::createVcardForm( HWND parent, const std::string &jid, ResourceContextRef rc, bool edit ) {
     VcardForm *vf=new VcardForm();
 
+    vf->editForm=edit;
     vf->parentHWnd=parent;
     vf->init();
     
@@ -129,16 +138,33 @@ void VcardForm::addHtmlField( const char *ns1, const char *ns2, const wchar_t* d
     const std::wstring value=utf8::utf8_wchar(XMLStringPrep(field->getText()));
     if (value.length()==0) return;
 
+    std::string name(ns1);
+    if (ns2) {
+        name+="#";
+        name+=ns2;
+    }
+    const std::wstring wname=utf8::utf8_wchar(name);
+
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) description);
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L": ");
-    if (flags & URL)   {
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<A HREF=\"");
-        //SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str()); 
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"\">");
-    }
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
-    if (flags & URL)   SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"</A>");
 
+    if (flags & TEXTBOX) {
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<BR><input type=\"text\" name=\"");
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) wname.c_str());
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"\" value=\"");
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"\"><BR>");
+        return;
+    }
+
+    if (flags & URL)   {
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<A HREF=\"\">");
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
+        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"</A><BR>");
+        return;
+    }
+
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<BR>");
 }
 

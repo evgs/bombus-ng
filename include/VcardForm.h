@@ -13,18 +13,22 @@ public:
     typedef boost::shared_ptr<VcardForm> ref;
     virtual void update();
 
-    static VcardForm::ref createVcardForm(HWND parent, const std::string &jid, ResourceContextRef rc);
+    static VcardForm::ref createVcardForm(HWND parent, const std::string &jid, ResourceContextRef rc, bool edit);
 
     virtual HBITMAP getImage(LPCTSTR url);
 
 protected:
     void loadPhoto();
     ImageRef img;
+    bool editForm;
 
     enum FieldType {
-        URL=1
+        TXT=0,
+        URL=1,
+        TEXTBOX=2,
+        MULTILINE=4,
     };
-    void addHtmlField(const char *ns1, const char *ns2, const wchar_t* description, int flags=0);
+    void addHtmlField(const char *ns1, const char *ns2, const wchar_t* description, int flags=TXT);
 
     boost::weak_ptr<VcardForm> formRef;
 

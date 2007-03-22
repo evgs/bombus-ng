@@ -36,6 +36,7 @@
 #include "ChatView.h"
 #include "TabCtrl.h"
 #include "HtmlView.h"
+#include "VcardForm.h"
 
 #include "Auth.h"
 
@@ -276,6 +277,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     if (rc->isLoggedIn())
                         DlgMucJoin::createDialog(hWnd, rc);
                     break;
+
+                case ID_TOOLS_MYVCARD:
+                    if (rc->isLoggedIn()) {
+                        WndRef vc=VcardForm::createVcardForm(tabs->getHWnd(), rc->account->getBareJid(), rc, true);
+                        tabs->addWindow(vc);
+                        tabs->switchByWndRef(vc);
+                        break;
+                    }
 
 				case IDM_JABBER_STREAMINFO:
                     Log::getInstance()->msg(

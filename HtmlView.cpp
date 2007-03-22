@@ -5,6 +5,7 @@
 #include <windowsx.h>
 #include <aygshell.h>
 #include "utf8.hpp"
+#include "basetypes.h"
 
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
@@ -135,8 +136,13 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                     }
                     else SendMessage(p->htmlHWnd, DTM_IMAGEFAIL, 0, pnm->dwCookie);
                     return TRUE;
-                    break;
                 } // end case NM_INLINE_IMAGE:
+            case NM_HOTSPOT:
+                {
+                    if (pnm->szTarget!=NULL)
+                        StringMapRef m=splitHREFtext(pnm->szTarget);
+                    return TRUE;
+                }
             } // end switch(pnm->hdr.code)
         } // End case IDC_HTMLVIEW:
         break;
@@ -205,5 +211,28 @@ HBITMAP HtmlView::getImage( LPCTSTR url )
     return NULL;
 }
 
+StringMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
+    std::string key;
+
+    std::string buf;
+
+    StringMap *m=new StringMap();
+
+    char c;
+    while ((c=(char)(*ht++))) {
+        switch (c) {
+            case '+': buf+=' '; break;
+            case '=': key=buf; buf.clear(); break;
+            case '&': m->operator [](key)=buf; buf.clear(); break; 
+            case '%': { 
+                char c1=(char)(*ht++)-'0'; if (c1>9) c1+='0'-'A'+10;
+                char c2=(char)(*ht++)-'0'; if (c2>9) c2+='0'-'A'+10;
+                buf+=c1<<4 | c2;
+            }
+        }
+
+    }
+    return StringMapRef(m);
+}
 ATOM HtmlView::windowClass=0;
 HINSTANCE HtmlView::htmlViewInstance=0;

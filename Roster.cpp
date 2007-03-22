@@ -445,7 +445,8 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
 
         case RosterView::VCARD: 
             {
-                WndRef vc=VcardForm::createVcardForm(tabs->getHWnd(), focusedContact->rosterJid, rc);
+                if (!rc->isLoggedIn()) break;
+                WndRef vc=VcardForm::createVcardForm(tabs->getHWnd(), focusedContact->rosterJid, rc, false);
                 tabs->addWindow(vc);
                 tabs->switchByWndRef(vc);
             }

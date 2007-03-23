@@ -1,7 +1,7 @@
 @echo off
 rem This script generates version.rc and sets env variables REVN and REVDATE
 
-SET VERSION=0.0.3
+SET VERSION=0.0.4
 
 SET VPATH=vs2005\ui\version.rc
 

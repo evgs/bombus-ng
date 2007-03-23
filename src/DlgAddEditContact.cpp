@@ -66,6 +66,8 @@ ProcessResult GetVcardNick::blockArrived(JabberDataBlockRef block, const Resourc
         JabberDataBlockRef vcard=block->getChildByName("vCard");
         if (vcard) {
             nick=vcard->getChildText("NICKNAME");
+            if (nick.length()==0)
+                nick=vcard->getChildText("FN");
         }
 
         SetDlgItemText(targetDlg, targetCtrl, nick);

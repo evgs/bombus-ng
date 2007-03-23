@@ -344,7 +344,7 @@ void VirtualListView::init() {
     if (windowClass==0)
         windowClass=RegisterWindowClass();
     if (windowClass==0) throw std::exception("Can't create window class");
-    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
+    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("VList"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentHWnd, NULL, g_hInst, (LPVOID)this);
     wrapList=true;
     winTop=0;

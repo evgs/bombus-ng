@@ -121,23 +121,65 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
 
                 HMENU hmenu = p->getContextMenu();
+                p->menuUserCmds(hmenu);
+
                 if (hmenu==NULL) break;
 
                 POINT pt={LOWORD(lParam), HIWORD(lParam) };
                 ClientToScreen(hWnd, &pt);
-                TrackPopupMenuEx(hmenu,
-                    /*TPM_LEFTALIGN |*/ TPM_TOPALIGN,
+                int cmd=TrackPopupMenuEx(hmenu,
+                    /*TPM_LEFTALIGN |*/ TPM_TOPALIGN | TPM_RETURNCMD,
                     pt.x, pt.y,
                     hWnd,
                     NULL);
 
+                if (cmd!=0) {
+                    MENUITEMINFO mi;
+                    mi.cbSize=sizeof(mi);
+                    mi.fMask=MIIM_DATA;
+                    GetMenuItemInfo(hmenu, cmd, FALSE, &mi);
+
+                    if (cmd>=TabsCtrl::SWITCH_TAB && cmd<TabsCtrl::USERCMD) {
+                        ODR *wt=(ODR*)((void *) mi.dwItemData);
+                        //switch to the selected tab
+                        p->switchByODR(wt);
+                    }
+
+                    if (cmd>=TabsCtrl::USERCMD) {
+                        p->menuUserActions(cmd, mi.dwItemData);
+                    }
+
+                    if (cmd==TabsCtrl::CLOSETAB) {
+                        PostMessage(hWnd, WM_COMMAND, cmd, mi.dwItemData);
+                    }
+                }
                 DestroyMenu(hmenu);
             }
             break;
-
-            break;
         }
 
+    case WM_COMMAND:
+        {
+            int cmd=LOWORD(wParam);
+            if (cmd==TabsCtrl::CLOSETAB) {
+                //close current tab
+                int nextTab=p->activeTab;
+                int delTab=nextTab;
+
+                p->activeTab++;
+                if (p->activeTab>=p->tabs.size()) {
+                    nextTab--;
+                    p->activeTab=nextTab;
+                }
+                p->showActiveTab(); //hide before delete
+                p->tabs.erase(p->tabs.begin()+delTab);
+                p->activeTab=nextTab;
+                p->tabDoLayout();
+                p->showActiveTab();
+                InvalidateRect(p->getHWnd(), NULL, true);
+            }
+            return 0;
+        }    
     case WM_MEASUREITEM:
         {
             LPMEASUREITEMSTRUCT mi=(LPMEASUREITEMSTRUCT)lParam;
@@ -157,24 +199,6 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             return TRUE;
         }
 
-    case WM_COMMAND:
-        {
-            int cmd=LOWORD(wParam);
-            if (cmd>=TabsCtrl::TAB_BEGIN_INDEX  && cmd<TabsCtrl::TAB_END_INDEX) {
-                //switch to the selected tab
-                p->activeTab=cmd-TabsCtrl::TAB_BEGIN_INDEX;
-            }
-            if (cmd==TabsCtrl::CLOSETAB) {
-                //close current tab
-                int activeTab=p->activeTab;
-                if (activeTab>1) p->tabs.erase(p->tabs.begin()+activeTab);
-                if (activeTab>=p->tabs.size()) p->activeTab--;
-            }
-            p->tabDoLayout();
-            InvalidateRect(p->getHWnd(), NULL, true);
-            p->showActiveTab();
-            return 0;
-        }
     case WM_SIZE: 
         { 
             int height=GET_Y_LPARAM(lParam);
@@ -211,18 +235,20 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     return 0;
 }
 
-TabsCtrl::TabsCtrl( HWND parent ) {
+void TabsCtrl::init(HWND parent) {
     if (windowClass==0)
         windowClass=RegisterWindowClass();
     if (windowClass==0) throw std::exception("Can't create window class");
 
     parentHWnd=parent;
-    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("ListView"), WS_VISIBLE | WS_CHILD,
+    thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("TabsBand"), WS_VISIBLE | WS_CHILD,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parent, NULL, g_hInst, (LPVOID)this);
     makeTabLayout=false;
     xOffset=0;
     activeTab=-1;
 }
+
+TabsCtrl::TabsCtrl( HWND parent ) { init(parent); }
 
 
 void TabsCtrl::addWindow( const WndRef &wnd ) {
@@ -340,9 +366,13 @@ bool TabsCtrl::switchByODR( ODRRef targetWnd ) {
     return switchByWndRef(getWindowByODR(targetWnd));
 }
 
-WndRef TabsCtrl::getWindowByODR(ODRRef const &title) {
+bool TabsCtrl::switchByODR( ODR * targetWnd ) {
+    return switchByWndRef(getWindowByODR(targetWnd));
+}
+
+WndRef TabsCtrl::getWindowByODR(ODR * title) {
     for (TabList::iterator i=tabs.begin(); i!=tabs.end(); i++) {
-        if (i->get()->wndChild->getODR()==title.get()) {
+        if (i->get()->wndChild->getODR()==title) {
             return i->get()->wndChild;
         }
     }
@@ -361,12 +391,12 @@ HMENU TabsCtrl::getContextMenu() {
     HMENU hmenu=CreatePopupMenu();
     AppendMenu(hmenu, MF_STRING, TabsCtrl::CLOSETAB, TEXT("Close"));
     AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-    int index=TabsCtrl::TAB_BEGIN_INDEX;
+    int index=0;
     for (TabList::iterator i=tabs.begin(); i!=tabs.end(); i++) {
         const ODR * title=i->get()->wndChild->getODR();
         //LPCTSTR title=i->get()->wndChild->getODR()->getText();
         //AppendMenu(hmenu, MF_STRING, index, title);
-        AppendMenu(hmenu, MF_OWNERDRAW, index, (LPCWSTR) title);
+        AppendMenu(hmenu, MF_OWNERDRAW, SWITCH_TAB+index, (LPCWSTR) title);
         index++;
     }
     //AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
@@ -378,3 +408,47 @@ HMENU TabsCtrl::getContextMenu() {
     return hmenu;
 }
 
+
+#include "ResourceContext.h"
+#include "Roster.h"
+#include "ChatView.h"
+extern ResourceContextRef rc;
+//////////////////////////////////////////////////////////////////////////
+MainTabs::MainTabs(HWND parent) {
+    init(parent);
+}
+
+void MainTabs::menuUserCmds( HMENU hmenu ) {
+    if (activeTab==0) {
+        DeleteMenu(hmenu, CLOSETAB, MF_BYCOMMAND);
+        DeleteMenu(hmenu, 0, MF_BYPOSITION); // separator
+    }
+
+    if (!rc->roster) return;
+    Roster::ContactListRef hots=rc->roster->getHotContacts();
+    if (hots->size()==0) return;
+
+    AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+
+    for (int i=0; i<(int)hots->size(); i++) {
+        const ODR * title=hots->operator [](i).get();
+        AppendMenu(hmenu, MF_OWNERDRAW, USERCMD+i, (LPCWSTR) title);
+    }
+
+}
+
+void MainTabs::menuUserActions( int cmdId, DWORD userData ) {
+    Contact * contact= (Contact *)((void*) userData);
+    if (!contact) return;
+    WndRef chat=getWindowByODR(contact);
+
+    if (!chat) {
+        //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
+        Contact::ref cref=rc->roster->findContact(contact->jid.getJid());
+        BOOST_ASSERT(cref.get());
+        chat=WndRef(new ChatView(getHWnd(), cref));
+        addWindow(chat);
+    }
+    switchByWndRef(chat);
+
+}

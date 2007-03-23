@@ -18,16 +18,25 @@ public:
     void showActiveTab();
     bool switchByWndRef(WndRef targetWnd);
     bool switchByODR(ODRRef targetWnd);
-    WndRef getWindowByODR(ODRRef const &title);
+    bool switchByODR(ODR * targetWnd);
+    WndRef getWindowByODR(ODR * title);
+    WndRef getWindowByODR(ODRRef title) { return getWindowByODR(title.get()); }
 
     void fwdWMCommand(int wmId);
 
     enum WmCommands {
-        CLOSETAB=41000
+        CLOSETAB=41000,
+        SWITCH_TAB,
+        USERCMD=42000
     };
 
 protected:
     HWND tabScrollHWnd;
+
+    virtual void menuUserCmds(HMENU hmenu) {};
+    virtual void menuUserActions(int cmdId, DWORD userData) {};
+
+    HMENU getContextMenu();
 
     struct TabInfo {
         int tabWidth;
@@ -46,13 +55,10 @@ protected:
     void tabDoLayout(/*HDC hdc*/);
     void updateChildsLayout();
 
-    HMENU getContextMenu();
 
+    void init(HWND parent);
 
-    enum actions {
-        TAB_BEGIN_INDEX=40000,
-        TAB_END_INDEX=40200
-    };
+    TabsCtrl(){};
 
 private:
 
@@ -64,3 +70,14 @@ private:
 };
 
 typedef boost::shared_ptr<TabsCtrl> TabsCtrlRef;
+
+class MainTabs : public TabsCtrl {
+
+public:
+    MainTabs(HWND parent);
+
+protected:
+    virtual void menuUserCmds(HMENU hmenu);
+    virtual void menuUserActions(int cmdId, DWORD userData);
+
+};

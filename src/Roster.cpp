@@ -242,7 +242,7 @@ void Roster::makeViewList() {
                 elemCount++;
             }
         }
-
+        //removing group header if nothing to display
         if (elemCount==0) { list->pop_back();  continue; } 
 
     }
@@ -297,6 +297,16 @@ void Roster::setStatusByFilter( const std::string & bareJid, int status ) {
     }
 }
 
+Roster::ContactListRef Roster::getHotContacts() {
+    ContactListRef hots=ContactListRef(new ContactList());
+    for (ContactList::const_iterator ci=contacts.begin(); ci!=contacts.end(); ci++) {
+        Contact::ref contact=*ci;
+        if (contact->nUnread > 0) {
+            hots->push_back(contact);
+        }
+    }
+    return hots;
+}
 RosterGroup::RosterGroup( const std::string &name, Type type ) {
     groupName=name;
     this->type=type;

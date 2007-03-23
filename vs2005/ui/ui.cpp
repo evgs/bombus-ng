@@ -315,7 +315,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //skin->setGridSize(8, 6);
 
 			//editWnd=DoCreateEditControl(hWnd);
-            tabs=TabsCtrlRef(new TabsCtrl(hWnd));
+            tabs=TabsCtrlRef(new MainTabs(hWnd));
             //tabs->setParent(hWnd);
 
             rosterWnd=RosterView::ref(new RosterView(tabs->getHWnd(), std::string("Roster")));
@@ -335,15 +335,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             /*htmlWnd=HtmlView::ref(new HtmlView(tabs->getHWnd(), std::string("html test")));
             tabs->addWindow(htmlWnd);*/
 
-            /*tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 1"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 2"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 3"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window long name"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 4"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 5"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 6"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window 7"))));
-            tabs->addWindow(ListViewRef(new ListView(hWnd, std::string("Window extra long name"))));*/
 			//listWnd=logWnd;
 			//dropdownWnd=DoCreateComboControl(hWnd);
 
@@ -385,8 +376,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				// Size the tab control to fit the client area. 
 				hdwp = BeginDeferWindowPos(1);
 
-				DeferWindowPos(hdwp, tabs->getHWnd(), HWND_TOP, 0, tabHeight, 
-					GET_X_LPARAM(lParam), height-tabHeight, 
+				DeferWindowPos(hdwp, tabs->getHWnd(), HWND_TOP, 0, 0 /*tabHeight*/, 
+					GET_X_LPARAM(lParam), height /* -tabHeight */, 
 					SWP_NOZORDER 
 					);
 				

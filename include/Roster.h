@@ -7,6 +7,8 @@
 #include "Contact.h"
 #include "VirtualListView.h"
 
+#include "JabberDataBlockListener.h"
+
 #include "basetypes.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -53,9 +55,12 @@ private:
 
 
 class Roster : public JabberDataBlockListener{
+public:
+    typedef std::vector<Contact::ref> ContactList;
+    typedef boost::shared_ptr<ContactList> ContactListRef;
+
 private:
     typedef std::map<std::string, Contact::ref> ContactMap;
-    typedef std::vector<Contact::ref> ContactList;
 
     typedef std::vector<RosterGroup::ref> GroupList;
 
@@ -64,7 +69,6 @@ private:
     GroupList groups;
 
 public:
-
 
     Roster(ResourceContextRef rc);
 
@@ -90,6 +94,7 @@ public:
     void addContact(Contact::ref contact);
     void deleteContact(Contact::ref contact);
     void setStatusByFilter(const std::string & bareJid, int status);
+    Roster::ContactListRef getHotContacts();
 
     void rosterSet(const char * nick, const char *jid, const char *group, const char *subscr );
     typedef boost::shared_ptr<Roster> ref;

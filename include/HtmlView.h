@@ -18,13 +18,33 @@ public:
     virtual const wchar_t * getWindowTitle() const;
     virtual const ODR * getODR() const;
 
-    virtual void update();
 
     typedef boost::shared_ptr<HtmlView> ref;
 
-    virtual HBITMAP getImage(LPCTSTR url);
 
 protected:
+
+    virtual HBITMAP getImage(LPCTSTR url);
+
+    virtual void onWmUserUpdate();
+
+    void startHtml();
+
+    void addText(const std::string &text);
+    void addText(const char *text);
+    void addText(const wchar_t *text);
+    void addImg(const wchar_t *src);
+
+    void beginForm(const char *name, const char *action);
+
+    void button(const std::string &label);
+    void textBox(const char *name, const std::string &label, const std::string &value);
+    void textML(const char *name, const std::string &label, const std::string &value);
+    void textConst(const std::string &label, const std::string &value);
+    void url(const std::string &label, const std::string &url);
+    
+    void endForm();
+    void endHtml();
 
     HWND htmlHWnd;
 
@@ -35,6 +55,8 @@ protected:
     static StringMapRef splitHREFtext(LPCTSTR ht);
 
 private:
+    
+
     static ATOM windowClass;
     static HINSTANCE htmlViewInstance;
 

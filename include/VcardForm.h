@@ -11,7 +11,7 @@ private:
 public:
     void vcardArrivedNotify(JabberDataBlockRef vcard);
     typedef boost::shared_ptr<VcardForm> ref;
-    virtual void update();
+    virtual void onWmUserUpdate();
 
     static VcardForm::ref createVcardForm(HWND parent, const std::string &jid, ResourceContextRef rc, bool edit);
 
@@ -26,9 +26,10 @@ protected:
         TXT=0,
         URL=1,
         TEXTBOX=2,
-        MULTILINE=4,
+        MULTILINE=4
     };
-    void addHtmlField(const char *ns1, const char *ns2, const wchar_t* description, int flags=TXT);
+
+    void addHtmlField(const char *ns1, const char *ns2, const char* description, int flags=TXT);
 
     boost::weak_ptr<VcardForm> formRef;
 

@@ -149,7 +149,7 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
     case WM_USER:
         {
-            p->update();
+            p->onWmUserUpdate();
             break;
         }
     case WM_DESTROY:
@@ -204,7 +204,7 @@ HtmlView::~HtmlView() {}
 
 const ODR * HtmlView::getODR() const { return wt.get(); }
 
-void HtmlView::update() {}
+void HtmlView::onWmUserUpdate() {}
 
 HBITMAP HtmlView::getImage( LPCTSTR url ) 
 {
@@ -234,5 +234,73 @@ StringMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
     }
     return StringMapRef(m);
 }
+
+void HtmlView::addText( const wchar_t *text ) { 
+    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) text);
+}
+
+void HtmlView::addText( const std::string &text ) { addText( (utf8::utf8_wchar(text).c_str()) ); }
+void HtmlView::addText( const char *text ) {  addText(std::string(text)); }
+
+void HtmlView::startHtml() {
+    SendMessage(htmlHWnd, DTM_CLEAR, 0, 0);
+    addText("<HTML><TITLE>form</TITLE><BODY><P>");
+}
+
+
+void HtmlView::addImg( const wchar_t *src ) {
+    addText("<IMG SRC=\"");
+    addText(src);
+    addText("\"><BR>");
+}
+
+void HtmlView::endForm() { addText("</form>"); }
+
+void HtmlView::endHtml() {
+    addText("</BODY></HTML>");
+    SendMessage(htmlHWnd, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);
+}
+
+void HtmlView::button( const std::string &label ) {
+    addText("<input type=\"submit\" value=\"");
+    addText(label);
+    addText("\"/>");
+}
+
+void HtmlView::textBox( const char *name, const std::string &label, const std::string &value ) {
+    addText(label);
+    addText(": <BR><input type=\"text\" name=\"");
+    addText(name);
+    addText("\" value=\"");
+    addText(value);
+    addText("\"><BR>");
+}
+
+void HtmlView::url( const std::string &label, const std::string &url ) {
+    addText(label);
+    addText(": <A HREF=\"");
+    addText(url);
+    addText("\">");
+    addText(url);
+    addText("</A><BR>");
+}
+
+void HtmlView::textConst( const std::string &label, const std::string &value ) {
+    addText(label);
+    addText(": ");
+    addText(value);
+    addText("<BR>");
+}
+
+void HtmlView::textML( const char *name, const std::string &label, const std::string &value ) {
+    addText(label);
+    addText(": ");
+    addText("<textarea rows=\"6\" cols=\"20\" name=\"");
+    addText(name);
+    addText("\">");
+    addText(value);
+    addText("</textarea><BR>");
+}
+
 ATOM HtmlView::windowClass=0;
 HINSTANCE HtmlView::htmlViewInstance=0;

@@ -45,7 +45,7 @@ void GetVcard::doRequest(ResourceContextRef rc) {
     rc->jabberStream->sendStanza(req);
 }
 
-void VcardForm::update() {
+void VcardForm::onWmUserUpdate() {
     //std::string xml=*(vcard->toXML());
     //const std::string &xml2=XMLStringPrep(xml);
     //const std::wstring xml3=utf8::utf8_wchar(xml2);
@@ -54,39 +54,34 @@ void VcardForm::update() {
 
     loadPhoto();
 
-    SendMessage(htmlHWnd, DTM_CLEAR, 0, 0);
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<HTML><TITLE>Test</TITLE>"));
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<BODY><P><IMG SRC=\"\\vcard\"><BR>"));
+    startHtml();
+    addImg(L"\\vcard");
 
     SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<form name=\"vcard\" action=\"rf.html\" method=\"post\">"));
 
-    int ltxt=TXT;
-    int lurl=URL;
-    if (editForm) ltxt=lurl=TEXTBOX;
+    addHtmlField("FN", NULL,        "Full Name", TXT);
+    addHtmlField("NICKNAME", NULL,  "Nickname", TXT);
+    addHtmlField("BDAY", NULL,      "Birthday", TXT);
+    addHtmlField("ADR", "STREET",   "Street", TXT);
+    addHtmlField("ADR", "EXTADR",   "Street2", TXT);
+    addHtmlField("ADR", "LOCALITY", "City", TXT);
+    addHtmlField("ADR", "REGION",   "State", TXT);
+    addHtmlField("ADR", "PCODE",    "Post code", TXT);
+    addHtmlField("ADR", "CTRY",     "Country", TXT);
+    addHtmlField("TEL", "HOME",     "Home Phone Number", TXT);
+    addHtmlField("TEL", "NUMBER",   "Phone Number", TXT);
+    addHtmlField("EMAIL", "USERID", "E-Mail", URL);
+    addHtmlField("TITLE", NULL,     "Position", TXT);
+    addHtmlField("ROLE", NULL,      "Role", TXT);
+    addHtmlField("ORG", "ORGNAME",  "Organization", TXT);
+    addHtmlField("ORG", "ORGUNIT",  "Dept", TXT);
+    addHtmlField("URL", NULL,       "Url", URL);
+    addHtmlField("DESC", NULL,      "About", MULTILINE);
 
-    addHtmlField("FN", NULL,        L"Full Name", ltxt);
-    addHtmlField("NICKNAME", NULL,  L"Nickname", ltxt);
-    addHtmlField("BDAY", NULL,      L"Birthday", ltxt);
-    addHtmlField("ADR", "STREET",   L"Street", ltxt);
-    addHtmlField("ADR", "EXTADR",   L"Street2", ltxt);
-    addHtmlField("ADR", "LOCALITY", L"City", ltxt);
-    addHtmlField("ADR", "REGION",   L"State", ltxt);
-    addHtmlField("ADR", "PCODE",    L"Post code", ltxt);
-    addHtmlField("ADR", "CTRY",     L"Country", ltxt);
-    addHtmlField("TEL", "HOME",     L"Home Phone Number", ltxt);
-    addHtmlField("TEL", "NUMBER",   L"Phone Number", ltxt);
-    addHtmlField("EMAIL", "USERID", L"E-Mail", lurl);
-    addHtmlField("TITLE", NULL,     L"Position", ltxt);
-    addHtmlField("ROLE", NULL,      L"Role", ltxt);
-    addHtmlField("ORG", "ORGNAME",  L"Organization", ltxt);
-    addHtmlField("ORG", "ORGUNIT",  L"Dept", ltxt);
-    addHtmlField("URL", NULL,       L"Url", lurl);
-    addHtmlField("DESC", NULL,      L"About", ltxt);
-
-    if (editForm) SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<input type=\"submit\" value=\"Refresh\"/>"));
-
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("</form></BODY></HTML>"));
-    SendMessage(htmlHWnd, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);
+    if (editForm) button(std::string("Refresh"));
+    
+    endForm();
+    endHtml();
 }
 
 ProcessResult GetVcard::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
@@ -129,14 +124,12 @@ void VcardForm::vcardArrivedNotify(JabberDataBlockRef vcard){
     PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
 }
 
-void VcardForm::addHtmlField( const char *ns1, const char *ns2, const wchar_t* description, int flags ) 
-{
+void VcardForm::addHtmlField( const char *ns1, const char *ns2, const char *description, int flags ) {
     if (!vcard) return;
     JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return;
     JabberDataBlockRef field=vcardTemp->getChildByName(ns1);     if (!field) return;
     if (ns2) field=field->getChildByName(ns2);     if (!field) return;
-    const std::wstring value=utf8::utf8_wchar(XMLStringPrep(field->getText()));
-    if (value.length()==0) return;
+    const std::string value=XMLStringPrep(field->getText());
 
     std::string name(ns1);
     if (ns2) {
@@ -145,27 +138,30 @@ void VcardForm::addHtmlField( const char *ns1, const char *ns2, const wchar_t* d
     }
     const std::wstring wname=utf8::utf8_wchar(name);
 
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) description);
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L": ");
+    if (editForm) {
+        if (flags==TXT) flags=TEXTBOX;
+        if (flags==URL) flags=TEXTBOX;
+    } else {
+        if (flags==MULTILINE) flags=TXT;
+    }
 
     if (flags & TEXTBOX) {
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<BR><input type=\"text\" name=\"");
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) wname.c_str());
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"\" value=\"");
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"\"><BR>");
+        textBox(name.c_str(), std::string(description), value);
+        return;
+    }
+    if (flags & MULTILINE) {
+        textML(name.c_str(), std::string(description), value);
         return;
     }
 
     if (flags & URL)   {
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<A HREF=\"\">");
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
-        SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"</A><BR>");
+        url(std::string(description), value);
         return;
     }
 
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) value.c_str());
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) L"<BR>");
+    if (!editForm) if (value.length()==0) return;
+
+    textConst(std::string(description), value);
 }
 
 HBITMAP VcardForm::getImage( LPCTSTR url ) {

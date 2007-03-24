@@ -173,7 +173,8 @@ void VcardForm::addHtmlField( const char *ns1, const char *ns2, const char *desc
     textConst(std::string(description), value);
 }
 
-HBITMAP VcardForm::getImage( LPCTSTR url ) {
+HBITMAP VcardForm::getImage( LPCTSTR url, DWORD cookie ) {
+    this->cookie=cookie;
     if (img) return img->getHBmp();
     return NULL;
 }
@@ -215,6 +216,8 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
     std::string nurl=utf8::wchar_utf8(std::wstring(url));
     if (nurl=="load") {
         //todo: load photo
+        //loadPhoto();
+        //setImage(img->getHBmp(), cookie);
         return;
     }
     if (nurl=="save") {
@@ -224,7 +227,7 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
     if (nurl=="clear") {
         //todo: clear photo
         img.reset();
-        PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
+        setImage(0, cookie);
         return;
     }
     if (nurl=="reload") {
@@ -233,7 +236,32 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
     }
     if (nurl=="publish") {
         //todo: publish vcard
+
+        JabberDataBlock viq("iq");
+        viq.setAttribute("to",jid.c_str());
+        viq.setAttribute("type","set");
+        viq.setAttribute("id",jid.c_str());
+        JabberDataBlock *vcardTemp=viq.addChild("vCard",NULL);
+        vcardTemp->setAttribute("xmlns","vcard-temp");
+
         StringMapRef m=HtmlView::splitHREFtext(param);
+        for (StringMap::iterator i=m->begin(); i!=m->end(); i++) {
+            std::string key=i->first;
+            std::string value=i->second;
+            std::string key2;
+            int k2=key.find('#');
+            if (k2>0) {
+                key2=key.substr(k2+1, key.length()-k2-1);
+                key=key.substr(0, k2);
+            }
+
+            JabberDataBlock *child=vcardTemp->addChild(key.c_str(), NULL);
+            if (k2>0) child=vcardTemp->addChild(key2.c_str(), NULL);
+            child->setText(value);
+        }
+
+        StringRef result=viq.toXML();
+        
         return;
     }
 

@@ -14,7 +14,6 @@ public:
     virtual ~HtmlView();
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
     virtual const wchar_t * getWindowTitle() const;
     virtual const ODR * getODR() const;
 
@@ -25,6 +24,7 @@ public:
 protected:
 
     virtual HBITMAP getImage(LPCTSTR url, DWORD cookie);
+    void setImage(HBITMAP bmp, DWORD cookie);
 
     virtual void onWmUserUpdate();
     virtual void onHotSpot(LPCTSTR url, LPCTSTR param){};

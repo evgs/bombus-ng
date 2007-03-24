@@ -15,13 +15,17 @@ public:
 
     static VcardForm::ref createVcardForm(HWND parent, const std::string &jid, ResourceContextRef rc, bool edit);
 
-    virtual HBITMAP getImage(LPCTSTR url);
 
 protected:
+    std::string jid;
+
+    virtual HBITMAP getImage(LPCTSTR url, DWORD cookie);
     virtual void onHotSpot(LPCTSTR url, LPCTSTR param);
 
     void loadPhoto();
     ImageRef img;
+    DWORD cookie;
+
     bool editForm;
 
     enum FieldType {

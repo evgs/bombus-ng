@@ -426,12 +426,22 @@ void MainTabs::menuUserCmds( HMENU hmenu ) {
 
     if (!rc->roster) return;
     Roster::ContactListRef hots=rc->roster->getHotContacts();
+
+    //filtering out already opened tabs
+    int i=0;
+    while (i<(int)hots->size()) {
+        ODR * title=hots->operator [](i).get();
+        if (getWindowByODR(title)) {
+            hots->erase(hots->begin()+i);
+        } else i++;
+    }
+
     if (hots->size()==0) return;
 
     AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
-    for (int i=0; i<(int)hots->size(); i++) {
-        const ODR * title=hots->operator [](i).get();
+    for (i=0; i<(int)hots->size(); i++) {
+        ODR * title=hots->operator [](i).get();
         AppendMenu(hmenu, MF_OWNERDRAW, USERCMD+i, (LPCWSTR) title);
     }
 

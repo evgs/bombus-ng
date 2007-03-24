@@ -120,13 +120,14 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             {
             case NM_INLINE_IMAGE:
                 {
-                    HBITMAP bmp=p->getImage(pnm->szTarget);
+                    DWORD cookie=pnm->dwCookie;
+                    HBITMAP bmp=p->getImage(pnm->szTarget, pnm->dwCookie);
                     if(bmp) {
                         BITMAP bm;
                         GetObject(bmp, sizeof(bm), &bm);
 
                         INLINEIMAGEINFO      imgInfo;
-                        imgInfo.dwCookie = pnm->dwCookie;
+                        imgInfo.dwCookie = cookie;
                         imgInfo.iOrigHeight = bm.bmHeight;
                         imgInfo.iOrigWidth = bm.bmWidth;
                         imgInfo.hbm = bmp;    
@@ -140,7 +141,7 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             case NM_HOTSPOT:
                 {
                     if (pnm->szTarget!=NULL)
-                        StringMapRef m=splitHREFtext(pnm->szTarget);
+                        p->onHotSpot(pnm->szTarget, pnm->szData);
                     return TRUE;
                 }
             } // end switch(pnm->hdr.code)
@@ -206,7 +207,7 @@ const ODR * HtmlView::getODR() const { return wt.get(); }
 
 void HtmlView::onWmUserUpdate() {}
 
-HBITMAP HtmlView::getImage( LPCTSTR url ) 
+HBITMAP HtmlView::getImage( LPCTSTR url, DWORD cookie ) 
 {
     return NULL;
 }
@@ -219,7 +220,7 @@ StringMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
     StringMap *m=new StringMap();
 
     char c;
-    while ((c=(char)(*ht++))) {
+    if (ht) while ((c=(char)(*ht++))) {
         switch (c) {
             case '+': buf+=' '; break;
             case '=': key=buf; buf.clear(); break;
@@ -267,6 +268,13 @@ void HtmlView::button( const std::string &label ) {
     addText("\"/>");
 }
 
+void HtmlView::button( const char *name, const std::string &label ) {
+    addText("<input type=\"button\" name=\"");
+    addText(name);
+    addText("\" value=\"");
+    addText(label);
+    addText("\">");
+}
 void HtmlView::textBox( const char *name, const std::string &label, const std::string &value ) {
     addText(label);
     addText(": <BR><input type=\"text\" name=\"");
@@ -294,13 +302,19 @@ void HtmlView::textConst( const std::string &label, const std::string &value ) {
 
 void HtmlView::textML( const char *name, const std::string &label, const std::string &value ) {
     addText(label);
-    addText(": ");
-    addText("<textarea rows=\"6\" cols=\"20\" name=\"");
+    addText(": <BR><textarea rows=\"6\" cols=\"20\" name=\"");
     addText(name);
     addText("\">");
     addText(value);
     addText("</textarea><BR>");
 }
 
+void HtmlView::beginForm( const char *name, const char *action ) {
+    addText("<form name=\"");
+    addText(name);
+    addText("\" action=\"");
+    addText(action);
+    addText("\" method=\"post\">");
+}
 ATOM HtmlView::windowClass=0;
 HINSTANCE HtmlView::htmlViewInstance=0;

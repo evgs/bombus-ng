@@ -56,8 +56,17 @@ void VcardForm::onWmUserUpdate() {
 
     startHtml();
     addImg(L"\\vcard");
+    beginForm("vcard-photo", "photo");
+    if (img) if (img->getHBmp()) {
+        button("save",std::string("Save")); 
+        if (editForm) button("clear",std::string("Clear")); 
+    }
+    if (editForm) button("load",std::string("Load")); 
+    addText("<BR>");
+    endForm(); 
+    
 
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM)TEXT("<form name=\"vcard\" action=\"rf.html\" method=\"post\">"));
+    beginForm("vcard-fields", "publish");
 
     addHtmlField("FN", NULL,        "Full Name", TXT);
     addHtmlField("NICKNAME", NULL,  "Nickname", TXT);
@@ -78,9 +87,9 @@ void VcardForm::onWmUserUpdate() {
     addHtmlField("URL", NULL,       "Url", URL);
     addHtmlField("DESC", NULL,      "About", MULTILINE);
 
-    if (editForm) button(std::string("Refresh"));
-    
-    endForm();
+    if (editForm) button(std::string("Publish"));
+    button("reload",std::string("Reload")); 
+
     endHtml();
 }
 
@@ -200,4 +209,32 @@ void VcardForm::loadPhoto() {
     img=ImageRef(new Image(imgFile.c_str()));
 
     delete dst;
+}
+
+void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
+    std::string nurl=utf8::wchar_utf8(std::wstring(url));
+    if (nurl=="load") {
+        //todo: load photo
+        return;
+    }
+    if (nurl=="save") {
+        //todo: save photo
+        return;
+    }
+    if (nurl=="clear") {
+        //todo: clear photo
+        img.reset();
+        PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
+        return;
+    }
+    if (nurl=="reload") {
+        //todo: re-request vcard
+        return;
+    }
+    if (nurl=="publish") {
+        //todo: publish vcard
+        StringMapRef m=HtmlView::splitHREFtext(param);
+        return;
+    }
+
 }

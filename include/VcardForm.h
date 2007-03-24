@@ -18,6 +18,8 @@ public:
     virtual HBITMAP getImage(LPCTSTR url);
 
 protected:
+    virtual void onHotSpot(LPCTSTR url, LPCTSTR param);
+
     void loadPhoto();
     ImageRef img;
     bool editForm;

@@ -24,9 +24,10 @@ public:
 
 protected:
 
-    virtual HBITMAP getImage(LPCTSTR url);
+    virtual HBITMAP getImage(LPCTSTR url, DWORD cookie);
 
     virtual void onWmUserUpdate();
+    virtual void onHotSpot(LPCTSTR url, LPCTSTR param){};
 
     void startHtml();
 
@@ -38,6 +39,8 @@ protected:
     void beginForm(const char *name, const char *action);
 
     void button(const std::string &label);
+    void button(const char *name, const std::string &label);
+
     void textBox(const char *name, const std::string &label, const std::string &value);
     void textML(const char *name, const std::string &label, const std::string &value);
     void textConst(const std::string &label, const std::string &value);

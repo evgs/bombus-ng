@@ -122,20 +122,7 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                 {
                     DWORD cookie=pnm->dwCookie;
                     HBITMAP bmp=p->getImage(pnm->szTarget, pnm->dwCookie);
-                    if(bmp) {
-                        BITMAP bm;
-                        GetObject(bmp, sizeof(bm), &bm);
-
-                        INLINEIMAGEINFO      imgInfo;
-                        imgInfo.dwCookie = cookie;
-                        imgInfo.iOrigHeight = bm.bmHeight;
-                        imgInfo.iOrigWidth = bm.bmWidth;
-                        imgInfo.hbm = bmp;    
-                        imgInfo.bOwnBitmap = FALSE;
-                        SendMessage(p->htmlHWnd, DTM_SETIMAGE, 0, (LPARAM)&imgInfo);   
-                        return TRUE;
-                    }
-                    else SendMessage(p->htmlHWnd, DTM_IMAGEFAIL, 0, pnm->dwCookie);
+                    p->setImage(bmp, cookie);
                     return TRUE;
                 } // end case NM_INLINE_IMAGE:
             case NM_HOTSPOT:
@@ -229,7 +216,10 @@ StringMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
                 char c1=(char)(*ht++)-'0'; if (c1>9) c1+='0'-'A'+10;
                 char c2=(char)(*ht++)-'0'; if (c2>9) c2+='0'-'A'+10;
                 buf+=c1<<4 | c2;
+                break;
             }
+            default:
+                buf+=c;
         }
 
     }
@@ -316,5 +306,24 @@ void HtmlView::beginForm( const char *name, const char *action ) {
     addText(action);
     addText("\" method=\"post\">");
 }
+
+void HtmlView::setImage( HBITMAP bmp, DWORD cookie ) {
+    if (!bmp) {
+        SendMessage(htmlHWnd, DTM_IMAGEFAIL, 0, cookie);
+        return;
+    }
+
+    BITMAP bm;
+    GetObject(bmp, sizeof(bm), &bm);
+
+    INLINEIMAGEINFO      imgInfo;
+    imgInfo.dwCookie = cookie;
+    imgInfo.iOrigHeight = bm.bmHeight;
+    imgInfo.iOrigWidth = bm.bmWidth;
+    imgInfo.hbm = bmp;    
+    imgInfo.bOwnBitmap = FALSE;
+    SendMessage(htmlHWnd, DTM_SETIMAGE, 0, (LPARAM)&imgInfo);   
+}
+
 ATOM HtmlView::windowClass=0;
 HINSTANCE HtmlView::htmlViewInstance=0;

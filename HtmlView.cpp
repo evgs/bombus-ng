@@ -59,7 +59,7 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             PostMessage(hwndHTML, DTM_ENABLESHRINK, 0, fFitToPage);
 
             SendMessage(hwndHTML, WM_SETTEXT, 0, (LPARAM)"");
-            SendMessage(hwndHTML, DTM_ADDTEXTW, FALSE, 
+            SendMessage(hwndHTML, DTM_ADDTEXT, FALSE, 
                 (LPARAM)TEXT("<HTML><TITLE>Test</TITLE><BODY><P>Loading...<BR></BODY></HTML>"));
             SendMessage(hwndHTML, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);
 
@@ -128,7 +128,7 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             case NM_HOTSPOT:
                 {
                     if (pnm->szTarget!=NULL)
-                        p->onHotSpot(pnm->szTarget, pnm->szData);
+                        p->onHotSpot((LPCSTR)pnm->szTarget, (LPCSTR)pnm->szData);
                     return TRUE;
                 }
             } // end switch(pnm->hdr.code)
@@ -199,18 +199,18 @@ HBITMAP HtmlView::getImage( LPCTSTR url, DWORD cookie )
     return NULL;
 }
 
-StringWMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
+StringMapRef HtmlView::splitHREFtext( LPCSTR ht ) {
     std::string key;
 
-    std::wstring buf;
+    std::string buf;
 
-    StringWMap *m=new StringWMap();
+    StringMap *m=new StringMap();
 
-    wchar_t c;
+    char c;
     if (ht) while ((c=(char)(*ht++))) {
         switch (c) {
             case '+': buf+=' '; break;
-            case '=': key=utf8::wchar_utf8(buf); buf.clear(); break;
+            case '=': key=buf; buf.clear(); break;
             case '&': m->operator [](key)=buf; buf.clear(); break; 
             case '%': { 
                 char c1=(char)(*ht++)-'0'; if (c1>9) c1+='0'-'A'+10;
@@ -223,20 +223,22 @@ StringWMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
         }
 
     }
-    return StringWMapRef(m);
+    return StringMapRef(m);
 }
 
-void HtmlView::addText( const wchar_t *text ) { 
-    SendMessage(htmlHWnd, DTM_ADDTEXTW, FALSE, (LPARAM) text);
+void HtmlView::addText( const char *text ) {  
+    SendMessage(htmlHWnd, DTM_ADDTEXT, FALSE, (LPARAM) text);
+}
+void HtmlView::addText( const std::string &text ) { addText( (text.c_str()) ); }
+void HtmlView::addText( const wchar_t *text ) {
+    SendMessage(htmlHWnd, DTM_ADDTEXT, FALSE, (LPARAM) (utf8::wchar_utf8(std::wstring(text))).c_str());
 }
 
-void HtmlView::addText( const std::string &text ) { addText( (utf8::utf8_wchar(text).c_str()) ); }
-void HtmlView::addText( const char *text ) {  addText(std::string(text)); }
 
 void HtmlView::startHtml() {
     SendMessage(htmlHWnd, DTM_CLEAR, 0, 0);
     addText("<HTML>"
-        "<meta http-equiv=\"content-type\" content=\"text/html; charset=unicode\">"
+        "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">"
         "<TITLE>form</TITLE><BODY><P>");
 }
 

@@ -27,7 +27,7 @@ protected:
     void setImage(HBITMAP bmp, DWORD cookie);
 
     virtual void onWmUserUpdate();
-    virtual void onHotSpot(LPCTSTR url, LPCTSTR param){};
+    virtual void onHotSpot(LPCSTR url, LPCSTR param){};
 
     void startHtml();
 
@@ -55,7 +55,7 @@ protected:
     WndTitleRef  wt;    
 
     void init();
-    static StringWMapRef splitHREFtext(LPCTSTR ht);
+    static StringMapRef splitHREFtext(LPCSTR ht);
 
 private:
     

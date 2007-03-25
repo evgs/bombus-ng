@@ -20,7 +20,7 @@ protected:
     std::string jid;
 
     virtual HBITMAP getImage(LPCTSTR url, DWORD cookie);
-    virtual void onHotSpot(LPCTSTR url, LPCTSTR param);
+    virtual void onHotSpot(LPCSTR url, LPCSTR param);
 
     BOOL savePhoto(LPCTSTR path);
     void loadPhoto(LPCTSTR path);

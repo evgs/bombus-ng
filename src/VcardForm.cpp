@@ -245,8 +245,8 @@ BOOL VcardForm::savePhoto( LPCTSTR path )
     return TRUE;
 }
 
-void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
-    std::string nurl=utf8::wchar_utf8(std::wstring(url));
+void VcardForm::onHotSpot( LPCSTR url, LPCSTR param ) {
+    std::string nurl=std::string(url);
     if (nurl=="load") {
         wchar_t filename[MAX_PATH];
         *filename=0;
@@ -301,10 +301,10 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
         viq->setAttribute("id",vcard->getAttribute("from"));
         viq->addChild(vcardTemp);
 
-        StringWMapRef m=HtmlView::splitHREFtext(param);
-        for (StringWMap::iterator i=m->begin(); i!=m->end(); i++) {
+        StringMapRef m=HtmlView::splitHREFtext(param);
+        for (StringMap::iterator i=m->begin(); i!=m->end(); i++) {
             std::string key=i->first;
-            std::string value=utf8::wchar_utf8(i->second);
+            std::string value=i->second;
             std::string key2;
             int k2=key.find('#');
             if (k2>0) {

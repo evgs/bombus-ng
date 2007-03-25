@@ -295,11 +295,11 @@ void VcardForm::onHotSpot( LPCSTR url, LPCSTR param ) {
             vcardTemp->setAttribute("xmlns","vcard-temp");
         }
 
-        JabberDataBlock *viq=new JabberDataBlock ("iq");
-        viq->setAttribute("to",vcard->getAttribute("from"));
-        viq->setAttribute("type","set");
-        viq->setAttribute("id",vcard->getAttribute("from"));
-        viq->addChild(vcardTemp);
+        JabberDataBlock viq("iq");
+        viq.setAttribute("to",vcard->getAttribute("from"));
+        viq.setAttribute("type","set");
+        viq.setAttribute("id","my-vcard-publish");
+        viq.addChild(vcardTemp);
 
         StringMapRef m=HtmlView::splitHREFtext(param);
         for (StringMap::iterator i=m->begin(); i!=m->end(); i++) {
@@ -327,7 +327,10 @@ void VcardForm::onHotSpot( LPCSTR url, LPCSTR param ) {
             loadPhoto(imgFile.c_str());
         }*/
 
-        StringRef result=viq->toXML();
+        //StringRef result=viq->toXML();
+
+        //todo: verify result
+        rc.lock()->jabberStream->sendStanza(viq);
         
         vcardArrivedNotify(vcard);
         return;

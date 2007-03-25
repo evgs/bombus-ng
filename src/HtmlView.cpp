@@ -207,21 +207,24 @@ StringMapRef HtmlView::splitHREFtext( LPCSTR ht ) {
     StringMap *m=new StringMap();
 
     char c;
-    if (ht) while ((c=(char)(*ht++))) {
-        switch (c) {
+    if (ht){
+        while ((c=(char)(*ht++))) {
+            switch (c) {
             case '+': buf+=' '; break;
             case '=': key=buf; buf.clear(); break;
             case '&': m->operator [](key)=buf; buf.clear(); break; 
             case '%': { 
                 char c1=(char)(*ht++)-'0'; if (c1>9) c1+='0'-'A'+10;
                 char c2=(char)(*ht++)-'0'; if (c2>9) c2+='0'-'A'+10;
-                buf+=c1<<4 | c2;
+                char c=c1<<4 | c2;
+                if (c!=0x0d) buf+=c;
                 break;
-            }
+                      }
             default:
                 buf+=c;
+            }
         }
-
+        m->operator [](key)=buf; 
     }
     return StringMapRef(m);
 }

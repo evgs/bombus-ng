@@ -199,18 +199,18 @@ HBITMAP HtmlView::getImage( LPCTSTR url, DWORD cookie )
     return NULL;
 }
 
-StringMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
+StringWMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
     std::string key;
 
-    std::string buf;
+    std::wstring buf;
 
-    StringMap *m=new StringMap();
+    StringWMap *m=new StringWMap();
 
-    char c;
+    wchar_t c;
     if (ht) while ((c=(char)(*ht++))) {
         switch (c) {
             case '+': buf+=' '; break;
-            case '=': key=buf; buf.clear(); break;
+            case '=': key=utf8::wchar_utf8(buf); buf.clear(); break;
             case '&': m->operator [](key)=buf; buf.clear(); break; 
             case '%': { 
                 char c1=(char)(*ht++)-'0'; if (c1>9) c1+='0'-'A'+10;
@@ -223,7 +223,7 @@ StringMapRef HtmlView::splitHREFtext( LPCTSTR ht ) {
         }
 
     }
-    return StringMapRef(m);
+    return StringWMapRef(m);
 }
 
 void HtmlView::addText( const wchar_t *text ) { 
@@ -235,7 +235,9 @@ void HtmlView::addText( const char *text ) {  addText(std::string(text)); }
 
 void HtmlView::startHtml() {
     SendMessage(htmlHWnd, DTM_CLEAR, 0, 0);
-    addText("<HTML><TITLE>form</TITLE><BODY><P>");
+    addText("<HTML>"
+        "<meta http-equiv=\"content-type\" content=\"text/html; charset=unicode\">"
+        "<TITLE>form</TITLE><BODY><P>");
 }
 
 
@@ -304,7 +306,7 @@ void HtmlView::beginForm( const char *name, const char *action ) {
     addText(name);
     addText("\" action=\"");
     addText(action);
-    addText("\" method=\"post\">");
+    addText("\" method=\"post\" accept-charset=\"UTF-8\">");
 }
 
 void HtmlView::setImage( HBITMAP bmp, DWORD cookie ) {

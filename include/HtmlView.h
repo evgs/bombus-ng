@@ -55,7 +55,7 @@ protected:
     WndTitleRef  wt;    
 
     void init();
-    static StringMapRef splitHREFtext(LPCTSTR ht);
+    static StringWMapRef splitHREFtext(LPCTSTR ht);
 
 private:
     

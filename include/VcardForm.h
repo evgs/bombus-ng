@@ -22,7 +22,7 @@ protected:
     virtual HBITMAP getImage(LPCTSTR url, DWORD cookie);
     virtual void onHotSpot(LPCTSTR url, LPCTSTR param);
 
-    void decodePhoto();
+    BOOL savePhoto(LPCTSTR path);
     void loadPhoto(LPCTSTR path);
 
     ImageRef img;
@@ -36,6 +36,8 @@ protected:
         TEXTBOX=2,
         MULTILINE=4
     };
+
+    int detectMime(char *buf);
 
     void addHtmlField(const char *ns1, const char *ns2, const char* description, int flags=TXT);
 

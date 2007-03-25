@@ -11,6 +11,8 @@
 #include "../gsgetfile/include/gsgetlib.h"
 extern std::wstring appRootPath;
 
+wchar_t * ext[]={L"*.unknown", L"*.jpg", L"*.png", L"*.gif", L"*.bmp"};
+char *mime[]={"image/unknown", "image/gpeg", "image/png", "image/gif", "image/x-ms-bmp"};
 
 class GetVcard : public JabberDataBlockListener {
 public:
@@ -53,7 +55,13 @@ void VcardForm::onWmUserUpdate() {
 
     //SendMessage(hwndHTML, WM_SETTEXT, 0, (LPARAM)"");
 
-    decodePhoto();
+    img.reset();
+
+    std::wstring imgFile=appRootPath+L"$tmpimg.jpg";
+
+    if (savePhoto(imgFile.c_str()))
+        img=ImageRef(new Image(imgFile.c_str()));
+
 
     startHtml();
     addImg(L"\\vcard");
@@ -180,12 +188,15 @@ HBITMAP VcardForm::getImage( LPCTSTR url, DWORD cookie ) {
     return NULL;
 }
 
-void VcardForm::decodePhoto() {
-    img.reset();
-    if (!vcard) return;
-    JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return;
-    JabberDataBlockRef photo=vcardTemp->getChildByName("PHOTO");    if (!photo) return;
-    JabberDataBlockRef binval=photo->getChildByName("BINVAL"); if (!binval) return;
+extern HINSTANCE g_hInst;
+
+BOOL VcardForm::savePhoto( LPCTSTR path ) 
+{
+    if (!vcard) return FALSE;
+
+    JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return FALSE;
+    JabberDataBlockRef photo=vcardTemp->getChildByName("PHOTO");    if (!photo) return FALSE;
+    JabberDataBlockRef binval=photo->getChildByName("BINVAL"); if (!binval) return FALSE;
     const std::string &data=binval->getText();
 
     int dstLen=base64::base64DecodeGetLength(data.length());
@@ -193,10 +204,31 @@ void VcardForm::decodePhoto() {
 
     dstLen=base64::base64Decode2(dst, data.c_str(), data.length());
 
-    std::wstring imgFile=appRootPath+L"$tmpimg.jpg";
+    wchar_t filename[MAX_PATH];
+    if (!path) {
+        wchar_t *extm=ext[detectMime(dst)]; 
+        *filename=0;
+        wcscpy_s(filename, MAX_PATH, extm);
+        OPENFILENAME ofn;
+        memset(&ofn, 0, sizeof(OPENFILENAME));
+        ofn.lStructSize=sizeof(OPENFILENAME);
+        ofn.hwndOwner=getHWnd();         
+        ofn.hInstance=g_hInst; //GetModuleHandle(NULL);  
+        ofn.lpstrFilter=L"Image files\0*.PNG;*.JPG;*.GIF\0All flles\0*.*\0\0\0";     
+        ofn.nFilterIndex=0;
+        ofn.lpstrFile=filename;     
+        ofn.nMaxFile=MAX_PATH;
+        //ofn.lpstrInitialDir   = ;     
+        ofn.lpstrTitle=L"Save image as";
+        ofn.lpstrDefExt=extm+2;
+        ofn.Flags=OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
 
+        BOOL result = GetSaveFileNameEx(&ofn);
+        if (!result) return FALSE;
+        path=filename;
+    }
 
-    HANDLE file=CreateFile(imgFile.c_str(), 
+    HANDLE file=CreateFile(path, 
         GENERIC_WRITE, 
         FILE_SHARE_READ, NULL, 
         CREATE_ALWAYS,
@@ -204,17 +236,14 @@ void VcardForm::decodePhoto() {
 
     DWORD dwProcessed;
     if (file==INVALID_HANDLE_VALUE) {
-        delete dst; return;
+        delete dst; return FALSE;
     }
     WriteFile(file, dst, dstLen, &dwProcessed, NULL);
     CloseHandle(file);
 
-    img=ImageRef(new Image(imgFile.c_str()));
-
     delete dst;
+    return TRUE;
 }
-
-extern HINSTANCE g_hInst;
 
 void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
     std::string nurl=utf8::wchar_utf8(std::wstring(url));
@@ -241,24 +270,7 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
         return;
     }
     if (nurl=="save") {
-        wchar_t filename[MAX_PATH];
-        *filename=0;
-        OPENFILENAME ofn;
-        memset(&ofn, 0, sizeof(OPENFILENAME));
-        ofn.lStructSize=sizeof(OPENFILENAME);
-        ofn.hwndOwner=getHWnd();         
-        ofn.hInstance=g_hInst; //GetModuleHandle(NULL);  
-        ofn.lpstrFilter=L"Image files\0*.PNG;*.JPG;*.GIF\0All flles\0*.*\0\0\0";     
-        ofn.nFilterIndex=0;
-        ofn.lpstrFile=filename;     
-        ofn.nMaxFile=MAX_PATH;
-        //ofn.lpstrInitialDir   = ;     
-        ofn.lpstrTitle=L"Save image as";
-        ofn.lpstrDefExt=L"jpg"; 
-        ofn.Flags=OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
-        
-        BOOL result = GetSaveFileNameEx(&ofn);
-        //todo: save photo
+        savePhoto(NULL);
         return;
     }
     if (nurl=="clear") {
@@ -289,10 +301,10 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
         viq->setAttribute("id",vcard->getAttribute("from"));
         viq->addChild(vcardTemp);
 
-        StringMapRef m=HtmlView::splitHREFtext(param);
-        for (StringMap::iterator i=m->begin(); i!=m->end(); i++) {
+        StringWMapRef m=HtmlView::splitHREFtext(param);
+        for (StringWMap::iterator i=m->begin(); i!=m->end(); i++) {
             std::string key=i->first;
-            std::string value=i->second;
+            std::string value=utf8::wchar_utf8(i->second);
             std::string key2;
             int k2=key.find('#');
             if (k2>0) {
@@ -310,10 +322,10 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
             child->setText(value);
         }
 
-        if (img) if (img->getHBmp()) {
+        /*if (img) if (img->getHBmp()) {
             std::wstring imgFile=appRootPath+L"$tmpimg.jpg";
             loadPhoto(imgFile.c_str());
-        }
+        }*/
 
         StringRef result=viq->toXML();
         
@@ -349,7 +361,34 @@ void VcardForm::loadPhoto( LPCTSTR path ) {
         vcardTemp->removeChild("PHOTO");
         JabberDataBlockRef photo=vcardTemp->addChild("PHOTO", NULL);
         photo->addChild("BINVAL",enc);
-        photo->addChild("TYPE","image/jpeg");
+        photo->addChild("TYPE",mime[detectMime(dst)]);
         delete enc;
     }
 }
+
+int VcardForm::detectMime( char *photo ) {
+    if (photo[0]==(char)0xff &&
+        photo[1]==(char)0xd8 &&
+        photo[6]==(char)'J' &&
+        photo[7]==(char)'F' &&
+        photo[8]==(char)'I' &&
+        photo[9]==(char)'F')
+        return 1; //"image/jpeg";
+
+    if (photo[0]==0x89 &&
+        photo[1]==(char)'P' &&
+        photo[2]==(char)'N' &&
+        photo[3]==(char)'G')
+        return 2; //"image/png";
+
+    if (photo[1]==(char)'G' &&
+        photo[2]==(char)'I' &&
+        photo[3]==(char)'F')
+        return 3; //"image/gif";
+
+    if (photo[1]==(char)'B' &&
+        photo[2]==(char)'M')
+        return 4; //"image/x-ms-bmp";
+    return 0;
+}
+

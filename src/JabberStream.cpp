@@ -75,7 +75,7 @@ bool JabberStream::tagEnd(const std::string & tagname) {
                     iqError.setAttribute("to", stanza->getAttribute("from"));
                     iqError.setAttribute("id", stanza->getAttribute("id"));
                     //todo: optional iq child blocks
-                    JabberDataBlock *err=iqError.addChild("error", NULL);
+                    JabberDataBlockRef err=iqError.addChild("error", NULL);
                         err->setAttribute("type","cancel");
                         err->addChild("feature-not-implemented", NULL)
                             ->setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-stanzas");

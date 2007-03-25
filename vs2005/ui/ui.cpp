@@ -678,7 +678,7 @@ void JabberStreamEvents::loginSuccess(){
     getRoster.setAttribute("type","get");
     getRoster.setAttribute("id","roster");
 
-    JabberDataBlock *qry =getRoster.addChild("query", NULL); 
+    JabberDataBlockRef qry =getRoster.addChild("query", NULL); 
     qry->setAttribute("xmlns","jabber:iq:roster");
 
     rc->jabberStream->sendStanza(getRoster);

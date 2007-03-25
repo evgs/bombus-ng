@@ -23,7 +23,7 @@ ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceC
     result.setAttribute("id", block->getAttribute("id"));
     result.addChild(query);
 
-    JabberDataBlock *identity=query->addChild("identity",NULL);
+    JabberDataBlockRef identity=query->addChild("identity",NULL);
     identity->setAttribute("category","client");
     identity->setAttribute("type","handheld");
 

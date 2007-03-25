@@ -64,7 +64,7 @@ JabberDataBlockRef NonSASLAuth::loginStanza( bool get, bool sha1 ) {
     JabberDataBlockRef login = JabberDataBlockRef(new JabberDataBlock("iq"));
     login->setAttribute("type", (get)? "get"   : "set" );
     login->setAttribute("id",   (get)? "auth1" : "auth2" );
-    JabberDataBlock * qry=login->addChild("query",NULL);
+    JabberDataBlockRef qry=login->addChild("query",NULL);
     qry->setAttribute("xmlns","jabber:iq:auth");
     
     qry->addChild("username",rc->account->getUserName().c_str());
@@ -182,7 +182,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 			JabberDataBlock bindIq("iq");
 			bindIq.setAttribute("type", "set");
 			bindIq.setAttribute("id", "bind");
-			JabberDataBlock *bind=bindIq.addChild("bind", NULL);
+			JabberDataBlockRef bind=bindIq.addChild("bind", NULL);
 			bind->setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-bind");
 			bind->addChild("resource", rc->account->getResource().c_str() );
 			rc->jabberStream->sendStanza(bindIq);

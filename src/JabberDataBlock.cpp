@@ -50,10 +50,10 @@ void JabberDataBlock::addChild(JabberDataBlockRef child){
 	childs.push_back(child);
 }
 
-JabberDataBlock * JabberDataBlock::addChild(const char *_tagName, const char *_text){
+JabberDataBlockRef JabberDataBlock::addChild(const char *_tagName, const char *_text){
 	JabberDataBlockRef child=JabberDataBlockRef(new JabberDataBlock(_tagName, _text));
 	addChild(child);
-	return child.get();
+	return child;
 }
 
 
@@ -64,6 +64,14 @@ JabberDataBlockRef JabberDataBlock::getChildByName(const char * tagName) const{
 	return JabberDataBlockRef();
 }
 
+void JabberDataBlock::removeChild( const char * tagName ) {
+    for (JabberDataBlockRefList::iterator c=childs.begin(); c!=childs.end(); c++) {
+        if ( (*c)->tagName==tagName) {
+            childs.erase(c);
+            return;
+        }
+    }
+}
 const std::string JabberDataBlock::getChildText( const char * tagName ) const{
     JabberDataBlockRef child=getChildByName(tagName);
     if (child) return child->getText();

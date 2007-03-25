@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <sipapi.h>
 #include <htmlctrl.h>
+#include <commdlg.h>
 
 #include "VcardForm.h"
 #include "JabberStream.h"
@@ -52,7 +53,7 @@ void VcardForm::onWmUserUpdate() {
 
     //SendMessage(hwndHTML, WM_SETTEXT, 0, (LPARAM)"");
 
-    loadPhoto();
+    decodePhoto();
 
     startHtml();
     addImg(L"\\vcard");
@@ -179,7 +180,8 @@ HBITMAP VcardForm::getImage( LPCTSTR url, DWORD cookie ) {
     return NULL;
 }
 
-void VcardForm::loadPhoto() {
+void VcardForm::decodePhoto() {
+    img.reset();
     if (!vcard) return;
     JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return;
     JabberDataBlockRef photo=vcardTemp->getChildByName("PHOTO");    if (!photo) return;
@@ -212,22 +214,59 @@ void VcardForm::loadPhoto() {
     delete dst;
 }
 
+extern HINSTANCE g_hInst;
+
 void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
     std::string nurl=utf8::wchar_utf8(std::wstring(url));
     if (nurl=="load") {
-        //todo: load photo
-        //loadPhoto();
-        //setImage(img->getHBmp(), cookie);
+        wchar_t filename[MAX_PATH];
+        *filename=0;
+        OPENFILENAME ofn;
+        memset(&ofn, 0, sizeof(OPENFILENAME));
+        ofn.lStructSize=sizeof(OPENFILENAME);
+        ofn.hwndOwner=getHWnd();
+        ofn.hInstance=g_hInst;
+        ofn.lpstrFilter=L"Image files\0*.PNG;*.JPG;*.GIF\0All flles\0*.*\0\0\0";
+        ofn.nFilterIndex=0;
+        ofn.lpstrFile=filename;
+        ofn.nMaxFile=MAX_PATH;
+        ofn.lpstrTitle=L"Select image file";
+        ofn.Flags=OFN_FILEMUSTEXIST | OFN_EXPLORER;
+        BOOL result=GetOpenFileName(&ofn);
+        if (!result) return;
+
+        loadPhoto(filename);
+
+        vcardArrivedNotify(vcard);
         return;
     }
     if (nurl=="save") {
+        wchar_t filename[MAX_PATH];
+        *filename=0;
+        OPENFILENAME ofn;
+        memset(&ofn, 0, sizeof(OPENFILENAME));
+        ofn.lStructSize=sizeof(OPENFILENAME);
+        ofn.hwndOwner=getHWnd();         
+        ofn.hInstance=g_hInst; //GetModuleHandle(NULL);  
+        ofn.lpstrFilter=L"Image files\0*.PNG;*.JPG;*.GIF\0All flles\0*.*\0\0\0";     
+        ofn.nFilterIndex=0;
+        ofn.lpstrFile=filename;     
+        ofn.nMaxFile=MAX_PATH;
+        //ofn.lpstrInitialDir   = ;     
+        ofn.lpstrTitle=L"Save image as";
+        ofn.lpstrDefExt=L"jpg"; 
+        ofn.Flags=OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
+        
+        BOOL result = GetSaveFileName(&ofn);
         //todo: save photo
         return;
     }
     if (nurl=="clear") {
         //todo: clear photo
-        img.reset();
-        setImage(0, cookie);
+        JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard","vcard-temp");
+        if (!vcardTemp) return;
+        vcardTemp->removeChild("PHOTO");
+        vcardArrivedNotify(vcard);
         return;
     }
     if (nurl=="reload") {
@@ -237,12 +276,18 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
     if (nurl=="publish") {
         //todo: publish vcard
 
-        JabberDataBlock viq("iq");
-        viq.setAttribute("to",jid.c_str());
-        viq.setAttribute("type","set");
-        viq.setAttribute("id",jid.c_str());
-        JabberDataBlock *vcardTemp=viq.addChild("vCard",NULL);
-        vcardTemp->setAttribute("xmlns","vcard-temp");
+        
+        JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard","vcard-temp");
+        if (!vcardTemp) {
+            vcardTemp=JabberDataBlockRef(new JabberDataBlock("vCard"));
+            vcardTemp->setAttribute("xmlns","vcard-temp");
+        }
+
+        JabberDataBlock *viq=new JabberDataBlock ("iq");
+        viq->setAttribute("to",vcard->getAttribute("from"));
+        viq->setAttribute("type","set");
+        viq->setAttribute("id",vcard->getAttribute("from"));
+        viq->addChild(vcardTemp);
 
         StringMapRef m=HtmlView::splitHREFtext(param);
         for (StringMap::iterator i=m->begin(); i!=m->end(); i++) {
@@ -255,14 +300,56 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
                 key=key.substr(0, k2);
             }
 
-            JabberDataBlock *child=vcardTemp->addChild(key.c_str(), NULL);
-            if (k2>0) child=vcardTemp->addChild(key2.c_str(), NULL);
+            JabberDataBlockRef child=vcardTemp->getChildByName(key.c_str());
+            if (!child) child=vcardTemp->addChild(key.c_str(), NULL);
+            if (k2>0) {
+                JabberDataBlockRef child2=child->getChildByName(key2.c_str());
+                if (!child2) child2=child->addChild(key2.c_str(), NULL);
+                child=child2;
+            }
             child->setText(value);
         }
 
-        StringRef result=viq.toXML();
+        if (img) if (img->getHBmp()) {
+            std::wstring imgFile=appRootPath+L"$tmpimg.jpg";
+            loadPhoto(imgFile.c_str());
+        }
+
+        StringRef result=viq->toXML();
         
+        vcardArrivedNotify(vcard);
         return;
     }
 
+}
+
+void VcardForm::loadPhoto( LPCTSTR path ) {
+    if (!vcard) return;
+    JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard","vcard-temp");
+
+    HANDLE file=CreateFile(path, 
+        GENERIC_READ, 
+        FILE_SHARE_READ, NULL, 
+        OPEN_EXISTING,
+        0, NULL);
+
+    DWORD dwProcessed;
+    if (file!=INVALID_HANDLE_VALUE) {
+        DWORD size=GetFileSize(file, NULL);
+        char *dst=new char[size];
+        ReadFile(file, dst, size, &dwProcessed, NULL);
+        CloseHandle(file);
+
+        DWORD encLength=base64::base64EncodeGetLength(size);
+        char *enc=new char[encLength];
+        encLength=base64::base64Encode(enc, dst, size);
+
+        //todo: get mime-type
+        delete dst;
+        vcardTemp->removeChild("PHOTO");
+        JabberDataBlockRef photo=vcardTemp->addChild("PHOTO", NULL);
+        photo->addChild("BINVAL",enc);
+        photo->addChild("TYPE","image/jpeg");
+        delete enc;
+    }
 }

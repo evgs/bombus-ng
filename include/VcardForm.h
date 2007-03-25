@@ -22,7 +22,9 @@ protected:
     virtual HBITMAP getImage(LPCTSTR url, DWORD cookie);
     virtual void onHotSpot(LPCTSTR url, LPCTSTR param);
 
-    void loadPhoto();
+    void decodePhoto();
+    void loadPhoto(LPCTSTR path);
+
     ImageRef img;
     DWORD cookie;
 

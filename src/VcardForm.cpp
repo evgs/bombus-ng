@@ -97,7 +97,7 @@ void VcardForm::onWmUserUpdate() {
     addHtmlField("DESC", NULL,      "About", MULTILINE);
 
     if (editForm) button(std::string("Publish"));
-    button("reload",std::string("Reload")); 
+    //button("reload",std::string("Reload")); 
 
     endHtml();
 }

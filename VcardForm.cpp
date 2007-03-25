@@ -8,7 +8,7 @@
 
 #include "utf8.hpp"
 #include "base64.h"
-
+#include "../gsgetfile/include/gsgetlib.h"
 extern std::wstring appRootPath;
 
 
@@ -232,7 +232,7 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
         ofn.nMaxFile=MAX_PATH;
         ofn.lpstrTitle=L"Select image file";
         ofn.Flags=OFN_FILEMUSTEXIST | OFN_EXPLORER;
-        BOOL result=GetOpenFileName(&ofn);
+        BOOL result=GetOpenFileNameEx(&ofn);
         if (!result) return;
 
         loadPhoto(filename);
@@ -257,7 +257,7 @@ void VcardForm::onHotSpot( LPCTSTR url, LPCTSTR param ) {
         ofn.lpstrDefExt=L"jpg"; 
         ofn.Flags=OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT;
         
-        BOOL result = GetSaveFileName(&ofn);
+        BOOL result = GetSaveFileNameEx(&ofn);
         //todo: save photo
         return;
     }

@@ -14,6 +14,8 @@ extern std::wstring appRootPath;
 wchar_t * ext[]={L"*.unknown", L"*.jpg", L"*.png", L"*.gif", L"*.bmp"};
 char *mime[]={"image/unknown", "image/gpeg", "image/png", "image/gif", "image/x-ms-bmp"};
 
+#define FILEIMGMASK L"Image files (*.png/jpeg/gif/bmp)\0*.PNG;*.JPG;*.GIF;*.BMP\0All flles (*.*)\0*.*\0\0\0"
+
 class GetVcard : public JabberDataBlockListener {
 public:
     GetVcard(const std::string &jid, VcardForm::ref form);
@@ -220,7 +222,7 @@ BOOL VcardForm::savePhoto( LPCTSTR path )
         ofn.lStructSize=sizeof(OPENFILENAME);
         ofn.hwndOwner=getHWnd();         
         ofn.hInstance=g_hInst; //GetModuleHandle(NULL);  
-        ofn.lpstrFilter=L"Image files\0*.PNG;*.JPG;*.GIF\0All flles\0*.*\0\0\0";     
+        ofn.lpstrFilter=FILEIMGMASK;     
         ofn.nFilterIndex=0;
         ofn.lpstrFile=filename;     
         ofn.nMaxFile=MAX_PATH;
@@ -261,7 +263,7 @@ void VcardForm::onHotSpot( LPCSTR url, LPCSTR param ) {
         ofn.lStructSize=sizeof(OPENFILENAME);
         ofn.hwndOwner=getHWnd();
         ofn.hInstance=g_hInst;
-        ofn.lpstrFilter=L"Image files\0*.PNG;*.JPG;*.GIF\0All flles\0*.*\0\0\0";
+        ofn.lpstrFilter=FILEIMGMASK;
         ofn.nFilterIndex=0;
         ofn.lpstrFile=filename;
         ofn.nMaxFile=MAX_PATH;

@@ -143,11 +143,17 @@ void VcardForm::vcardArrivedNotify(JabberDataBlockRef vcard){
 }
 
 void VcardForm::addHtmlField( const char *ns1, const char *ns2, const char *description, int flags ) {
-    if (!vcard) return;
-    JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      if (!vcardTemp) return;
-    JabberDataBlockRef field=vcardTemp->getChildByName(ns1);     if (!field) return;
-    if (ns2) field=field->getChildByName(ns2);     if (!field) return;
-    const std::string value=XMLStringPrep(field->getText());
+    std::string value;
+    if (vcard) {
+        JabberDataBlockRef vcardTemp=vcard->findChildNamespace("vCard", "vcard-temp");      
+        if (vcardTemp) {
+            JabberDataBlockRef field=vcardTemp->getChildByName(ns1);     
+            if (field) {
+                if (ns2) field=field->getChildByName(ns2);
+            }
+            if (field) value=XMLStringPrep(field->getText());
+        }
+    }
 
     std::string name(ns1);
     if (ns2) {

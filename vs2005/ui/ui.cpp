@@ -56,6 +56,7 @@ HWND		mainWnd;
 //ListViewRef logWnd;
 TabsCtrlRef tabs;
 
+VirtualListView::ref odrLog;
 RosterView::ref rosterWnd;
 ChatView::ref chatSample;
 ResourceContextRef rc;
@@ -293,7 +294,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					break;
 
 				case IDM_WINDOWS_LOG:
+                    if (!tabs->switchByWndRef(odrLog)) {
+                        tabs->addWindow(odrLog);
+                        tabs->switchByWndRef(odrLog);
+                    }
+                    break;
+
+
 				case IDM_WINDOWS_ROSTER:
+                    tabs->switchByWndRef(rosterWnd);
 					break;
 
                 default:
@@ -327,7 +336,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //tabs->addWindow(logWnd);
 
             { 
-                VirtualListView::ref odrLog = VirtualListView::ref(new VirtualListView(tabs->getHWnd(), std::string("Log")));
+                odrLog = VirtualListView::ref(new VirtualListView(tabs->getHWnd(), std::string("Log")));
                 tabs->addWindow(odrLog);
                 Log::getInstance()->bindLV(odrLog); 
             }

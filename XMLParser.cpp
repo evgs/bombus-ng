@@ -112,17 +112,18 @@ void XMLParser::parse(){
 std::string XMLStringPrep(const std::string & data){
 	std::string result;
 	for (std::string::const_iterator i=data.begin(); i!=data.end(); i++) {
-		char ch=*i;
+		unsigned char ch=(unsigned char)*i;
 		switch (ch) {
 			case '&':   result+="&amp;" ; break;
 			case '"':   result+="&quot;" ; break;
 			case '<':   result+="&lt;" ; break;
 			case '>':   result+="&gt;" ; break;
 			case '\'':  result+="&apos;" ; break;
+            case 0x09:  result+=(char)0x09; break;
                 // not nessesary
             case 0x0d:  /*result+="&#13;"*/ ; break;
             case 0x0a:  result+="&#10;" ; break;
-			default: result+=ch;
+			default: if (ch>0x1f) result+=ch;
 		}
 	}
 	return result;

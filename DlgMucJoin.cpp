@@ -9,6 +9,7 @@
 
 #include "DlgMucJoin.h"
 #include "DlgUtils.h"
+#include "MRU.h"
 
 #include "ProcessMUC.h"
 
@@ -39,7 +40,7 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
             std::string room="bombus";
             std::string server="conference.jabber.ru";
             std::string pass="";
-            std::string nick; //="evgs";
+            //std::string nick; //="evgs";
 
             /*for (int i=0; i<6; i++)
                 SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) statusNames[i]);
@@ -48,7 +49,8 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
             SetDlgItemText(hDlg, IDC_E_ROOM, room);
             SetDlgItemText(hDlg, IDC_E_SERVER, server);
             SetDlgItemText(hDlg, IDC_E_PASSWORD, pass);
-            SetDlgItemText(hDlg, IDC_C_NICK, nick);
+            mru::readMru(L"MucJoinNick", hDlg, IDC_C_NICK, NULL);
+            //SetDlgItemText(hDlg, IDC_C_NICK, nick);
 
             SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_SETRANGE32, 0, 20);
             SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_SETPOS, 0, 20 /*p->rc->priority*/);
@@ -73,6 +75,7 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
             std::string server; GetDlgItemText(hDlg, IDC_E_SERVER, server);
             std::string pass; GetDlgItemText(hDlg, IDC_E_PASSWORD, pass);
             std::string nick; GetDlgItemText(hDlg, IDC_C_NICK, nick);
+            mru::saveMru(L"MruJoinNick", hDlg, IDC_C_NICK);
 
             int histSz=SendDlgItemMessage(hDlg, IDC_SPIN_HIST_SZ, UDM_GETPOS, 0, 0);
 

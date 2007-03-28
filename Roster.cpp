@@ -448,21 +448,21 @@ HMENU RosterView::getContextMenu() {
 
             if (!canKick && !canBan) return hmenu;
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-            if (canKick) AppendMenu(hmenu, MF_STRING, RosterView::MUCKICK, L"Kick");
-            if (canBan)  AppendMenu(hmenu, MF_STRING, RosterView::MUCBAN,  L"Ban");
+            if (canKick) AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MUCKICK, L"Kick");
+            if (canBan)  AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MUCBAN,  L"Ban");
 
             HMENU roleMenu=CreatePopupMenu();
-            AppendMenu(roleMenu, MF_STRING | (mc->role==MucContact::VISITOR ? MF_CHECKED : 0), RosterView::MUCVISITOR, L"Visitor");
-            AppendMenu(roleMenu, MF_STRING | (mc->role==MucContact::PARTICIPANT ? MF_CHECKED : 0), RosterView::MUCPARTICIPANT, L"Participant");
-            AppendMenu(roleMenu, MF_STRING | (mc->role==MucContact::MODERATOR ? MF_CHECKED : 0), RosterView::UNSUBSCRIBED, L"Moderator");
+            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::VISITOR ? MF_CHECKED : 0), RosterView::MUCVISITOR, L"Visitor");
+            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::PARTICIPANT ? MF_CHECKED : 0), RosterView::MUCPARTICIPANT, L"Participant");
+            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::MODERATOR ? MF_CHECKED : 0), RosterView::UNSUBSCRIBED, L"Moderator");
 
             if (myRole>=MucContact::MODERATOR) AppendMenu(hmenu, MF_POPUP, (LPARAM)roleMenu,               TEXT("Role"));
 
             HMENU afflMenu=CreatePopupMenu();
-            AppendMenu(afflMenu, MF_STRING | (mc->affiliation==MucContact::NONE ? MF_CHECKED : 0), RosterView::MUCNONE, L"None");
-            AppendMenu(afflMenu, MF_STRING | (mc->affiliation==MucContact::MEMBER ? MF_CHECKED : 0), RosterView::MUCMEMBER, L"Member");
-            AppendMenu(afflMenu, MF_STRING | (mc->affiliation==MucContact::ADMIN ? MF_CHECKED : 0), RosterView::MUCADMIN, L"Admin");
-            AppendMenu(afflMenu, MF_STRING | (mc->affiliation==MucContact::OWNER ? MF_CHECKED : 0), RosterView::MUCOWNER, L"Owner");
+            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::NONE ? MF_CHECKED : 0), RosterView::MUCNONE, L"None");
+            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::MEMBER ? MF_CHECKED : 0), RosterView::MUCMEMBER, L"Member");
+            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::ADMIN ? MF_CHECKED : 0), RosterView::MUCADMIN, L"Admin");
+            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::OWNER ? MF_CHECKED : 0), RosterView::MUCOWNER, L"Owner");
 
             if (myAff>=MucContact::ADMIN) AppendMenu(hmenu, MF_POPUP, (LPARAM)afflMenu,               TEXT("Affiliation"));
 

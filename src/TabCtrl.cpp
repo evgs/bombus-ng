@@ -412,6 +412,7 @@ HMENU TabsCtrl::getContextMenu() {
 #include "ResourceContext.h"
 #include "Roster.h"
 #include "ChatView.h"
+#include "ProcessMUC.h"
 extern ResourceContextRef rc;
 //////////////////////////////////////////////////////////////////////////
 MainTabs::MainTabs(HWND parent) {
@@ -454,7 +455,14 @@ void MainTabs::menuUserActions( int cmdId, DWORD userData ) {
 
     if (!chat) {
         //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
-        Contact::ref cref=rc->roster->findContact(contact->jid.getJid());
+        Contact::ref cref;
+
+        if (dynamic_cast<MucRoom *>(contact)) {
+            MucGroup::ref roomGrp=boost::dynamic_pointer_cast<MucGroup> (rc->roster->findGroup(contact->jid.getBareJid()));
+            cref=roomGrp->room;
+        } else
+            cref=rc->roster->findContact(contact->jid.getJid());
+
         BOOST_ASSERT(cref.get());
         chat=WndRef(new ChatView(getHWnd(), cref));
         addWindow(chat);

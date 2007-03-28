@@ -15,6 +15,7 @@
 #include "Image.h"
 #include "JabberStream.h"
 #include "Presence.h"
+#include "ProcessMUC.h"
 
 #include "TabCtrl.h"
 #include "ChatView.h"
@@ -305,6 +306,17 @@ Roster::ContactListRef Roster::getHotContacts() {
             hots->push_back(contact);
         }
     }
+
+    //muc rooms
+    for (GroupList::const_iterator i=groups.begin(); i!=groups.end(); i++) {
+        MucGroup::ref r= boost::dynamic_pointer_cast<MucGroup>(*i);
+        if (r) {
+            MucRoom::ref room=r->room;
+            if (room->nUnread>0)
+                hots->push_back(room);
+        }
+    }
+
     return hots;
 }
 RosterGroup::RosterGroup( const std::string &name, Type type ) {

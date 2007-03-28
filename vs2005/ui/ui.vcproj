@@ -300,6 +300,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\MRU.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Notify.cpp"
 				>
 			</File>
@@ -507,6 +511,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\crypto\MessageDigest.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\MRU.h"
 				>
 			</File>
 			<File

@@ -24,6 +24,22 @@ enum MPA {
     LEAVE=2
 };
 
+char * roleName[]= { "none", "visitor", "participant", "moderator" };
+char * affiliationName[]= { "outcast", "none", "member", "admin", "owner" };
+
+MucContact::Role getRoleIndex(const std::string &role) {
+    if (role=="visitor") return MucContact::VISITOR;
+    if (role=="participant") return MucContact::PARTICIPANT;
+    if (role=="moderator") return MucContact::MODERATOR;
+    return MucContact::NONE_ROLE;
+}
+MucContact::Affiliation getAffiliationIndex(const std::string &role) {
+    if (role=="outcast") return MucContact::OUTCAST;
+    if (role=="member") return MucContact::MEMBER;
+    if (role=="admin") return MucContact::ADMIN;
+    if (role=="owner") return MucContact::OWNER;
+    return MucContact::NONE;
+}
 //////////////////////////////////////////////////////////////////////////
 ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 
@@ -74,16 +90,12 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
     } else {
         JabberDataBlockRef item=xmuc->getChildByName("item");   
 
-        std::string role=item->getAttribute("role");
-        if (role=="visitor") c->sortKey=2;
-        if (role=="participant") c->sortKey=1;   
-        if (role=="moderator") c->sortKey=0;
+        MucContact::Role role = 
+            getRoleIndex(item->getAttribute("role"));
+        c->sortKey=MucContact::MODERATOR-role;
         
-        std::string affiliation=item->getAttribute("affiliation");
-        //if (affiliation.equals("owner")) affiliationCode=AFFILIATION_OWNER;
-        //if (affiliation.equals("admin")) affiliationCode=AFFILIATION_ADMIN;
-        //if (affiliation.equals("member")) affiliationCode=AFFILIATION_MEMBER;
-        //if (affiliation.equals("none")) affiliationCode=AFFILIATION_NONE;
+        MucContact::Affiliation affiliation = 
+            getAffiliationIndex(item->getAttribute("affiliation"));
 
         boolean roleChanged= c->role != role;
         boolean affiliationChanged= c->affiliation !=affiliation;
@@ -95,12 +107,11 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
         //setSortKey(nick);
 
-        if (role=="moderator") {
+        if (role==MucContact::MODERATOR) {
             c->transpIndex=icons::ICON_MODERATOR_INDEX;
         } else {
             c->transpIndex=0;
         }
-
 
         JabberDataBlockRef statusBlock=xmuc->getChildByName("status");
         int statusCode=(statusBlock)? atoi(statusBlock->getAttribute("code").c_str()) : 0; 
@@ -163,11 +174,11 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                     message+=")";
                 }
                 message+=" has joined the channel as ";
-                message+=role;
+                message+=roleName[role];
 
-                if (affiliation!="none") {
+                if (affiliation!=MucContact::NONE) {
                     message+=" and ";
-                    message+=affiliation;
+                    message+=affiliationName[affiliation-MucContact::OUTCAST];
 
                     const std::string & status=block->getChildText("status");
                     message+=" (";
@@ -178,10 +189,11 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                 //change status
                 message+=" is now ";
 
-                if ( roleChanged ) message+=role;
+                if ( roleChanged ) message+=roleName[role];
                 if (affiliationChanged) {
                     if (roleChanged) message+=" and ";
-                    message+=(affiliation=="none")? "unaffiliated" : affiliation;
+                    message+=(affiliation==MucContact::NONE)? 
+                        "unaffiliated" : affiliationName[affiliation-MucContact::OUTCAST];
                 }
                 if (!roleChanged && !affiliationChanged) {
                     const std::string &show=block->getChildText("show");

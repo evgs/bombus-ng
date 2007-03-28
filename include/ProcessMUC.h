@@ -9,14 +9,30 @@
 
 class MucContact : public Contact {
 public:
+    enum Role {
+        NONE_ROLE=0,
+        VISITOR,
+        PARTICIPANT,
+        MODERATOR
+    };
+    enum Affiliation {
+        OUTCAST=-1,
+        NONE=0,
+        MEMBER,
+        ADMIN,
+        OWNER
+    };
+
+
     MucContact(const std::string &jid);
     std::string realJid;
-    std::string role;
-    std::string affiliation;
+    Role role;
+    Affiliation affiliation;
 
     virtual void update();
 
     typedef boost::shared_ptr<MucContact> ref;
+
 };
 
 class MucRoom : public Contact {

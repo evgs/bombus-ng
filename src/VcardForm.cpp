@@ -388,7 +388,7 @@ int VcardForm::detectMime( char *photo ) {
         photo[9]==(char)'F')
         return 1; //"image/jpeg";
 
-    if (photo[0]==0x89 &&
+    if (photo[0]==(char)0x89 &&
         photo[1]==(char)'P' &&
         photo[2]==(char)'N' &&
         photo[3]==(char)'G')

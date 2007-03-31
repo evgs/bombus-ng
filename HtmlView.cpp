@@ -60,7 +60,7 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
             SendMessage(hwndHTML, WM_SETTEXT, 0, (LPARAM)"");
             SendMessage(hwndHTML, DTM_ADDTEXT, FALSE, 
-                (LPARAM)TEXT("<HTML><TITLE>Test</TITLE><BODY><P>Loading...<BR></BODY></HTML>"));
+                (LPARAM)"<HTML><TITLE>Test</TITLE><BODY><P>Loading...<BR></BODY></HTML>");
             SendMessage(hwndHTML, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);
 
 

@@ -13,7 +13,7 @@ public:
     void streamInt   (int &data);
     void streamString(std::string &data);
     // ***WARNING!!!*** THIS method is not a strong cryptographic algorithm.
-    // the single usage of this method is protecting from accidental displaying of scrambled data
+    // the simple usage of this method is protecting only from accidental displaying of scrambled data
     void streamScrambledString(std::string &data);
 
 private:

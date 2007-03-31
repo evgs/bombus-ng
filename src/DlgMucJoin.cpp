@@ -21,6 +21,8 @@
 extern HINSTANCE	g_hInst;			// current instance
 extern RosterView::ref rosterWnd;
 
+#define MRU_MUC_NICK L"MucJoinNick"
+
 INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     DlgMucJoin *p=(DlgMucJoin *) GetWindowLong(hDlg, GWL_USERDATA);
 
@@ -49,7 +51,7 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
             SetDlgItemText(hDlg, IDC_E_ROOM, room);
             SetDlgItemText(hDlg, IDC_E_SERVER, server);
             SetDlgItemText(hDlg, IDC_E_PASSWORD, pass);
-            mru::readMru(L"MucJoinNick", hDlg, IDC_C_NICK, NULL);
+            mru::readMru(MRU_MUC_NICK, hDlg, IDC_C_NICK, NULL);
             //SetDlgItemText(hDlg, IDC_C_NICK, nick);
 
             SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_SETRANGE32, 0, 20);
@@ -75,7 +77,7 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
             std::string server; GetDlgItemText(hDlg, IDC_E_SERVER, server);
             std::string pass; GetDlgItemText(hDlg, IDC_E_PASSWORD, pass);
             std::string nick; GetDlgItemText(hDlg, IDC_C_NICK, nick);
-            mru::saveMru(L"MruJoinNick", hDlg, IDC_C_NICK);
+            mru::saveMru(MRU_MUC_NICK, hDlg, IDC_C_NICK);
 
             int histSz=SendDlgItemMessage(hDlg, IDC_SPIN_HIST_SZ, UDM_GETPOS, 0, 0);
 

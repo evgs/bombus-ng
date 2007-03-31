@@ -7,7 +7,7 @@ Serialize::Serialize( LPCTSTR fileName, bool read ) {
     file=CreateFile(path.c_str(), 
                     (read)? GENERIC_READ : GENERIC_WRITE, 
                     FILE_SHARE_READ, NULL, 
-                    (read)? OPEN_EXISTING : OPEN_ALWAYS,
+                    (read)? OPEN_EXISTING : CREATE_ALWAYS,
                     0, NULL);
     this->read=read;
 }

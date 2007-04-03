@@ -12,6 +12,11 @@ public:
     virtual int getHeight() const =0;
     virtual int getColor() const =0;
 
+    virtual void measure(HDC hdc, RECT &rt) {
+        rt.bottom=rt.top+getHeight();
+        rt.right=rt.left+getWidth();
+    }
+
     virtual void draw(HDC hdc, RECT &rt) const=0;
 
     virtual const wchar_t * getText() const =0;

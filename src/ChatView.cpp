@@ -378,6 +378,13 @@ void MessageElement::init() {
     DeleteDC(tmp);
 }
 
+void MessageElement::measure(HDC hdc, RECT &rt) {
+    SetBkMode(hdc, TRANSPARENT);
+    DrawText(hdc, getText(), -1, &rt, DT_LEFT | DT_TOP | DT_WORDBREAK | DT_CALCRECT);
+    width=rt.right-rt.left;
+    height=rt.bottom-rt.top;  
+}
+
 void MessageElement::draw(HDC hdc, RECT &rt) const {
     SetBkMode(hdc, TRANSPARENT);
     DrawText(hdc, getText(), -1, &rt, DT_LEFT | DT_TOP | DT_WORDBREAK);

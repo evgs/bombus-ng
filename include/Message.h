@@ -15,6 +15,7 @@ public:
     virtual int getHeight() const;
     virtual int getColor() const;
 
+    virtual void measure(HDC hdc, RECT &rt);
     virtual void draw(HDC hdc, RECT &rt) const;
 
 protected:

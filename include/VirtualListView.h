@@ -42,6 +42,8 @@ public:
 
 
     bool wrapList;
+    // enable different background colors for odd and even list elements
+    bool colorInterleaving;
 
 protected:
 

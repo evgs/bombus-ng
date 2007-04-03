@@ -43,6 +43,7 @@ protected:
 
 private:
     static ATOM windowClass;
+    void calcEditHeight();
     ATOM RegisterWindowClass();
 };
 //////////////////////////////////////////////////////////////////////////

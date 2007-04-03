@@ -73,9 +73,11 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
 
                     bool focused = (odr.get()==p->cursorPos.get());
 
-                    int iHeight=odr->getHeight();
-                    RECT ritem={0, y, p->clientRect.right, y+iHeight} ;
-                    y+=iHeight;
+                    RECT ritem={0, y, p->clientRect.right, y} ;
+                    odr->measure(hdc, ritem);
+                    //int iHeight=odr->getHeight();
+                    //y+=iHeight;
+                    y=ritem.bottom;
                     //index++;
 
                     if (ritem.bottom < 0) continue;

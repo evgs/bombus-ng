@@ -380,6 +380,11 @@ void MessageElement::init() {
 
 void MessageElement::measure(HDC hdc, RECT &rt) {
     SetBkMode(hdc, TRANSPARENT);
+    if (width==rt.right-rt.left) return; //already measured
+    //if (width>220) { //debug code
+    //    SetBkMode(hdc, TRANSPARENT);
+    //}
+
     DrawText(hdc, getText(), -1, &rt, DT_LEFT | DT_TOP | DT_WORDBREAK | DT_CALCRECT);
     width=rt.right-rt.left;
     height=rt.bottom-rt.top;  

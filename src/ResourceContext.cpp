@@ -3,6 +3,8 @@
 #include "ResourceContext.h"
 #include "EntityCaps.h"
 #include "JabberStream.h"
+
+#include <Presence.h>
 #include <stdlib.h>
 
 ResourceContext::ResourceContext() {
@@ -18,39 +20,41 @@ char *statusVals []= {
 void ResourceContext::sendPresence(const char *to, presence::PresenceIndex status, const std::string &message, int priority) {
     if (!isLoggedIn()) return;
 
-    JabberDataBlock presenceStanza("presence");
+    jabberStream->sendStanza(constructPresence(to, status, message, priority));
+}
 
-    if (to) presenceStanza.setAttribute("to",to);
+JabberDataBlockRef presence::constructPresence(const char *to, presence::PresenceIndex status, const std::string &message, int priority) {
+    JabberDataBlockRef presenceStanza=JabberDataBlockRef(new JabberDataBlock("presence"));
+
+    if (to) presenceStanza->setAttribute("to",to);
 
     switch (status) {
     case presence::PRESENCE_AUTH_ASK: 
-        presenceStanza.setAttribute("type", "subscribe");
-        jabberStream->sendStanza(presenceStanza);
-        return;
+        presenceStanza->setAttribute("type", "subscribe");
+        return presenceStanza;
     case presence::PRESENCE_AUTH: 
-        presenceStanza.setAttribute("type", "subscribed");
-        jabberStream->sendStanza(presenceStanza);
-        return;
-    //TODO: unsubscribe, unsubscribed
+        presenceStanza->setAttribute("type", "subscribed");
+        return presenceStanza;
+        //TODO: unsubscribe, unsubscribed
 
     case presence::OFFLINE:
-        presenceStanza.setAttribute("type", "unavailable"); break;
+        presenceStanza->setAttribute("type", "unavailable"); break;
     case presence::INVISIBLE:
-        presenceStanza.setAttribute("type", "invisible"); break;
+        presenceStanza->setAttribute("type", "invisible"); break;
     case presence::ONLINE:
         break;
     default:
-        presenceStanza.addChild("show", statusVals[status]);
+        presenceStanza->addChild("show", statusVals[status]);
     }
-    
-    presenceStanza.addChild("status", message.c_str());
-    presenceStanza.addChild(EntityCaps::presenceEntityCaps());
+
+    presenceStanza->addChild("status", message.c_str());
+    presenceStanza->addChild(EntityCaps::presenceEntityCaps());
 
     char spriority[6];
     _itoa_s(priority, spriority, sizeof(spriority), 10);
-    presenceStanza.addChild("priority", spriority);
+    presenceStanza->addChild("priority", spriority);
 
     //c->setAttribute("ext", "none");
 
-    jabberStream->sendStanza(presenceStanza);
+    return presenceStanza;
 }

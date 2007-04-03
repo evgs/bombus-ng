@@ -1,5 +1,6 @@
 #pragma once
 
+#include "JabberDataBlock.h"
 #include "Image.h"
 
 namespace presence {
@@ -20,4 +21,6 @@ namespace presence {
         PRESENCE_AUTH_ASK=-2,
         PRESENCE_AUTH_REMOVE=-3
     };
+
+    JabberDataBlockRef constructPresence(const char *to, presence::PresenceIndex status, const std::string &message, int priority);
 }

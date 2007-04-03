@@ -6,6 +6,7 @@
 
 #include "ResourceContext.h"
 #include "JabberAccount.h"
+#include "JabberStream.h"
 
 #include "DlgMucJoin.h"
 #include "DlgUtils.h"
@@ -90,7 +91,14 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
 
             ProcessMuc::initMuc(roomNode.getJid(), pass, p->rc);
 
-            p->rc->sendPresence(roomNode.getJid().c_str(), p->rc->status, p->rc->presenceMessage, p->rc->priority); //TODO
+            JabberDataBlockRef joinPresence=constructPresence(
+                roomNode.getJid().c_str(), 
+                p->rc->status, 
+                p->rc->presenceMessage, 
+                p->rc->priority); 
+            joinPresence->addChild("x",NULL)->setAttribute("xmlns","http://jabber.org/protocol/muc");
+            if (p->rc->isLoggedIn())
+                p->rc->jabberStream->sendStanza(joinPresence);
 
             /*
             dlgAccountParam->setBareJid(GetDlgItemText(hDlg, IDC_E_JID));

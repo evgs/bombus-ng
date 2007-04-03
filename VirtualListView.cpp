@@ -62,12 +62,14 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             SetBkMode(hdc, OPAQUE);
 
             int y=-p->winTop;
-            //int index=-1;
+            int index=0;
 
             if (p->odrlist.get()) {
                 ODRList::const_iterator i=p->odrlist->begin();
                 while (i!=p->odrlist->end()) {
-                    ODRRef odr=*i; i++;
+                    ODRRef odr=*i; i++; 
+                    bool oddIndex=(index & 1) && p->colorInterleaving;
+                    index++;
 
                     bool focused = (odr.get()==p->cursorPos.get());
 
@@ -78,20 +80,22 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
 
                     if (ritem.bottom < 0) continue;
                     if (ritem.top > p->clientRect.bottom) continue;
+
+                    int bkColor=0xffffff;
                     if (focused) {
                         // focused item
-                        int cursColor=(GetFocus()==hWnd)?0x800000:0x808080;
-                        HBRUSH cur=CreateSolidBrush(cursColor);
                         SetTextColor(hdc, 0xffffff);
-                        SetBkColor(hdc, cursColor);
-                        FillRect(hdc, &ritem, cur);
-                        DeleteObject(cur);
+                        bkColor=(GetFocus()==hWnd)?0x800000:0x808080;
                         //DrawFocusRect(hdc, &ritem);
                     } else {
                         //usual item
                         SetTextColor(hdc, odr->getColor());
-                        SetBkColor(hdc, 0xffffff);
+                        bkColor= (oddIndex)? 0xffeeff : 0xffffff;
                     }
+                    HBRUSH bkBrush=CreateSolidBrush(bkColor);
+                    SetBkColor(hdc, bkColor);
+                    FillRect(hdc, &ritem, bkBrush);
+                    DeleteObject(bkBrush);
                     odr->draw(hdc, ritem);
                 }
             }
@@ -336,7 +340,8 @@ void VirtualListView::cursorFit() {
 }
 
 
-VirtualListView::VirtualListView() { /*init(); - MUST NOT be called before setting up parentHWnd */ }
+VirtualListView::VirtualListView()  : colorInterleaving(FALSE)
+{ /*init(); - MUST NOT be called before setting up parentHWnd */ }
 
 void VirtualListView::init() {
     BOOST_ASSERT(parentHWnd);
@@ -347,6 +352,7 @@ void VirtualListView::init() {
     thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("VList"), WS_CHILD | WS_VISIBLE | WS_VSCROLL,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentHWnd, NULL, g_hInst, (LPVOID)this);
     wrapList=true;
+    colorInterleaving=false;
     winTop=0;
 }
 

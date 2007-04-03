@@ -146,7 +146,11 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             p->msgList->setParent(hWnd);
             p->msgList->showWindow(true);
             p->msgList->wrapList=false;
+            p->msgList->colorInterleaving=true;
+
             p->editWnd=DoCreateEditControl(hWnd);
+            p->calcEditHeight();
+
             p->msgList->bindODRList(p->contact->messageList);
             break;
         }
@@ -183,6 +187,9 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             p->width=GET_X_LPARAM(lParam);
 
             int ySplit=height-p->editHeight;
+
+            p->calcEditHeight();
+
             // Calculate the display rectangle, assuming the 
             // tab control is the size of the client area. 
             SetRect(&rc, 0, 0, 
@@ -350,6 +357,10 @@ void ChatView::sendJabberMessage() {
     SendMessage(editWnd, WM_SETTEXT, 1024, (LPARAM) buf);
 }
 
+void ChatView::calcEditHeight() {
+    RECT rect;
+    GetWindowRect(editWnd, &rect);
+}
 //////////////////////////////////////////////////////////////////////////  
 // WARNING!!! ONLY FOR WM2003 and higher
 //////////////////////////////////////////////////////////////////////////

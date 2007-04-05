@@ -69,6 +69,11 @@ bool JabberStream::tagEnd(const std::string & tagname) {
             if (! dispatcher->dispatchDataBlock(stanza)) {
                 //all lesteners rejected this stanza
                 if (tagname=="iq") {
+
+                    std::string &type=stanza->getAttribute("type");
+                    if (type=="error") return false; //don't reply to error stanza
+                    if (type=="result") return false; //don't reply to result stanza
+
                     //client sould reject unknown iq-stanza
                     JabberDataBlock iqError("iq");
                     iqError.setAttribute("type", "error");

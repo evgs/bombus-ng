@@ -39,7 +39,7 @@ BEGIN
         MENUITEM "Account",                     IDM_JABBER_ACCOUNT
         POPUP "Tools"
         BEGIN
-            MENUITEM "Service Discovery",           ID_TOOLS_SERVICEDISCOVERY, GRAYED
+            MENUITEM "Service Discovery",           ID_TOOLS_SERVICEDISCOVERY
             MENUITEM "File transfers",              ID_TOOLS_FILETRANSFERS, GRAYED
             MENUITEM "My vCard",                    ID_TOOLS_MYVCARD
             MENUITEM SEPARATOR

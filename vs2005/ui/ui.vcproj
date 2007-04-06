@@ -324,6 +324,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\ServiceDiscovery.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\crypto\SHA1.cpp"
 				>
 			</File>
@@ -547,6 +551,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\Serialize.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\ServiceDiscovery.h"
 				>
 			</File>
 			<File

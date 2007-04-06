@@ -37,6 +37,7 @@
 #include "TabCtrl.h"
 #include "HtmlView.h"
 #include "VcardForm.h"
+#include "ServiceDiscovery.h"
 
 #include "Auth.h"
 
@@ -58,7 +59,6 @@ TabsCtrlRef tabs;
 
 VirtualListView::ref odrLog;
 RosterView::ref rosterWnd;
-ChatView::ref chatSample;
 ResourceContextRef rc;
 HtmlView::ref htmlWnd;
 
@@ -287,6 +287,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         break;
                     }
 
+                case ID_TOOLS_SERVICEDISCOVERY:
+                    {
+                        ServiceDiscovery::ref disco=ServiceDiscovery::ref(new ServiceDiscovery(tabs->getHWnd()));
+                        tabs->addWindow(disco);
+                        tabs->switchByWndRef(disco);
+                    }
+                    break;
+
 				case IDM_JABBER_STREAMINFO:
                     Log::getInstance()->msg(
 						rc->jabberStream->connection->getStatistics().c_str()
@@ -332,8 +340,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             //chatSample=ChatView::ref(new ChatView(tabs->getHWnd(), Contact::ref(new Contact("test@server","resource",""))));
             //tabs->addWindow(chatSample);
-            //logWnd=ListViewRef(new ListView(hWnd, std::string("Log")));
-            //tabs->addWindow(logWnd);
 
             { 
                 odrLog = VirtualListView::ref(new VirtualListView(tabs->getHWnd(), std::string("Log")));

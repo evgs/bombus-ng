@@ -84,6 +84,10 @@ int CeTLSSocket::SslValidate (
                  DWORD  dwFlags
                  ) 
 {
+    CeTLSSocket * s=(CeTLSSocket *)pvArg;
+
+    if (s->ignoreSSLWarnings) return SSL_ERR_OKAY;
+
     if (dwFlags!=SSL_CERT_X509) return SSL_ERR_CERT_UNKNOWN;
 
     if (pCertChain==NULL) return SSL_ERR_CERT_UNKNOWN;
@@ -92,9 +96,7 @@ int CeTLSSocket::SslValidate (
 
     if (dwFlags & SSL_CERT_FLAG_ISSUER_UNKNOWN) {
         //TODO: ask for accept/decline certificate
-        CeTLSSocket * s=(CeTLSSocket *)pvArg;
 
-        if (s->ignoreSSLWarnings) return SSL_ERR_OKAY;
 
         std::wstring url=utf8::utf8_wchar(s->url);
 
@@ -103,7 +105,7 @@ int CeTLSSocket::SslValidate (
         // crack X.509 Certificate
         if (!gSslCrackCertificate(pCertChain->pBlobData, pCertChain->cbSize, TRUE, &pCert)) return SSL_ERR_BAD_DATA;
 
-        std::string certInfo="Certificate Issuer unknown";
+        std::string certInfo="\nCertificate Issuer unknown";
         certInfo+="\nIssuer: "; certInfo+=pCert->pszIssuer;
         certInfo+="\nSubject: "; certInfo+=pCert->pszSubject;
         certInfo+="\nValid from: "; certInfo+=fileTimeToDate(&(pCert->ValidFrom));

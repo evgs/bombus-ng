@@ -3,6 +3,9 @@
 #include "XMLParser.h"
 #include "XMLEventListener.h"
 
+std::string dbgbuf;
+
+
 XMLParser::XMLParser(XMLEventListener *eventListener){
 	this->eventListener=eventListener;
 	prebuffered=0;
@@ -22,7 +25,7 @@ void XMLParser::parse( const char * buf, int size ) {
                 //parsing plain text
                 if (c=='<') {
                     state=TAGNAME;
-                    if (!sbuf.empty()) eventListener->plainTextEncountered( sbuf );
+                    if (sbuf.length()) eventListener->plainTextEncountered( sbuf );
                     sbuf.clear();
                     tagname.clear();
                     attr.clear();
@@ -37,12 +40,15 @@ void XMLParser::parse( const char * buf, int size ) {
                 if (c==' ') continue;
                 if (c=='=') continue;
                 if (c=='\'') { state=ATRVALQS; atrname=sbuf; sbuf.clear(); continue; }
-                if (c=='\"') { state=ATRVALQS; atrname=sbuf; sbuf.clear(); continue; }
+                if (c=='\"') { state=ATRVALQD; atrname=sbuf; sbuf.clear(); continue; }
 
                 if (c!='>' && c!='/') { 
                     sbuf+=c;
                     continue;
-                } else state=TAGNAME;
+                } else {
+                    state=TAGNAME;
+                    sbuf.clear();
+                }
             }
 
         case TAGNAME:

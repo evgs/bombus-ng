@@ -7,6 +7,7 @@ XMLParser::XMLParser(XMLEventListener *eventListener){
 	this->eventListener=eventListener;
 	prebuffered=0;
 	inbufIdx=0;
+    state=PLAIN_TEXT;
 }
 
 XMLParser::~XMLParser(){}
@@ -107,6 +108,99 @@ void XMLParser::parse(){
             if (lastTag) return; // normal end 
         }
 	}
+}
+
+void XMLParser::parse( const char * buf, int size ) {
+    while (size>0) {
+        size--;
+        char c=*buf++;
+
+        switch (state) {
+        case PLAIN_TEXT: 
+            {
+                //parsing plain text
+                if (c=='<') {
+                    state=TAGNAME;
+                    if (!sbuf.empty()) eventListener->plainTextEncountered( sbuf );
+                    sbuf.clear();
+                    tagname.clear();
+                    attr.clear();
+                    continue;
+                }
+                sbuf+=c; continue;
+            }
+
+        case ATRNAME:
+            {
+                if (c=='?') continue;
+                if (c==' ') continue;
+                if (c=='=') continue;
+                if (c=='\'') { state=ATRVALQS; atrname=sbuf; sbuf.clear(); continue; }
+                if (c=='\"') { state=ATRVALQS; atrname=sbuf; sbuf.clear(); continue; }
+
+                if (c!='>' && c!='/') { 
+                    sbuf+=c;
+                    continue;
+                } else state=TAGNAME;
+            }
+
+        case TAGNAME:
+            {
+                if (c=='?') continue;
+                if (c=='/') { 
+                    state=ENDTAGNAME; 
+                    sbuf.clear();
+                    if (tagname.length()) {
+                        eventListener->tagStart(tagname, attr); 
+                        sbuf=tagname;
+                    }
+                    continue; 
+                }
+                if (c==' ') { state=ATRNAME; continue; }
+                if (c=='>') { 
+                    state=PLAIN_TEXT; 
+                    eventListener->tagStart(tagname, attr); 
+                    continue; 
+                }
+                tagname+=c;
+                continue;
+            }
+
+        case ENDTAGNAME:
+            {
+                if (c==' ') continue;
+                if (c=='>') {
+                    state=PLAIN_TEXT;
+                    eventListener->tagEnd(sbuf);
+                    sbuf.clear();
+                    continue;
+                }
+                sbuf+=c;
+                continue;
+            }
+            
+        case ATRVALQS: 
+            {
+                if (c=='\'') { state=ATRNAME; attr[atrname]=sbuf; sbuf.clear(); continue; }
+                sbuf+=c;
+                continue;
+            }
+        case ATRVALQD: 
+            {
+                if (c=='\"') { state=ATRNAME; attr[atrname]=sbuf; sbuf.clear(); continue; }
+                sbuf+=c;
+                continue;
+            }
+        }
+    }
+}
+
+void XMLParser::parseStream() {
+    while (true) {
+        prebuffered=inStream->read(inbuf, XML_PREBUF_SZ);
+        if (prebuffered<=0) throw std::exception("Unexpected end of XML");
+        parse(inbuf, prebuffered);
+    }
 }
 
 std::string XMLStringPrep(const std::string & data){

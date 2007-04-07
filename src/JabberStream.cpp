@@ -22,7 +22,8 @@ void JabberStream::run(JabberStream * _stream){
             _stream->jabberListener->connect();
         }
         _stream->parser->bindStream( _stream->connection );
-		_stream->parser-> parse();
+		//_stream->parser-> parse();
+        _stream->parser-> parseStream();
         _stream->jabberListener->endConversation(NULL);
 	} catch (std::exception ex) {
         _stream->jabberListener->endConversation(&ex);

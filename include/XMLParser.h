@@ -16,7 +16,20 @@ private:
 	int prebuffered;
 	int inbufIdx;
 
+    std::string sbuf;
+    std::string tagname;
+    std::string atrname;
+    StringMap attr;
 
+    enum ParseState {
+        PLAIN_TEXT=0,
+        TAGNAME,
+        ENDTAGNAME,
+        ATRNAME,
+        ATRVALQS,
+        ATRVALQD
+    };
+    ParseState state;
 public:
 	XMLParser(XMLEventListener * eventListener);
 	~XMLParser();
@@ -24,6 +37,9 @@ public:
 	void bindStream(ConnectionRef s) {inStream=s; };
 
 	void parse();
+
+    void parseStream();
+    void parse(const char * buf, int size);
 
 private:
 	char getChar();

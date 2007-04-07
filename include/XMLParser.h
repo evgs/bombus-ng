@@ -14,7 +14,6 @@ private:
 
 	char inbuf[XML_PREBUF_SZ];
 	int prebuffered;
-	int inbufIdx;
 
     std::string sbuf;
     std::string tagname;
@@ -36,14 +35,8 @@ public:
 
 	void bindStream(ConnectionRef s) {inStream=s; };
 
-	void parse();
-
     void parseStream();
     void parse(const char * buf, int size);
-
-private:
-	char getChar();
-	const std::string XMLParser::readTagPortion();
 };
 
 typedef boost::shared_ptr<XMLParser> XMLParserRef;

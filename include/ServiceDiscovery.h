@@ -13,10 +13,13 @@
 #include "Contact.h"
 #include "OwnerDrawRect.h"
 
+#include "ResourceContext.h"
+
 class ServiceDiscovery : public Wnd{
+protected:
+    ServiceDiscovery(HWND parent);
 public:
     //ChatView(HWND parent, const std::string & title);
-    ServiceDiscovery(HWND parent);
     virtual ~ServiceDiscovery();
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -29,13 +32,22 @@ public:
 
     void redraw();
 
+    static ServiceDiscovery::ref createServiceDiscovery(HWND parent, ResourceContextRef rc, const std::string &jid);
+
 protected:
+    
+
     VirtualListView::ref nodeList;
     HWND editWnd;
     int editHeight;
     int width;
 
     std::string jid;
+
+    boost::weak_ptr<ServiceDiscovery> thisRef;
+
+    ResourceContextRef rc;
+    void discoverJid(const std::string &jid);
 
 private:
     static ATOM windowClass;

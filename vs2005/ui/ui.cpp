@@ -289,7 +289,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case ID_TOOLS_SERVICEDISCOVERY:
                     {
-                        ServiceDiscovery::ref disco=ServiceDiscovery::ref(new ServiceDiscovery(tabs->getHWnd()));
+                        ServiceDiscovery::ref disco=ServiceDiscovery::createServiceDiscovery(tabs->getHWnd(), rc, std::string("jabber.ru"));
                         tabs->addWindow(disco);
                         tabs->switchByWndRef(disco);
                     }

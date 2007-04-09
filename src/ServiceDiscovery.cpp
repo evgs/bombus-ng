@@ -14,6 +14,60 @@ extern HWND	g_hWndMenuBar;		// menu bar handle
 extern ResourceContextRef rc;
 extern ImgListRef skin;
 
+
+//////////////////////////////////////////////////////////////////////////
+class GetDisco : public JabberDataBlockListener {
+public:
+    GetDisco(const std::string &jid, ServiceDiscovery::ref form);
+    ~GetDisco(){};
+    virtual const char * getType() const{ return NULL; }
+    virtual const char * getId() const{ return NULL; }
+    virtual const char * getTagName() const { return "iq"; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+    void doRequest(ResourceContextRef rc);
+private:
+    std::string jid;
+    std::string idinfo;
+    std::string iditems;
+    ResourceContextRef rc;
+    boost::weak_ptr<ServiceDiscovery> vf;
+};
+
+GetDisco::GetDisco(const std::string &jid, ServiceDiscovery::ref form){
+    this->jid=jid;
+    this->vf=form;
+    idinfo="info#"; idinfo+=jid;
+    iditems="items#"; iditems+=jid;
+}
+
+void GetDisco::doRequest(ResourceContextRef rc) {
+    JabberDataBlock req("iq");
+    req.setAttribute("to", jid);
+    req.setAttribute("type", "get");
+    JabberDataBlockRef qry=req.addChild("query", NULL);
+
+    qry->setAttribute("xmlns","http://jabber.org/protocol/disco#info");
+    req.setAttribute("id", idinfo);
+    rc->jabberStream->sendStanza(req);
+
+    qry->setAttribute("xmlns","http://jabber.org/protocol/disco#items");
+    req.setAttribute("id", iditems);
+    rc->jabberStream->sendStanza(req);
+}
+
+ProcessResult GetDisco::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+    //VcardForm::ref vfRef=vf.lock();
+
+    if (block->getAttribute("type")==idinfo) {
+        return BLOCK_PROCESSED;
+    }
+    if (block->getAttribute("type")==iditems) {
+        return LAST_BLOCK_PROCESSED;
+    }
+
+    return BLOCK_REJECTED;
+}
+
 //////////////////////////////////////////////////////////////////////////
 ATOM ServiceDiscovery::RegisterWindowClass() {
     WNDCLASS wc;
@@ -214,12 +268,16 @@ void ServiceDiscovery::redraw(){
     //InvalidateRect(msgList->getHWnd(), NULL, false);
 }
 
+ServiceDiscovery::ref ServiceDiscovery::createServiceDiscovery( HWND parent, ResourceContextRef rc, const std::string &jid ) {
+    ServiceDiscovery::ref sd=ServiceDiscovery::ref(new ServiceDiscovery(parent));
+    sd->thisRef=sd;
+    sd->discoverJid(jid);
+    sd->rc=rc;
+    return sd;
+}
+
+void ServiceDiscovery::discoverJid( const std::string &jid ) {
+    SendMessage(editWnd, WM_SETTEXT, 0, (LPARAM)utf8::utf8_wchar(jid).c_str());
+}
 ATOM ServiceDiscovery::windowClass=0;
 
-//////////////////////////////////////////////////////////////////////////
-// WARNING!!! ONLY FOR WM2003 and higher
-//////////////////////////////////////////////////////////////////////////
-#ifndef DT_END_ELLIPSIS
-#define DT_END_ELLIPSIS 0x00008000
-#endif
-//////////////////////////////////////////////////////////////////////////

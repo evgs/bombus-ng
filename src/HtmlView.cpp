@@ -7,8 +7,11 @@
 #include "utf8.hpp"
 #include "basetypes.h"
 
+#include "TabCtrl.h"
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
+extern ImgListRef skin;
 
 ATOM HtmlView::RegisterWindowClass() {
     WNDCLASS wc;
@@ -20,7 +23,7 @@ ATOM HtmlView::RegisterWindowClass() {
     wc.hInstance     = g_hInst;
     wc.hIcon         = NULL;
     wc.hCursor       = 0;
-    wc.hbrBackground = NULL;//(HBRUSH)COLOR_WINDOW;
+    wc.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
     wc.lpszMenuName  = 0;
     wc.lpszClassName = _T("BombusHTV");
 
@@ -80,8 +83,16 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
 
         {
             PAINTSTRUCT ps;
-            HDC wnd;
-            wnd = BeginPaint(hWnd, &ps);
+            HDC hdc;
+            hdc = BeginPaint(hWnd, &ps);
+
+            RECT rc = {0, 0, p->width, p->wt->getHeight()};
+
+            SetBkMode(hdc, TRANSPARENT);
+            SetTextColor(hdc, p->wt->getColor());
+            p->wt->draw(hdc, rc);
+
+            skin->drawElement(hdc, icons::ICON_CLOSE, p->width-2-skin->getElementWidth(), 0);
 
 
             EndPaint(hWnd, &ps);
@@ -93,13 +104,15 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             //HDWP hdwp; 
 
             int height=GET_Y_LPARAM(lParam);
-            int width=GET_X_LPARAM(lParam);
+            int width=GET_X_LPARAM(lParam); p->width=width;
+
+            int xHeight=tabHeight;/*p->wt->getHeight();*/
             // Calculate the display rectangle, assuming the 
             // tab control is the size of the client area. 
             SetRect(&(p->clientRect), 0, 0, width, height ); 
 
             if(IsWindow(p->htmlHWnd))
-                SetWindowPos(p->htmlHWnd, 0, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
+                SetWindowPos(p->htmlHWnd, 0, 0, xHeight, width, height-xHeight, SWP_NOZORDER );
             /*hdwp = BeginDeferWindowPos(1);
 
             DeferWindowPos(hdwp, p->listScrollHWND, HWND_TOP, width-SCROLLWIDTH, tabHeight, 
@@ -133,6 +146,14 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                 }
             } // end switch(pnm->hdr.code)
         } // End case IDC_HTMLVIEW:
+        break;
+
+    case WM_LBUTTONDOWN:
+        SetFocus(hWnd);
+        if ((GET_Y_LPARAM(lParam))>tabHeight) break;
+        if (GET_X_LPARAM(lParam) > p->width-2-skin->getElementWidth()) {
+            PostMessage(GetParent(hWnd), WM_COMMAND, TabsCtrl::CLOSETAB, 0);
+        }
         break;
 
     case WM_USER:

@@ -58,7 +58,7 @@ protected:
     static StringMapRef splitHREFtext(LPCSTR ht);
 
 private:
-    
+    int width;    
 
     static ATOM windowClass;
     static HINSTANCE htmlViewInstance;

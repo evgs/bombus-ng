@@ -119,13 +119,14 @@ VcardForm::ref VcardForm::createVcardForm( HWND parent, const std::string &jid, 
 
     vf->editForm=edit;
     vf->parentHWnd=parent;
+    vf->title=utf8::utf8_wchar(jid);
+    vf->wt=WndTitleRef(new WndTitle(vf, icons::ICON_VCARD));
+
     vf->init();
     
     SetParent(vf->thisHWnd, parent);
 
-    vf->title=utf8::utf8_wchar(jid);
 
-    vf->wt=WndTitleRef(new WndTitle(vf, icons::ICON_VCARD));
 
     vf->rc=rc;
 

@@ -34,6 +34,10 @@ public:
 
     static ServiceDiscovery::ref createServiceDiscovery(HWND parent, ResourceContextRef rc, const std::string &jid);
 
+    JabberDataBlockRef itemReply;
+    JabberDataBlockRef infoReply;
+
+
 protected:
     
 
@@ -47,7 +51,10 @@ protected:
     boost::weak_ptr<ServiceDiscovery> thisRef;
 
     ResourceContextRef rc;
+    void go();
     void discoverJid(const std::string &jid);
+
+    void parseResult();
 
 private:
     static ATOM windowClass;

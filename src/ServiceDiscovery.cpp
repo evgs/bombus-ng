@@ -7,6 +7,7 @@
 #include "ResourceContext.h"
 #include "JabberStream.h"
 #include "TabCtrl.h"
+#include "Presence.h"
 
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
@@ -14,6 +15,7 @@ extern HWND	g_hWndMenuBar;		// menu bar handle
 extern ResourceContextRef rc;
 extern ImgListRef skin;
 
+//TODO: subclass combo box: clipboard, enter redirection
 
 //////////////////////////////////////////////////////////////////////////
 class GetDisco : public JabberDataBlockListener {
@@ -25,6 +27,7 @@ public:
     virtual const char * getTagName() const { return "iq"; }
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
     void doRequest(ResourceContextRef rc);
+
 private:
     std::string jid;
     std::string idinfo;
@@ -58,10 +61,28 @@ void GetDisco::doRequest(ResourceContextRef rc) {
 ProcessResult GetDisco::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     //VcardForm::ref vfRef=vf.lock();
 
-    if (block->getAttribute("type")==idinfo) {
+    ServiceDiscovery::ref sd=vf.lock();
+
+    if (block->getAttribute("id")==idinfo) {
+        if (block->getAttribute("type")=="result") {
+            if (sd) {
+                sd->infoReply=block->findChildNamespace("query", "http://jabber.org/protocol/disco#info");
+                SendMessage(sd->getHWnd(), WM_USER, 0,0);
+            }
+        } else {
+            //TODO: error
+        }
         return BLOCK_PROCESSED;
     }
-    if (block->getAttribute("type")==iditems) {
+    if (block->getAttribute("id")==iditems) {
+        if (block->getAttribute("type")=="result") {
+            if (sd) {
+                sd->itemReply=block->findChildNamespace("query", "http://jabber.org/protocol/disco#items");
+                SendMessage(sd->getHWnd(), WM_USER, 0,0);
+            }
+        } else {
+            //TODO: error
+        }
         return LAST_BLOCK_PROCESSED;
     }
 
@@ -201,7 +222,14 @@ LRESULT CALLBACK ServiceDiscovery::WndProc( HWND hWnd, UINT message, WPARAM wPar
         if (GET_X_LPARAM(lParam) > p->width-2-skin->getElementWidth()) {
             PostMessage(GetParent(hWnd), WM_COMMAND, TabsCtrl::CLOSETAB, 0);
         }
+        if (GET_X_LPARAM(lParam) > p->width-2-2*skin->getElementWidth()) {
+            p->go();
+        }
         break;
+
+    case WM_USER:
+        p->parseResult();
+        return 0;
 
     case WM_DESTROY:
         //TODO: Destroy all child data associated eith this window
@@ -279,5 +307,35 @@ ServiceDiscovery::ref ServiceDiscovery::createServiceDiscovery( HWND parent, Res
 void ServiceDiscovery::discoverJid( const std::string &jid ) {
     SendMessage(editWnd, WM_SETTEXT, 0, (LPARAM)utf8::utf8_wchar(jid).c_str());
 }
+
+void ServiceDiscovery::go() {
+    wchar_t buf[1024];
+    SendMessage(editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
+    std::string jid=utf8::wchar_utf8(std::wstring(buf));
+
+    GetDisco *gd=new GetDisco(jid, thisRef.lock());
+    rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(gd));
+
+    gd->doRequest(rc);
+}
+
+void ServiceDiscovery::parseResult() {
+    //parsing items
+    if (!itemReply) return;
+    ODRList *list=new ODRList();
+
+    JabberDataBlockRefList::iterator i=itemReply->getChilds()->begin();
+    while (i!=itemReply->getChilds()->end()) {
+        JabberDataBlockRef item=*(i++);
+        std::string &jid=item->getAttribute("jid");
+        std::string &name=item->getAttribute("name");
+        Contact::ref contact=Contact::ref(new Contact(jid, "", name));
+        contact->status=presence::ONLINE;
+        list->push_back(contact);
+    }
+    nodeList->bindODRList(ODRListRef(list));
+    nodeList->notifyListUpdate(true);
+}
+
 ATOM ServiceDiscovery::windowClass=0;
 

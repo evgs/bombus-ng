@@ -18,6 +18,8 @@ public:
     virtual void measure(HDC hdc, RECT &rt);
     virtual void draw(HDC hdc, RECT &rt) const;
 
+    virtual void render(HDC hdc, RECT &rt, bool measure) const;
+
 protected:
     std::wstring wstr;
     int width;

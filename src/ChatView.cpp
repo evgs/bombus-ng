@@ -361,6 +361,43 @@ void ChatView::calcEditHeight() {
     RECT rect;
     GetWindowRect(editWnd, &rect);
 }
+
+//////////////////////////////////////////////////////////////////////////
+class FontMetricCache {
+public: 
+    FontMetricCache();
+    ~FontMetricCache();
+    inline int getWidth(HDC hdc, wchar_t chr);
+    int getHeight() {return height; };
+private:
+    LPINT page[256];
+    int height;
+};
+
+FontMetricCache::FontMetricCache(){
+    memset(page, 0, sizeof(page));
+}
+
+FontMetricCache::~FontMetricCache(){
+    for (int i=0; i<256; i++) {
+        if (page[i]) delete page[i];
+    }
+}
+
+int FontMetricCache::getWidth(HDC hdc, wchar_t chr){
+    byte pn=(chr>>8);
+    if (!page[pn]) {
+        page[pn]=new int[256];
+        GetCharWidth32(hdc, chr & 0xff00, chr | 0xff, page[pn]);
+
+        TEXTMETRIC metric;
+        GetTextMetrics(hdc, &metric);
+        height=metric.tmHeight;
+    }
+    return page[pn][chr&0xff];
+}
+
+FontMetricCache fmc;
 //////////////////////////////////////////////////////////////////////////  
 // WARNING!!! ONLY FOR WM2003 and higher
 //////////////////////////////////////////////////////////////////////////
@@ -372,27 +409,67 @@ void ChatView::calcEditHeight() {
 void MessageElement::init() {
     HDC tmp=CreateCompatibleDC(NULL);
     RECT r={0,0,230,10}; //todo: fix width detection
-    DrawText(tmp, getText(), -1, &r, DT_CALCRECT | DT_LEFT | DT_TOP |DT_WORDBREAK);
-    width=r.right;
-    height=r.bottom;  
+    measure(tmp, r);
     DeleteDC(tmp);
 }
 
 void MessageElement::measure(HDC hdc, RECT &rt) {
-    SetBkMode(hdc, TRANSPARENT);
-    if (width==rt.right-rt.left) return; //already measured
+    fmc.getWidth(hdc, ' ');
+    if (width==rt.right-rt.left) {rt.bottom=rt.top+height; return; }//already measured
     //if (width>220) { //debug code
     //    SetBkMode(hdc, TRANSPARENT);
     //}
 
-    DrawText(hdc, getText(), -1, &rt, DT_LEFT | DT_TOP | DT_WORDBREAK | DT_CALCRECT);
+    render(hdc, rt, true);
     width=rt.right-rt.left;
     height=rt.bottom-rt.top;  
 }
 
 void MessageElement::draw(HDC hdc, RECT &rt) const {
-    SetBkMode(hdc, TRANSPARENT);
-    DrawText(hdc, getText(), -1, &rt, DT_LEFT | DT_TOP | DT_WORDBREAK);
+    render(hdc, rt, false);
+}
+
+void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
+    int ypos=rt.top; //fmc.getHeight();
+    
+    const wchar_t *end=getText();
+    const wchar_t *lineBegin=end;
+    const wchar_t *wordBegin=NULL;
+
+
+    int xpos=rt.left;
+    int xbegin=xpos;
+    int mw=rt.right;
+
+    wchar_t c;
+    do { 
+        c=*end;
+        switch (c) {
+            case 0: break; //newline;
+            case 0x0a: end++; break; //newline;
+
+            case ' ':
+            case '-':
+            case '(':
+            case ')':
+            case ':':
+            case '/':
+                wordBegin=end+1;
+            default:
+                xpos+=fmc.getWidth(hdc, c);
+                if (xpos<mw) {
+                    end++; continue; 
+                } else if (wordBegin) end=wordBegin;
+        }
+
+
+        if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
+        ypos+=fmc.getHeight(); xpos=rt.left; lineBegin=end; wordBegin=NULL; //newline
+        if (!measure) if (ypos>=rt.bottom) break;
+        //if (c) end++;
+    } while (c);
+
+    if (measure) rt.bottom=ypos;
 }
 
 int MessageElement::getWidth() const { return width;}

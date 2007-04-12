@@ -55,6 +55,7 @@ void ImgArray::setGridSize( int nColumns, int nRows ) {
     this->nRows=nRows;
     elWidth=bm.bmWidth/nColumns;
     elHeight=bm.bmHeight/nRows;
+    if (elHeight<0) elHeight=elWidth;
 }
 
 ImgArray::ImgArray( LPCTSTR path, int nColumns, int nRows ) {

@@ -448,12 +448,15 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
             case 0: break; //newline;
             case 0x0a: end++; break; //newline;
 
+                //some word delimiters
             case ' ':
             case '-':
             case '(':
             case ')':
             case ':':
             case '/':
+            case '.':
+            case ',':
                 wordBegin=end+1;
             default:
                 xpos+=fmc.getWidth(hdc, c);

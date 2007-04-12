@@ -58,7 +58,11 @@ void SmileParser::loadSmiles() {
         switch (c) {
             case 0x0d: *(p-1)=0; if (*p==0x0a) p++;
             case 0x0a: 
+                *(p-1)=0;
+                addSmile(smileStart, smileIndex);
                 smileIndex++;
+                break;
+
             case 0x09:
                 *(p-1)=0;
                 addSmile(smileStart, smileIndex);

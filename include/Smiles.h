@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Image.h"
-#include "boost/"
 
 class BNode {
+public:
+    BNode();
+    ~BNode();
     BNode * bTrue;
     BNode * bFalse;
     char sIndex;
@@ -15,10 +17,12 @@ public:
     SmileParser();
     ~SmileParser();
 
-    int findsmile();
+    int findSmile(LPTSTR *pstr);
 
 protected:
-    loadSmiles();
+    void loadSmiles();
     ImgListRef icons;
     BNode* root;
+
+    void addSmile(const char *smile, int index);
 };

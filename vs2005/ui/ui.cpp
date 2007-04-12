@@ -44,6 +44,7 @@
 #include "Sysinfo.h"
 
 #include "Image.h"
+#include "Smiles.h"
 
 #include "utf8.hpp"
 
@@ -63,6 +64,8 @@ ResourceContextRef rc;
 HtmlView::ref htmlWnd;
 
 ImgListRef skin;
+
+SmileParser *smileParser;
 
 std::wstring appRootPath;
 std::wstring skinRootPath;
@@ -329,6 +332,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             //skin=ImgListRef(new ImgArray(TEXT("skin.png"), 8, 6));
             skin=ImgListRef(new Skin(TEXT("")));
+
+            smileParser=new SmileParser();
             //skin->setGridSize(8, 6);
 
 			//editWnd=DoCreateEditControl(hWnd);

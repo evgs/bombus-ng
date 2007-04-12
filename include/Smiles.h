@@ -17,11 +17,11 @@ public:
     SmileParser();
     ~SmileParser();
 
-    int findSmile(LPTSTR *pstr);
+    int findSmile(LPCTSTR *pstr);
+    ImgListRef icons;
 
 protected:
     void loadSmiles();
-    ImgListRef icons;
     BNode* root;
 
     void addSmile(const char *smile, int index);

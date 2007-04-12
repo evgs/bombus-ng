@@ -9,11 +9,14 @@
 #include "TabCtrl.h"
 #include "ProcessMUC.h"
 
+#include "Smiles.h"
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern HWND	g_hWndMenuBar;		// menu bar handle
 extern ResourceContextRef rc;
 extern ImgListRef skin;
+extern SmileParser *smileParser;
 
 //////////////////////////////////////////////////////////////////////////
 ATOM ChatView::RegisterWindowClass() {
@@ -407,10 +410,12 @@ FontMetricCache fmc;
 //////////////////////////////////////////////////////////////////////////
 
 void MessageElement::init() {
+    //TODO: recalculate screen and scroller height after rendering, remove this prefetch
     HDC tmp=CreateCompatibleDC(NULL);
     RECT r={0,0,230,10}; //todo: fix width detection
     measure(tmp, r);
     DeleteDC(tmp);
+    //height=10; width=10;
 }
 
 void MessageElement::measure(HDC hdc, RECT &rt) {
@@ -435,6 +440,9 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
     const wchar_t *end=getText();
     const wchar_t *lineBegin=end;
     const wchar_t *wordBegin=NULL;
+    const wchar_t *smileEnd;
+
+    int smileIndex=-1;
 
 
     int xpos=rt.left;
@@ -459,6 +467,16 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
             case ',':
                 wordBegin=end+1;
             default:
+                smileEnd=end;
+                smileIndex=smileParser->findSmile(&smileEnd);
+                if (smileIndex>=0) {
+                    if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
+                    lineBegin=end=smileEnd; wordBegin=NULL; xbegin=xpos+smileParser->icons->getElementWidth();
+                    if (!measure) smileParser->icons->drawElement(hdc, smileIndex, xpos, ypos);
+                    xpos=xbegin;
+                    continue;
+                }
+
                 xpos+=fmc.getWidth(hdc, c);
                 if (xpos<mw) {
                     end++; continue; 
@@ -467,6 +485,8 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
 
 
         if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
+        xbegin=rt.left;
+
         ypos+=fmc.getHeight(); xpos=rt.left; lineBegin=end; wordBegin=NULL; //newline
         if (!measure) if (ypos>=rt.bottom) break;
         //if (c) end++;

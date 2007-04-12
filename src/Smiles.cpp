@@ -95,8 +95,8 @@ void SmileParser::addSmile(const char *smile, int index) {
     p->sIndex=index;
 }
 
-int SmileParser::findSmile(LPTSTR *pstr){
-    wchar_t *p=*pstr;
+int SmileParser::findSmile(LPCTSTR *pstr){
+    const wchar_t *p=*pstr;
     BNode *psmile=root;
 
     wchar_t c;
@@ -104,9 +104,10 @@ int SmileParser::findSmile(LPTSTR *pstr){
         if (psmile->nodeChar==c) {
             psmile=psmile->bTrue; 
             p++;
-        } else psmile=psmile->bFalse; 
-
-        if (psmile->bFalse==NULL) break; //branch end
+        } else {
+            if (psmile->bFalse==NULL) break; //branch end
+            psmile=psmile->bFalse; 
+        }
     }
     int result=psmile->sIndex;
     if (result>=0) *pstr=p;

@@ -61,6 +61,7 @@ void SmileParser::loadSmiles() {
                 *(p-1)=0;
                 addSmile(smileStart, smileIndex);
                 smileIndex++;
+                smileStart=p;
                 break;
 
             case 0x09:

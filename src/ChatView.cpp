@@ -413,12 +413,12 @@ FontMetricCache fmc;
 //////////////////////////////////////////////////////////////////////////
 
 void MessageElement::init() {
-    //TODO: recalculate screen and scroller height after rendering, remove this prefetch
-    //RECT r={0,0,230,10}; //todo: fix width detection
-    //HDC tmp=CreateCompatibleDC(NULL);
-    //measure(tmp, r);
-    //DeleteDC(tmp);
-    height=10; width=10;
+    //TODO: fix bug with cursor fit immediately after init();
+    RECT r={0,0,230,10}; //todo: fix width detection
+    HDC tmp=CreateCompatibleDC(NULL);
+    measure(tmp, r);
+    DeleteDC(tmp);
+    //height=10; width=10;
 }
 
 void MessageElement::measure(HDC hdc, RECT &rt) {
@@ -456,7 +456,9 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
     do { 
         c=*end;
         switch (c) {
+            //TODO: fix /n and /r/n
             case 0: break; //newline;
+            case 0x0d: end++; if (*end!=0x0a) break;
             case 0x0a: end++; break; //newline;
 
                 //some word delimiters

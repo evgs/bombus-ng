@@ -19,8 +19,6 @@ public:
     VirtualListView(HWND parent, const std::string & title);
     virtual ~VirtualListView();
 
-    static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
     virtual const wchar_t * getWindowTitle() const;
     virtual const ODR * getODR() const;
 
@@ -46,6 +44,8 @@ public:
     bool colorInterleaving;
 
 protected:
+
+    static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
     int winTop;
 

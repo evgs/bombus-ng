@@ -70,7 +70,7 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                 HMENU hmenu = CreatePopupMenu();
                 if (hmenu==NULL) break;
 
-                AppendMenu(hmenu, MF_STRING | MF_GRAYED, 0, TEXT("Add Smile"));
+                AppendMenu(hmenu, MF_STRING, WM_USER, TEXT("Add Smile"));
                 AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
                 AppendMenu(hmenu, cut, WM_CUT, TEXT("Cut") );
                 AppendMenu(hmenu, cut, WM_COPY, TEXT("Copy") );
@@ -86,6 +86,8 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                     pt.x, pt.y,
                     hWnd,
                     NULL);
+
+                if (cmdId==WM_USER) SmileBox::showSmileBox(hWnd, pt.x, pt.y, smileParser);
 
                 DestroyMenu(hmenu);
 
@@ -345,8 +347,8 @@ void ChatView::sendJabberMessage() {
 
     if (!muc) contact->messageList->push_back(msg);
 
-    //redraw();
     msgList->moveCursorEnd();
+    redraw();
 
     //if (!muc) msgList->moveCursorEnd();
 

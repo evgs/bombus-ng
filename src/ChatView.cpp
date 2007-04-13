@@ -412,11 +412,11 @@ FontMetricCache fmc;
 
 void MessageElement::init() {
     //TODO: recalculate screen and scroller height after rendering, remove this prefetch
-    HDC tmp=CreateCompatibleDC(NULL);
-    RECT r={0,0,230,10}; //todo: fix width detection
-    measure(tmp, r);
-    DeleteDC(tmp);
-    //height=10; width=10;
+    //RECT r={0,0,230,10}; //todo: fix width detection
+    //HDC tmp=CreateCompatibleDC(NULL);
+    //measure(tmp, r);
+    //DeleteDC(tmp);
+    height=10; width=10;
 }
 
 void MessageElement::measure(HDC hdc, RECT &rt) {

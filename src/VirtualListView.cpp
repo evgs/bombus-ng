@@ -397,7 +397,8 @@ const ODR * VirtualListView::getODR() const { return wt.get(); }
 
 void VirtualListView::notifyListUpdate( bool redraw ) {
     if (!odrlist) return;
-    int lastY=0;
+    if (!redraw) return;
+    /*int lastY=0;
     for (ODRList::const_iterator i = odrlist->begin(); i!=odrlist->end(); i++) {
         lastY+= i->get()->getHeight();
     }
@@ -409,8 +410,7 @@ void VirtualListView::notifyListUpdate( bool redraw ) {
     si.nMin=0;
     si.nMax=lastY;
 
-    if (!redraw) return;
-    SetScrollInfo(thisHWnd, SB_VERT, &si, TRUE);
+    SetScrollInfo(thisHWnd, SB_VERT, &si, TRUE);*/
 
     InvalidateRect(getHWnd(), NULL, true);
 }

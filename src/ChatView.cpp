@@ -345,9 +345,10 @@ void ChatView::sendJabberMessage() {
 
     if (!muc) contact->messageList->push_back(msg);
 
-    redraw();
+    //redraw();
+    msgList->moveCursorEnd();
 
-    if (!muc) msgList->moveCursorEnd();
+    //if (!muc) msgList->moveCursorEnd();
 
     std::string to=(muc)?contact->jid.getBareJid() : contact->jid.getJid();
     JabberDataBlockRef out=msg->constructStanza(to);

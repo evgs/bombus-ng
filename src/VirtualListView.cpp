@@ -104,6 +104,16 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
 
             RECT rc = {0, 0, 100, 100};
 
+            SCROLLINFO si;
+            si.cbSize=sizeof(SCROLLINFO);
+            si.fMask=SIF_PAGE |SIF_POS |SIF_RANGE;
+            si.nPage=p->clientRect.bottom;
+            si.nPos=p->winTop;
+            si.nMin=0;
+            si.nMax=y+p->winTop;
+
+            SetScrollInfo(p->thisHWnd, SB_VERT, &si, TRUE);
+
             /*int titleBgnd=0x808080;
             HBRUSH tb=CreateSolidBrush(titleBgnd);
             SetBkColor(hdc, titleBgnd);
@@ -335,10 +345,16 @@ void VirtualListView::cursorFit() {
         if ( (*i).get()==cursorPos.get() ) {
             if (yBot>winTop+clientRect.bottom) winTop=yBot-(clientRect.bottom);
             if (yTop<winTop) winTop=yTop;
-            break;
+            //break;
         }
         yTop=yBot;
     }
+    //finally: align list bottom with window bottom, if list bottom is visile and list is long enough
+    int listHeight=yTop;
+    // test if window bottom is lower than list bottom
+    if (winTop+clientRect.bottom>listHeight) winTop=listHeight-clientRect.bottom;
+    // test if window top is not upper than list top
+    if (winTop<0) winTop=0;
 }
 
 

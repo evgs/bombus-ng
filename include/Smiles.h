@@ -27,7 +27,7 @@ protected:
     void loadSmiles();
     BNode* root;
 
-    void addSmile(const char *smile, int index);
+    void addSmile(const char *smile, uint index);
 };
 
 

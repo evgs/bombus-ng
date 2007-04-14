@@ -102,7 +102,7 @@ INT_PTR CALLBACK DlgAddEditContact::dialogProc(HWND hDlg, UINT message, WPARAM w
 
             StringVectorRef groups=p->rc->roster->getRosterGroups();
 
-            for (int i=0; i<groups->size(); i++)
+            for (size_t i=0; i<groups->size(); i++)
                 AddComboString(hDlg, IDC_C_GROUP, (*groups)[i]);
 
 

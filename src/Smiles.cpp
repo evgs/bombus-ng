@@ -51,7 +51,7 @@ void SmileParser::loadSmiles() {
 
     char *p=buf;
     char *smileStart=p;
-    int smileIndex=0;
+    uint smileIndex=0;
 
     root=new BNode();
 
@@ -77,7 +77,7 @@ void SmileParser::loadSmiles() {
     CloseHandle(file);
     delete buf;
 }
-void SmileParser::addSmile(const char *smile, int index) {
+void SmileParser::addSmile(const char *smile, uint index) {
     BNode *p=root;
     BNode *p1;
 
@@ -167,7 +167,7 @@ LRESULT CALLBACK SmileBox::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             int rowcnt=0;
             int iconWidth=p->parser->icons->getElementWidth() + 4;
             
-            for (int i=0; i < p->parser->smileAscii.size(); i++){
+            for (size_t i=0; i < p->parser->smileAscii.size(); i++){
                 p->parser->icons->drawElement(hdc, i, x,y);
                 x+=iconWidth; rowcnt++;
                 if (rowcnt == p->nwidth ) {
@@ -204,7 +204,7 @@ LRESULT CALLBACK SmileBox::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             int width=p->parser->icons->getElementWidth()+4;
             int nx=x/width;
             if (nx>=p->nwidth) break;
-            int nsmile=nx + p->nwidth*(y/width);
+            uint nsmile=nx + p->nwidth*(y/width);
             if (nsmile>=p->parser->smileAscii.size()) break;
 
             SendMessage(

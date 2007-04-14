@@ -1,5 +1,8 @@
 #include "Message.h"
 #include <utf8.hpp>
+#include <boost/regex.hpp>
+
+//boost::regex e1("((?:(?:ht|f)tps?://|www\\.)[^<\\s\\n]+)(?<![]\\.,:;!\\})<-])");
 
 Message::Message(std::string body, std::string fromName, int type) {
     this->body=body;

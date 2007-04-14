@@ -49,7 +49,7 @@ protected:
 
     int xOffset;
     TabList tabs;
-    int /*TabList::iterator*/ activeTab;
+    uint /*TabList::iterator*/ activeTab;
 
     bool makeTabLayout;
     void tabDoLayout(/*HDC hdc*/);

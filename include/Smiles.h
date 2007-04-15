@@ -23,6 +23,8 @@ public:
 
     StringVector smileAscii;
 
+    bool hasSmiles(){return root!=NULL;}
+
 protected:
     void loadSmiles();
     BNode* root;

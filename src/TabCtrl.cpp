@@ -167,7 +167,7 @@ LRESULT CALLBACK TabsCtrl::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
                 int delTab=nextTab;
 
                 p->activeTab++;
-                if (p->activeTab>=p->tabs.size()) {
+                if (p->activeTab>=(int)p->tabs.size()) {
                     nextTab--;
                     p->activeTab=nextTab;
                 }

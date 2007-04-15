@@ -70,7 +70,7 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                 HMENU hmenu = CreatePopupMenu();
                 if (hmenu==NULL) break;
 
-                AppendMenu(hmenu, MF_STRING, WM_USER, TEXT("Add Smile"));
+                AppendMenu(hmenu, (smileParser->hasSmiles())? MF_STRING : MF_STRING | MF_GRAYED, WM_USER, TEXT("Add Smile"));
                 AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
                 AppendMenu(hmenu, cut, WM_CUT, TEXT("Cut") );
                 AppendMenu(hmenu, cut, WM_COPY, TEXT("Copy") );
@@ -476,8 +476,12 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
                 smileIndex=smileParser->findSmile(&smileEnd);
                 if (smileIndex>=0) {
                     if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
-                    lineBegin=end=smileEnd; wordBegin=NULL; xbegin=xpos+smileParser->icons->getElementWidth();
-                    if (!measure) smileParser->icons->drawElement(hdc, smileIndex, xpos, ypos);
+                    int smileWidth=smileParser->icons->getElementWidth();
+                    lineBegin=end=smileEnd; wordBegin=NULL; xbegin=xpos+smileWidth;
+                    if (!measure) {
+                        if (ypos<rt.bottom && ypos+smileWidth>=rt.top)
+                        smileParser->icons->drawElement(hdc, smileIndex, xpos, ypos);
+                    }
                     xpos=xbegin;
                     continue;
                 }

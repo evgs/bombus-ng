@@ -46,8 +46,10 @@ void SmileParser::loadSmiles() {
 
     char *buf=new char[size+1];
     DWORD rd;
-    ReadFile(file, buf, size, &rd, NULL);
-    buf[rd+1]=NULL;
+    ReadFile(file, buf, size, &rd, NULL);     
+    CloseHandle(file);
+
+    buf[rd]=NULL;
 
     char *p=buf;
     char *smileStart=p;
@@ -74,7 +76,6 @@ void SmileParser::loadSmiles() {
 
     }
 
-    CloseHandle(file);
     delete buf;
 }
 void SmileParser::addSmile(const char *smile, uint index) {
@@ -107,6 +108,7 @@ void SmileParser::addSmile(const char *smile, uint index) {
 int SmileParser::findSmile(LPCTSTR *pstr){
     const wchar_t *p=*pstr;
     BNode *psmile=root;
+    if (!psmile) return -1;
 
     wchar_t c;
     while (c=*p) {
@@ -243,7 +245,7 @@ void SmileBox::showSmileBox(HWND editBoxWnd, int x, int y, SmileParser *parser) 
     RECT parent;
     GetClientRect(editBoxWnd, &parent);
 
-    b->nwidth=(int)sqrt(parser->smileAscii.size());
+    b->nwidth=(int)sqrt(parser->smileAscii.size())+1;
     int total=parser->smileAscii.size();
 
     int iconwidth=parser->icons->getElementWidth() + 4;

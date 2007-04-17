@@ -68,7 +68,7 @@
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
 				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ui.pdb"

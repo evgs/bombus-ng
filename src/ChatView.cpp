@@ -438,6 +438,7 @@ void MessageElement::draw(HDC hdc, RECT &rt) const {
 }
 
 void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
+    HPEN hbr=NULL;
     int ypos=rt.top; //fmc.getHeight();
     
     const wchar_t *end=getText();
@@ -452,16 +453,36 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
     int xbegin=xpos;
     int mw=rt.right;
 
+    bool inUrl=FALSE;
+
     wchar_t c;
     do { 
         c=*end;
         switch (c) {
-            //TODO: fix /n and /r/n
             case 0: break; //newline;
-            case 0x0d: end++; if (*end!=0x0a) break;
+                //TODO: fix /n and /r/n
+            case 0x0d: if (*(end+1)==0x0a) end++;
             case 0x0a: end++; break; //newline;
 
-                //some word delimiters
+            case 0x01: 
+                if (hbr==NULL) {
+                    hbr=CreatePen(PS_SOLID, 0, GetTextColor(hdc));
+                    SelectObject(hdc, hbr);
+                }
+            case 0x02:
+                if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
+                if (inUrl) {
+                    //TODO: use underline font style instead of lines
+                    int h=ypos+fmc.getHeight()-1;
+                    MoveToEx(hdc,xbegin, h, NULL);
+                    LineTo(hdc, xpos, h);
+                }
+                inUrl=(c==0x1);
+                end++;
+                lineBegin=end; wordBegin=NULL; xbegin=xpos;
+                continue;
+
+            //some word delimiters
             case ' ':
             case '-':
             case '(':
@@ -470,20 +491,27 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
             case '/':
             case '.':
             case ',':
-                wordBegin=end+1;
+                if (!inUrl) wordBegin=end+1;
             default:
                 smileEnd=end;
-                smileIndex=smileParser->findSmile(&smileEnd);
-                if (smileIndex>=0) {
-                    if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
-                    int smileWidth=smileParser->icons->getElementWidth();
-                    lineBegin=end=smileEnd; wordBegin=NULL; xbegin=xpos+smileWidth;
-                    if (!measure) {
-                        if (ypos<rt.bottom && ypos+smileWidth>=rt.top)
-                        smileParser->icons->drawElement(hdc, smileIndex, xpos, ypos);
+                if (!inUrl) {
+                    smileIndex=smileParser->findSmile(&smileEnd);
+                    if (smileIndex>=0) {
+                        if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
+                        if (inUrl) {
+                            int h=ypos+fmc.getHeight()-1;
+                            MoveToEx(hdc,xbegin, h, NULL);
+                            LineTo(hdc, xpos, h);
+                        }
+                        int smileWidth=smileParser->icons->getElementWidth();
+                        lineBegin=end=smileEnd; wordBegin=NULL; xbegin=xpos+smileWidth;
+                        if (!measure) {
+                            if (ypos<rt.bottom && ypos+smileWidth>=rt.top)
+                                smileParser->icons->drawElement(hdc, smileIndex, xpos, ypos);
+                        }
+                        xpos=xbegin;
+                        continue;
                     }
-                    xpos=xbegin;
-                    continue;
                 }
 
                 xpos+=fmc.getWidth(hdc, c);
@@ -494,14 +522,19 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
 
 
         if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
+        if (inUrl) {
+            int h=ypos+fmc.getHeight()-1;
+            MoveToEx(hdc,xbegin, h, NULL);
+            LineTo(hdc, xpos, h);
+        }
         xbegin=rt.left;
 
         ypos+=fmc.getHeight(); xpos=rt.left; lineBegin=end; wordBegin=NULL; //newline
-        if (!measure) if (ypos>=rt.bottom) break;
         //if (c) end++;
     } while (c);
 
     if (measure) rt.bottom=ypos;
+    if (hbr) DeleteObject(hbr);
 }
 
 int MessageElement::getWidth() const { return width;}

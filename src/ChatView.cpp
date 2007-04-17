@@ -459,8 +459,8 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
     do { 
         c=*end;
         switch (c) {
-            //TODO: fix /n and /r/n
             case 0: break; //newline;
+                //TODO: fix /n and /r/n
             case 0x0d: if (*(end+1)==0x0a) end++;
             case 0x0a: end++; break; //newline;
 

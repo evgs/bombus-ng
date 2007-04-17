@@ -66,7 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib"
+				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib ..\sockets\regex\Debug\regex.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"
@@ -150,7 +150,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib"
+				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib ..\sockets\regex\Release\regex.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"
@@ -309,10 +309,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\ProcessMUC.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\sockets\regex\pocket pc 2003 (armv4)\release\regex.lib"
 				>
 			</File>
 			<File

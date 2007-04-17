@@ -12,7 +12,7 @@ Message::Message(std::string body, std::string fromName, int type) {
 
     //TODO: xml escaping
     
-    std::string tmp=boost::regex_replace(body, e1, std::string("[\\1]"));
+    std::string tmp=boost::regex_replace(body, e1, std::string("\x01\\1\x02"));
     wstr=utf8::utf8_wchar(tmp);
     init();
 }

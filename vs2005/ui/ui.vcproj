@@ -66,7 +66,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib"
+				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib ..\sockets\regex\debug\regex.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="2"
 				DelayLoadDLLs="$(NOINHERIT)"
@@ -150,7 +150,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib"
+				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib ..\sockets\regex\release\regex.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"

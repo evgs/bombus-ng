@@ -2,7 +2,7 @@
 #include <utf8.hpp>
 #include <boost/regex.hpp>
 
-//boost::regex e1("((?:(?:ht|f)tps?://|www\\.)[^<\\s\\n]+)(?<![]\\.,:;!\\})<-])");
+boost::regex e1("((?:(?:ht|f)tps?://|www\\.)[^<\\s\\n]+)(?<![]\\.,:;!\\})<-])");
 
 Message::Message(std::string body, std::string fromName, int type) {
     this->body=body;
@@ -11,7 +11,9 @@ Message::Message(std::string body, std::string fromName, int type) {
     unread=(type==Message::INCOMING);
 
     //TODO: xml escaping
-    wstr=utf8::utf8_wchar(body);
+    
+    std::string tmp=boost::regex_replace(body, e1, std::string("[\\1]"));
+    wstr=utf8::utf8_wchar(tmp);
     init();
 }
 

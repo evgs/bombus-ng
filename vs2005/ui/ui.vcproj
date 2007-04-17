@@ -312,6 +312,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\sockets\regex\pocket pc 2003 (armv4)\release\regex.lib"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ResourceContext.cpp"
 				>
 			</File>

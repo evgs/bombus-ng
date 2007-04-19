@@ -454,6 +454,7 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
     int mw=rt.right;
 
     bool inUrl=FALSE;
+    int lHeight=fmc.getHeight();
 
     wchar_t c;
     do { 
@@ -504,6 +505,7 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
                             LineTo(hdc, xpos, h);
                         }
                         int smileWidth=smileParser->icons->getElementWidth();
+                        lHeight=smileWidth;
                         lineBegin=end=smileEnd; wordBegin=NULL; xbegin=xpos+smileWidth;
                         if (!measure) {
                             if (ypos<rt.bottom && ypos+smileWidth>=rt.top)
@@ -529,7 +531,8 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
         }
         xbegin=rt.left;
 
-        ypos+=fmc.getHeight(); xpos=rt.left; lineBegin=end; wordBegin=NULL; //newline
+        ypos+=lHeight; xpos=rt.left; lineBegin=end; wordBegin=NULL; //newline
+        lHeight=fmc.getHeight();
         //if (c) end++;
     } while (c);
 

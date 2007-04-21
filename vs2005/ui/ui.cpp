@@ -614,6 +614,8 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     c->nUnread++;
     c->messageList->push_back(msg);
 
+    if (rc->roster->needUpdateView) rc->roster->makeViewList();
+
     ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
     if(cv) {
         cv->moveUnread();

@@ -199,6 +199,7 @@ Contact::ref Roster::getContactEntry(const std::string & from){
                 contact=contact->clone();
                 contact->jid.setResource(jid.getResource());
                 contacts.push_back(contact);
+                needUpdateView=true;
             } else {
 
                 //finally - based on NOT-IN-LIST policy
@@ -211,6 +212,7 @@ Contact::ref Roster::getContactEntry(const std::string & from){
                 contact->group=NIL;
                 //bareJidMap[contact->jid.getBareJid()]=contact;
                 contacts.push_back(contact);
+                needUpdateView=true;
             }
         }
     }
@@ -248,6 +250,7 @@ void Roster::makeViewList() {
 
     }
 
+    needUpdateView=false;
     //roster->bindODRList(odrlist);
     PostMessage(roster->getHWnd(), WM_USER+1, 0, (LPARAM)list); //ÀÕÒÓÍÃ ¹2
     //roster->notifyListUpdate(false);

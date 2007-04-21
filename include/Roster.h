@@ -80,6 +80,7 @@ public:
     RosterGroup::ref findGroup(const std::string &name);
     RosterGroup::ref createGroup(const std::string &name, RosterGroup::Type type);
 
+    bool needUpdateView;
     void makeViewList();
 
     virtual const char * getType() const{ return NULL; /* result/set */ }

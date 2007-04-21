@@ -342,7 +342,7 @@ void ChatView::sendJabberMessage() {
     if (len==0) return;
     std::string body=utf8::wchar_utf8(buf);
 
-    Message::ref msg=Message::ref(new Message(body, "", Message::SENT));
+    Message::ref msg=Message::ref(new Message(body, "", Message::SENT, strtime::getCurrentUtc() ));
     bool muc=boost::dynamic_pointer_cast<MucRoom>(contact);
 
     if (!muc) contact->messageList->push_back(msg);

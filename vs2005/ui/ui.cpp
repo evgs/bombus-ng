@@ -602,7 +602,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
 
     } else c=rc->roster->getContactEntry(from);
 
-    Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING));
+    Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING, Message::extractXDelay(block) ));
 
     std::wstring soundName(appRootPath);
     soundName+=TEXT("sounds\\message.wav");

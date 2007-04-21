@@ -4,6 +4,7 @@
 #include "Contact.h"
 #include "utf8.hpp"
 #include "Image.h"
+#include "TimeFunc.h"
 //////////////////////////////////////////////////////////////////////////
 extern ImgListRef skin;
 
@@ -132,9 +133,9 @@ void Contact::processPresence( JabberDataBlockRef block ) {
     std::string body=type;
     body+=" (";
     body+=status;
-    body+=") [#]";
+    body+=") [#]"; //todo: priority
 
-    Message::ref msg=Message::ref(new Message(body, block->getAttribute("from"), msgType));
+    Message::ref msg=Message::ref(new Message(body, block->getAttribute("from"), msgType, Message::extractXDelay(block) ));
 
     if (this->messageList->size()==1) {
         //TODO: verify if it is presence;

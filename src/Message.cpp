@@ -4,7 +4,8 @@
 
 boost::regex e1("((?:(?:ht|f)tps?://|www\\.)[^<\\s\\n]+)(?<![]\\.,:;!\\})<-])");
 
-Message::Message(std::string body, std::string fromName, int type) {
+Message::Message( std::string body, std::string fromName, int type, const PackedTime &time ) 
+{
     this->body=body;
     this->fromName=fromName;
     this->type=(Message::MsgType)type;
@@ -13,6 +14,8 @@ Message::Message(std::string body, std::string fromName, int type) {
     //TODO: xml escaping
     
     std::string tmp=boost::regex_replace(body, e1, std::string("\x01\\1\x02"));
+    tmp.insert(0,"[] ");
+    tmp.insert(1, strtime::toTime(time));
     wstr=utf8::utf8_wchar(tmp);
     init();
 }
@@ -34,4 +37,10 @@ int Message::getColor() const{
         default: return 0x000000;
     }
 
+}
+
+PackedTime Message::extractXDelay( JabberDataBlockRef stanza ) {
+    JabberDataBlockRef xdelay=stanza->findChildNamespace("x","jabber:x:delay");
+    if (!xdelay) return strtime::getCurrentUtc();
+    return strtime::PackIso8601(xdelay->getAttribute("stamp"));
 }

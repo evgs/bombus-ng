@@ -228,7 +228,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
     c->processPresence(block);
     rc->roster->makeViewList();
 
-    Message::ref msg=Message::ref(new Message(message, from, Message::PRESENCE));
+    Message::ref msg=Message::ref(new Message(message, from, Message::PRESENCE, Message::extractXDelay(block) ));
 
     Contact::ref room=roomGrp->room;
     

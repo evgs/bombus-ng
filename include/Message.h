@@ -4,6 +4,7 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 
+#include "TimeFunc.h"
 #include "OwnerDrawRect.h"
 #include "JabberDataBlock.h"
 
@@ -45,16 +46,20 @@ public:
     typedef boost::shared_ptr<Message> ref;
 
 public:
-    Message(std::string body, std::string fromName, int type);
+    Message(std::string body, std::string fromName, int type, const PackedTime &time);
 
     JabberDataBlockRef constructStanza(const std::string &to) const;
 
     std::string body;
     std::string fromName;
+
+    PackedTime time;
     
     bool unread;
 
     MsgType type;
+
+    static PackedTime extractXDelay(JabberDataBlockRef stanza);
 };
 
 

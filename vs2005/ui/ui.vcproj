@@ -368,6 +368,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\Time.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui.cpp"
 				>
 			</File>
@@ -583,6 +587,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\TabCtrl.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\TimeFunc.h"
 				>
 			</File>
 			<File

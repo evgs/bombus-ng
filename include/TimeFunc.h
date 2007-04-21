@@ -5,7 +5,7 @@
 
 typedef FILETIME PackedTime;
 
-namespace time {
+namespace strtime {
     std::string toDate(const PackedTime &utcTime);
     std::string toTime(const PackedTime &utcTime);
 

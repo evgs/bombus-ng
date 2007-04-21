@@ -64,7 +64,7 @@ void strAppendInt(std::string &s, int n){
     s+=tmpbuf;
 }
 
-std::string fileTimeToDate(FILETIME * time) {
+std::string fileTimeToString(FILETIME * time) {
     SYSTEMTIME stime;
     FileTimeToSystemTime(time, &stime);
     std::string result;
@@ -108,8 +108,8 @@ int CeTLSSocket::SslValidate (
         std::string certInfo="\nCertificate Issuer unknown";
         certInfo+="\nIssuer: "; certInfo+=pCert->pszIssuer;
         certInfo+="\nSubject: "; certInfo+=pCert->pszSubject;
-        certInfo+="\nValid from: "; certInfo+=fileTimeToDate(&(pCert->ValidFrom));
-        certInfo+="\nValid until: "; certInfo+=fileTimeToDate(&(pCert->ValidUntil));
+        certInfo+="\nValid from: "; certInfo+=fileTimeToString(&(pCert->ValidFrom));
+        certInfo+="\nValid until: "; certInfo+=fileTimeToString(&(pCert->ValidUntil));
 
         certInfo+="\n\nAccept this certificate?";
 

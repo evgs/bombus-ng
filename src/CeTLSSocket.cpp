@@ -10,6 +10,8 @@
 #include <sslsock.h>
 #include <schnlsp.h>
 
+#include "TimeFunc.h"
+
 // load SslCrackCertificate and SslFreeCertificate
 #define SSL_CRACK_CERTIFICATE_NAME TEXT("SslCrackCertificate")
 #define SSL_FREE_CERTIFICATE_NAME TEXT("SslFreeCertificate")
@@ -64,17 +66,6 @@ void strAppendInt(std::string &s, int n){
     s+=tmpbuf;
 }
 
-std::string fileTimeToString(FILETIME * time) {
-    SYSTEMTIME stime;
-    FileTimeToSystemTime(time, &stime);
-    std::string result;
-    strAppendInt(result, stime.wDay); result+=".";
-    strAppendInt(result, stime.wMonth); result+=".";
-    strAppendInt(result, stime.wYear);
-
-    return result;
-}
-
 
 int CeTLSSocket::SslValidate (
                  DWORD  dwType,
@@ -108,8 +99,8 @@ int CeTLSSocket::SslValidate (
         std::string certInfo="\nCertificate Issuer unknown";
         certInfo+="\nIssuer: "; certInfo+=pCert->pszIssuer;
         certInfo+="\nSubject: "; certInfo+=pCert->pszSubject;
-        certInfo+="\nValid from: "; certInfo+=fileTimeToString(&(pCert->ValidFrom));
-        certInfo+="\nValid until: "; certInfo+=fileTimeToString(&(pCert->ValidUntil));
+        certInfo+="\nValid from: "; certInfo+=strtime::toDate(pCert->ValidFrom);
+        certInfo+="\nValid until: "; certInfo+=strtime::toDate(pCert->ValidUntil);
 
         certInfo+="\n\nAccept this certificate?";
 

@@ -594,7 +594,7 @@ bool MessageElement::OnMenuCommand(int cmdId, HWND parent){
                 memcpy(hmem, copy.c_str(), dsize);
 
                 if (OpenClipboard(NULL)) {
-                    EmptyClipboard();
+                    EmptyClipboard(); //need to take ownership
                     SetClipboardData(CF_UNICODETEXT, hmem);
                     CloseClipboard();
                 } else LocalFree(hmem);

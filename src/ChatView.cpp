@@ -17,6 +17,7 @@ extern HWND	g_hWndMenuBar;		// menu bar handle
 extern ResourceContextRef rc;
 extern ImgListRef skin;
 extern SmileParser *smileParser;
+extern HWND		mainWnd;
 
 //////////////////////////////////////////////////////////////////////////
 ATOM ChatView::RegisterWindowClass() {
@@ -414,6 +415,7 @@ FontMetricCache fmc;
 
 void MessageElement::init() {
     //TODO: fix bug with cursor fit immediately after init();
+    smiles=true; singleLine=false;
     RECT r={0,0,230,10}; //todo: fix width detection
     HDC tmp=CreateCompatibleDC(NULL);
     measure(tmp, r);
@@ -456,6 +458,12 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
     bool inUrl=FALSE;
     int lHeight=fmc.getHeight();
 
+    if (!measure) if (singleLine) {
+        skin->drawElement(hdc, icons::ICON_MSGCOLLAPSED_INDEX, xpos, ypos);
+        xpos+=skin->getElementWidth()/2;
+        xbegin=xpos;
+    }
+
     wchar_t c;
     do { 
         c=*end;
@@ -463,7 +471,7 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
             case 0: break; //newline;
                 //TODO: fix /n and /r/n
             case 0x0d: if (*(end+1)==0x0a) end++;
-            case 0x0a: end++; break; //newline;
+            case 0x0a: end++; if (!singleLine) break; //newline;
 
             case 0x01: 
                 if (hbr==NULL) {
@@ -492,10 +500,10 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
             case '/':
             case '.':
             case ',':
-                if (!inUrl) wordBegin=end+1;
+                if (!inUrl) if (!singleLine) wordBegin=end+1;
             default:
                 smileEnd=end;
-                if (!inUrl) {
+                if (smiles) if (!inUrl) {
                     smileIndex=smileParser->findSmile(&smileEnd);
                     if (smileIndex>=0) {
                         if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
@@ -533,6 +541,7 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
 
         ypos+=lHeight; xpos=rt.left; lineBegin=end; wordBegin=NULL; //newline
         lHeight=fmc.getHeight();
+        if (singleLine) break;
         //if (c) end++;
     } while (c);
 
@@ -551,3 +560,60 @@ MessageElement::MessageElement(const std::string &str) {
 const wchar_t * MessageElement::getText() const { return wstr.c_str(); }
 
 int MessageElement::getColor() const { return 0; }
+
+HMENU MessageElement::getContextMenu( HMENU menu ) {
+    if (!menu) 
+        menu=CreatePopupMenu(); 
+    else
+        AppendMenu(menu, MF_SEPARATOR , 0, NULL);
+
+    AppendMenu(menu, MF_STRING, WM_COPY, L"Copy" );
+    AppendMenu(menu, MF_SEPARATOR , 0, NULL);
+    AppendMenu(menu, (singleLine)? MF_STRING  :  MF_STRING | MF_CHECKED, IDOK, L"Expanded" );
+    AppendMenu(menu, (smiles)? MF_STRING | MF_CHECKED  :  MF_STRING, IDM_SMILES, L"Smiles" );
+    return menu;
+}
+
+bool MessageElement::OnMenuCommand(int cmdId, HWND parent){
+    switch (cmdId) {
+        case WM_COPY:
+            {
+                std::wstring copy=wstr;
+                // striping formating
+                size_t i=0;
+                while (i<copy.length()) {
+                    if (copy[i]<0x09) {
+                        copy.erase(i,1);
+                        continue;
+                    }
+                    i++;
+                }
+                int dsize=sizeof(wchar_t)*(copy.length()+1);
+                HANDLE hmem=LocalAlloc(LPTR, dsize);
+                if (!hmem) return true;
+                memcpy(hmem, copy.c_str(), dsize);
+
+                if (OpenClipboard(NULL)) {
+                    EmptyClipboard();
+                    SetClipboardData(CF_UNICODETEXT, hmem);
+                    CloseClipboard();
+                } else LocalFree(hmem);
+                return true;
+            }
+        case IDOK:
+            {
+                singleLine=!singleLine;
+                width=1;
+                InvalidateRect(parent, NULL, true);
+                return true;
+            }
+        case IDM_SMILES:
+            {
+                smiles=!smiles;
+                width=1;
+                InvalidateRect(parent, NULL, true);
+                return true;
+            }
+    }
+    return false;
+}

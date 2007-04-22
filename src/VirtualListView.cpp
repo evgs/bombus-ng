@@ -167,7 +167,8 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
     case WM_LBUTTONDOWN:
         {
             SetFocus(hWnd);
-            if (!(p->moveCursorTo(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)))) break;
+            ODRRef focused=p->moveCursorTo(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            if (!(focused)) break;
             InvalidateRect(p->getHWnd(), NULL, true);
 
             SHRGINFO    shrg;
@@ -180,15 +181,26 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
 
                 HMENU hmenu = p->getContextMenu();
+
+                VirtualListElement *velement=dynamic_cast<VirtualListElement *>(focused.get());
+                if (velement) hmenu=velement->getContextMenu(hmenu);
+
                 if (hmenu==NULL) break;
 
                 POINT pt={LOWORD(lParam), HIWORD(lParam) };
                 ClientToScreen(hWnd, &pt);
-                TrackPopupMenuEx(hmenu,
-                    /*TPM_LEFTALIGN |*/ TPM_TOPALIGN,
+                int cmdId=TrackPopupMenuEx(hmenu,
+                    /*TPM_LEFTALIGN |*/ TPM_TOPALIGN | TPM_RETURNCMD, 
                     pt.x, pt.y,
                     hWnd,
                     NULL);
+
+                bool cmdProcessed=false;
+                if (velement) 
+                    cmdProcessed=velement->OnMenuCommand(cmdId, p->getHWnd());
+
+                if (!cmdProcessed)
+                    p->OnCommand(cmdId, NULL);
 
                 DestroyMenu(hmenu);
             }
@@ -305,10 +317,10 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
 }
 
 
-bool VirtualListView::moveCursorTo( int x, int y ) 
+ODRRef VirtualListView::moveCursorTo( int x, int y ) 
 {
     y+=winTop;
-    if (y<0) return false;
+    if (y<0) return ODRRef();
 
     int yTop=0;
 
@@ -320,12 +332,12 @@ bool VirtualListView::moveCursorTo( int x, int y )
                 cursorPos=*i;
 
                 cursorFit();
-                return true;
+                return cursorPos;
             }
         }
         yTop=yBot;
     }
-    return false;
+    return ODRRef();
 }
 
 bool VirtualListView::moveCursorEnd() {
@@ -415,7 +427,11 @@ void VirtualListView::notifyListUpdate( bool redraw ) {
     InvalidateRect(getHWnd(), NULL, true);
 }
 
-void VirtualListView::eventOk() { }
+void VirtualListView::eventOk() { 
+    VirtualListElement *velement=dynamic_cast<VirtualListElement *>(cursorPos.get());
+    if (velement) 
+        velement->OnMenuCommand(IDOK, getHWnd());
+}
 
 void VirtualListView::moveCursor( int direction ) {
     for (ODRList::const_iterator i=odrlist->begin(); i!=odrlist->end(); i++) {

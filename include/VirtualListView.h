@@ -11,7 +11,13 @@ typedef std::vector<ODRRef> ODRList;
 typedef boost::shared_ptr<ODRList> ODRListRef;
 
 //////////////////////////////////////////////////////////////////////////
-
+class VirtualListElement {
+public:
+    typedef boost::shared_ptr<VirtualListElement> ref;
+    virtual HMENU getContextMenu(HMENU menu){ return menu; }
+    virtual bool OnMenuCommand(int cmdId, HWND parent) { return false; }
+};
+//////////////////////////////////////////////////////////////////////////
 
 class VirtualListView : public Wnd {
 public:
@@ -63,7 +69,7 @@ private:
         SCROLLWIDTH=14
     };
 
-    bool moveCursorTo(int x, int y);
+    ODRRef moveCursorTo(int x, int y);
     void moveCursor(int direction);
     void cursorFit();
 

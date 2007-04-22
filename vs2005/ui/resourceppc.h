@@ -22,6 +22,7 @@
 #define IDM_SEND                        110
 #define IDD_ADD_CONTACT                 110
 #define IDD_CONFERENCE                  111
+#define IDM_SMILES                      111
 #define IDI_BOMBUS                      130
 #define IDC_STATIC_2                    202
 #define IDC_STATIC_3                    203
@@ -83,6 +84,6 @@
 #define _APS_NEXT_RESOURCE_VALUE        133
 #define _APS_NEXT_COMMAND_VALUE         32797
 #define _APS_NEXT_CONTROL_VALUE         1038
-#define _APS_NEXT_SYMED_VALUE           111
+#define _APS_NEXT_SYMED_VALUE           112
 #endif
 #endif

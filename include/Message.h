@@ -7,8 +7,9 @@
 #include "TimeFunc.h"
 #include "OwnerDrawRect.h"
 #include "JabberDataBlock.h"
+#include "VirtualListView.h"
 
-class MessageElement : public ODR {
+class MessageElement : public ODR, public VirtualListElement{
 public:
     MessageElement(){};
     MessageElement(const std::string &str);
@@ -21,10 +22,15 @@ public:
 
     virtual void render(HDC hdc, RECT &rt, bool measure) const;
 
+    virtual HMENU getContextMenu(HMENU menu);
+    virtual bool OnMenuCommand(int cmdId, HWND parent);
+
 protected:
     std::wstring wstr;
     int width;
     int height;
+    bool singleLine;
+    bool smiles;
     void init();
     virtual const wchar_t * getText() const;
 };

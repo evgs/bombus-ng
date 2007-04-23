@@ -137,9 +137,11 @@ void Contact::processPresence( JabberDataBlockRef block ) {
 
     Message::ref msg=Message::ref(new Message(body, block->getAttribute("from"), msgType, Message::extractXDelay(block) ));
 
-    if (this->messageList->size()==1) {
-        //TODO: verify if it is presence;
-        this->messageList->erase( this->messageList->begin());
+    if (messageList->size()==1) {
+        //verify if it is presence;
+        Message::ref mfirst=boost::dynamic_pointer_cast<Message>(messageList->front());
+        if (mfirst) if (mfirst->type==Message::PRESENCE)
+            this->messageList->erase( this->messageList->begin());
     }
     this->messageList->push_back(msg);
 }

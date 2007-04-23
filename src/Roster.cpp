@@ -192,6 +192,8 @@ Contact::ref Roster::getContactEntry(const std::string & from){
         if (contact) {
             // store resource
             contact->jid.setResource(jid.getResource());
+            contact->update();
+            needUpdateView=true;
         } else { 
             //third attempt - clone contact from bareJidMap
             if ( bareJidMap.count(jid.getBareJid())!=0 ) {

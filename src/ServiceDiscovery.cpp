@@ -15,6 +15,32 @@ extern HWND	g_hWndMenuBar;		// menu bar handle
 extern ResourceContextRef rc;
 extern ImgListRef skin;
 
+
+class DiscoCommand: public IconTextElementContainer {
+public:
+    enum DiscoCmds {
+        REGISTER=1,
+        SEARCH=2,
+        EXECUTE=3,
+        VCARD=4,
+        JOINGC=5,
+        ADD=6
+    };
+    DiscoCommand(std::wstring cmdName, int icon, int cmdId);
+    DiscoCmds cmdId;
+
+    typedef boost::shared_ptr<DiscoCommand> ref;
+    virtual int getColor() const;
+};
+
+DiscoCommand::DiscoCommand(std::wstring cmdName, int icon, int cmdId) {
+    this->iconIndex=icon;
+    this->wstr=cmdName;
+    this->cmdId=(DiscoCmds)cmdId;
+    init();
+}
+
+int DiscoCommand::getColor() const { return 0xff0000; }
 //TODO: subclass combo box: clipboard, enter redirection
 
 //////////////////////////////////////////////////////////////////////////
@@ -321,18 +347,36 @@ void ServiceDiscovery::go() {
 
 void ServiceDiscovery::parseResult() {
     //parsing items
-    if (!itemReply) return;
     ODRList *list=new ODRList();
 
-    JabberDataBlockRefList::iterator i=itemReply->getChilds()->begin();
-    while (i!=itemReply->getChilds()->end()) {
-        JabberDataBlockRef item=*(i++);
-        std::string &jid=item->getAttribute("jid");
-        std::string &name=item->getAttribute("name");
-        Contact::ref contact=Contact::ref(new Contact(jid, "", name));
-        contact->status=presence::ONLINE;
-        list->push_back(contact);
+    if (infoReply) {
+        JabberDataBlockRefList::iterator i=infoReply->getChilds()->begin();
+        while (i!=infoReply->getChilds()->end()) {
+            JabberDataBlockRef feature=*(i++);
+            std::string &var=feature->getAttribute("var");
+            DiscoCommand *cmd=NULL;
+            if (var=="jabber:iq:register") cmd=new DiscoCommand(L"Register", icons::ICON_REGISTER_INDEX, DiscoCommand::REGISTER);
+            if (var=="jabber:iq:search") cmd=new DiscoCommand(L"Search", icons::ICON_SEARCH_INDEX, DiscoCommand::SEARCH);
+            //EXECUTE=3,
+            if (var=="vcard-temp") cmd=new DiscoCommand(L"vCard", icons::ICON_VCARD, DiscoCommand::VCARD);
+            if (var=="http://jabber.org/protocol/muc") cmd=new DiscoCommand(L"Join conference", icons::ICON_GCJOIN_INDEX, DiscoCommand::JOINGC);
+            //    ADD=6
+            if (cmd) list->push_back(DiscoCommand::ref(cmd));
+        }
     }
+
+    if (itemReply) {
+        JabberDataBlockRefList::iterator i=itemReply->getChilds()->begin();
+        while (i!=itemReply->getChilds()->end()) {
+            JabberDataBlockRef item=*(i++);
+            std::string &jid=item->getAttribute("jid");
+            std::string &name=item->getAttribute("name");
+            Contact::ref contact=Contact::ref(new Contact(jid, "", name));
+            contact->status=presence::ONLINE;
+            list->push_back(contact);
+        }
+    }
+
     nodeList->bindODRList(ODRListRef(list));
     nodeList->notifyListUpdate(true);
 }

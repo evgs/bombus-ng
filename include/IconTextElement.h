@@ -29,11 +29,12 @@ protected:
 
 class IconTextElementContainer : public IconTextElement {
 public:
-    IconTextElementContainer(std::wstring &wstr, int icon);
+    IconTextElementContainer(const std::wstring &wstr, int icon);
     virtual int getColor() const;
     virtual const wchar_t * getText() const;
     virtual int getIconIndex() const;
-private:
+protected:
+    IconTextElementContainer(){};
     std::wstring wstr;
     int iconIndex;
 };

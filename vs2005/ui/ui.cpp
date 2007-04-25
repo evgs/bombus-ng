@@ -683,6 +683,10 @@ void JabberStreamEvents::beginConversation(JabberDataBlockRef streamHeader){
 void JabberStreamEvents::endConversation(const std::exception *ex){
     if (ex!=NULL)  Log::getInstance()->msg(ex->what());
     Log::getInstance()->msg("End Conversation");
+    rc->roster->setAllOffline();
+    rc->roster->makeViewList();
+    //tabs->
+
     rosterWnd->setIcon(presence::OFFLINE);
 }
 
@@ -758,7 +762,8 @@ int initJabber() {
     rc->jabberStanzaDispatcher2=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
 
     //TODO: roster caching
-    rc->roster=RosterRef(new Roster(rc));
+    if (!rc->roster)
+        rc->roster=RosterRef(new Roster(rc));
     rc->roster->bindWindow(rosterWnd);
     rosterWnd->setIcon(icons::ICON_PROGRESS_INDEX);
     rosterWnd->roster=rc->roster;

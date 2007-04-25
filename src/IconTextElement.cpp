@@ -35,7 +35,7 @@ void IconTextElement::draw(HDC hdc, RECT &rt) const {
 int IconTextElement::getWidth() const { return width;}
 int IconTextElement::getHeight() const { return height; }
 
-IconTextElementContainer::IconTextElementContainer( std::wstring &wstr, int icon ) {
+IconTextElementContainer::IconTextElementContainer(const std::wstring &wstr, int icon ) {
     this->iconIndex=icon;
     this->wstr=wstr;
     init();

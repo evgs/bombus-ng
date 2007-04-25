@@ -13,6 +13,7 @@
 #include <algorithm>
 
 #include "Image.h"
+#include "JabberAccount.h"
 #include "JabberStream.h"
 #include "Presence.h"
 #include "ProcessMUC.h"
@@ -36,6 +37,11 @@ Roster::Roster(ResourceContextRef rc){
     createGroup("Self-Contact", RosterGroup::SELF_CONTACT);
     createGroup("Transports", RosterGroup::TRANSPORTS);
     createGroup(NIL, RosterGroup::NOT_IN_LIST);
+
+    Contact::ref self=Contact::ref(new Contact(rc->account->getBareJid(), "", ""));
+    self->group="Self-Contact";
+    bareJidMap[self->jid.getBareJid()]=self;
+    addContact(self);
 }
 
 /*void Roster::addContact(Contact::ref contact) {
@@ -125,8 +131,10 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
             contact=Contact::ref(new Contact(jid, "", name));
             //std::wstring rjid=utf8::utf8_wchar(contact->rosterJid);
             //roster->addODR(contact, (i==query->getChilds()->end()));
-            bareJidMap[contact->jid.getBareJid()]=contact;
-            contacts.push_back(contact);
+            if (!bareJidMap[contact->jid.getBareJid()]) {
+                bareJidMap[contact->jid.getBareJid()]=contact;
+                contacts.push_back(contact);
+            }
         }   
 
         contact->subscr=subscr;
@@ -303,6 +311,15 @@ void Roster::setStatusByFilter( const std::string & bareJid, int status ) {
     }
 }
 
+void Roster::setAllOffline() {
+    int i=0;
+    while (i!=contacts.size()) {
+        contacts[i]->status=presence::OFFLINE;
+        i++;
+    }
+}
+
+
 Roster::ContactListRef Roster::getHotContacts() {
     ContactListRef hots=ContactListRef(new ContactList());
     for (ContactList::const_iterator ci=contacts.begin(); ci!=contacts.end(); ci++) {
@@ -324,6 +341,7 @@ Roster::ContactListRef Roster::getHotContacts() {
 
     return hots;
 }
+
 RosterGroup::RosterGroup( const std::string &name, Type type ) {
     groupName=name;
     this->type=type;

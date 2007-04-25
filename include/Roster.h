@@ -95,6 +95,7 @@ public:
     void addContact(Contact::ref contact);
     void deleteContact(Contact::ref contact);
     void setStatusByFilter(const std::string & bareJid, int status);
+    void setAllOffline();
     Roster::ContactListRef getHotContacts();
 
     void rosterSet(const char * nick, const char *jid, const char *group, const char *subscr );

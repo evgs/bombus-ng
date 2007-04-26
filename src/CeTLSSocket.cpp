@@ -79,7 +79,7 @@ int CeTLSSocket::SslValidate (
 
     if (s->ignoreSSLWarnings) return SSL_ERR_OKAY;
 
-    if (dwFlags!=SSL_CERT_X509) return SSL_ERR_CERT_UNKNOWN;
+    if (dwType!=SSL_CERT_X509) return SSL_ERR_CERT_UNKNOWN;
 
     if (pCertChain==NULL) return SSL_ERR_CERT_UNKNOWN;
 

@@ -154,7 +154,7 @@
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"
-				GenerateDebugInformation="false"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ui.pdb"
 				GenerateMapFile="true"
 				SubSystem="0"

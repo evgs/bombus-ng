@@ -17,19 +17,21 @@
 #define SSL_FREE_CERTIFICATE_NAME TEXT("SslFreeCertificate")
 
 //////////////////////////////////////////////////////////////////////////
-SSL_CRACK_CERTIFICATE_FN gSslCrackCertificate;
-SSL_FREE_CERTIFICATE_FN gSslFreeCertificate;
-HINSTANCE hSchannelDLL;
+SSL_CRACK_CERTIFICATE_FN gSslCrackCertificate=0;
+SSL_FREE_CERTIFICATE_FN gSslFreeCertificate=0;
+HINSTANCE hSchannelDLL=0;
 
-HRESULT LoadSSL()
-{
+HRESULT LoadSSL(){
+
     // already loaded?
     if (hSchannelDLL) return S_OK;
-    if (gSslCrackCertificate && gSslFreeCertificate) return S_OK;
+    //if (gSslCrackCertificate && gSslFreeCertificate) return S_OK;
 
     hSchannelDLL = LoadLibrary(TEXT("schannel.dll"));
     if (!hSchannelDLL) {
         // error logging
+        gSslCrackCertificate = NULL;
+        gSslFreeCertificate = NULL;
         return E_FAIL;
     }
 
@@ -38,6 +40,7 @@ HRESULT LoadSSL()
 
     if (!gSslCrackCertificate || !gSslFreeCertificate) {
         // error logging
+
         gSslCrackCertificate = NULL;
         gSslFreeCertificate = NULL;
         FreeLibrary(hSchannelDLL);
@@ -88,7 +91,6 @@ int CeTLSSocket::SslValidate (
     if (dwFlags & SSL_CERT_FLAG_ISSUER_UNKNOWN) {
         //TODO: ask for accept/decline certificate
 
-
         std::wstring url=utf8::utf8_wchar(s->url);
 
         if (!gSslCrackCertificate || !gSslFreeCertificate) return SSL_ERR_CERT_UNKNOWN;
@@ -108,7 +110,7 @@ int CeTLSSocket::SslValidate (
 
         std::wstring wcertInfo=utf8::utf8_wchar(certInfo);
 
-        int result=MessageBox(NULL, wcertInfo.c_str(), TEXT("SSL handshake Error"), MB_OKCANCEL | MB_ICONEXCLAMATION );
+        int result=MessageBox(NULL, wcertInfo.c_str(), TEXT("SSL Certificate Error"), MB_OKCANCEL | MB_ICONEXCLAMATION );
         if (result!=IDOK) return SSL_ERR_CERT_UNKNOWN;
     }
 
@@ -161,7 +163,8 @@ CeTLSSocket::~CeTLSSocket(){
 
 bool CeTLSSocket::startTls(bool ignoreSSLWarnings){
     this->ignoreSSLWarnings=ignoreSSLWarnings;
-    BOOST_ASSERT(LoadSSL()==S_OK);
+    int result=LoadSSL();
+    BOOST_ASSERT(result==S_OK);
     int ioctlresult=WSAIoctl(sock, SO_SSL_PERFORM_HANDSHAKE, (LPVOID)url.c_str(), url.length(), 0, 0, 0, 0, 0);
     if (ioctlresult==SOCKET_ERROR) throwSocketError();
     return true;

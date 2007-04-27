@@ -609,14 +609,15 @@ bool MessageElement::OnMenuCommand(int cmdId, HWND parent){
         case IDOK:
             {
                 singleLine=!singleLine;
-                width=1;
-                InvalidateRect(parent, NULL, true);
-                return true;
+                smiles=!smiles;
             }
         case IDM_SMILES:
             {
                 smiles=!smiles;
-                width=1;
+                RECT rt={0,0,width,0};
+                render(NULL, rt, true);
+                width=rt.right-rt.left;
+                height=rt.bottom-rt.top;
                 InvalidateRect(parent, NULL, true);
                 return true;
             }

@@ -232,12 +232,13 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
     Contact::ref room=roomGrp->room;
     
+    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
+
+    bool ascroll=(cv==NULL)? false: cv->autoScroll();
     room->messageList->push_back(msg);
 
-
-    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(room).get());
-    if(cv) {
-        cv->moveUnread();
+    if (ascroll) {
+        cv->moveEnd();
         cv->redraw();
     }
     return BLOCK_PROCESSED;

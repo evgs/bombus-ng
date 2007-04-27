@@ -142,6 +142,12 @@ ProcessResult Roster::blockArrived(JabberDataBlockRef block, const ResourceConte
         contact->offlineIcon=offlineIcon;
 
     }
+    if (rosterPush) {
+        JabberDataBlock result("iq");
+        result.setAttribute("type","result");
+        result.setAttribute("id",block->getAttribute("id"));
+        rc->jabberStream->sendStanza(result);
+    }
     //std::stable_sort(contacts.begin(), contacts.end(), Contact::compare);
     makeViewList();
     return BLOCK_PROCESSED;

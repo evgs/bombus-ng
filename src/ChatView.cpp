@@ -331,9 +331,15 @@ void ChatView::redraw(){
     //InvalidateRect(msgList->getHWnd(), NULL, false);
 }
 
-void ChatView::moveUnread() {
+void ChatView::moveEnd() {
     msgList->moveCursorEnd();
 }
+
+bool ChatView::autoScroll() {
+    if (!IsWindowVisible(getHWnd())) return false;
+    return (msgList->cursorAtEnd());
+}
+
 ATOM ChatView::windowClass=0;
 
 //////////////////////////////////////////////////////////////////////////

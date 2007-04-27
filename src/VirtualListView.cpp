@@ -208,9 +208,11 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
         }
     case WM_LBUTTONDBLCLK:
         {
-            if (!(p->moveCursorTo(LOWORD(lParam), HIWORD(lParam)))) break;
+            ODRRef oldCursor=p->cursorPos;
+            ODRRef focused=p->moveCursorTo(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            if (!(focused)) break;
             InvalidateRect(p->getHWnd(), NULL, true);
-            p->eventOk();
+            if (focused==oldCursor) p->eventOk();
             break;
         }
 
@@ -346,6 +348,12 @@ bool VirtualListView::moveCursorEnd() {
     cursorFit();
     return true;
 }
+
+bool VirtualListView::cursorAtEnd() {
+    if (odrlist.get()==NULL) return false;
+    return cursorPos==odrlist->back();
+}
+
 
 void VirtualListView::cursorFit() {
     if (!cursorPos) return;

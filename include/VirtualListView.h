@@ -40,7 +40,7 @@ public:
     virtual void OnCommand(int cmdId, LONG lParam);
 
     bool moveCursorEnd();
-
+    bool cursorAtEnd();
 
     typedef boost::shared_ptr<VirtualListView> ref;
 

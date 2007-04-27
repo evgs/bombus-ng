@@ -611,14 +611,16 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     
     PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
 
+    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
+    bool ascroll=(cv==NULL)? false: cv->autoScroll();
+
     c->nUnread++;
     c->messageList->push_back(msg);
 
     if (rc->roster->needUpdateView) rc->roster->makeViewList();
 
-    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
-    if(cv) {
-        cv->moveUnread();
+    if (ascroll) /*if (cv)*/ {
+        cv->moveEnd();
         cv->redraw();
     }
 
@@ -643,14 +645,16 @@ ProcessResult PresenceRecv::blockArrived(JabberDataBlockRef block, const Resourc
     std::string from=block->getAttribute("from");
 
     Contact::ref contact=rc->roster->getContactEntry(from);
+    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(contact).get());
+    bool ascroll=(cv==NULL)? false: cv->autoScroll();
+
     contact->processPresence(block);
 
     rc->roster->makeViewList();
 
 
-    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(contact).get());
-    if(cv) {
-        cv->moveUnread();
+    if (ascroll) /*if(cv)*/ {
+        cv->moveEnd();
         cv->redraw();
     }
 

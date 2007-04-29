@@ -41,7 +41,7 @@ ATOM ChatView::RegisterWindowClass() {
 
 //////////////////////////////////////////////////////////////////////////
 // real WndProc for edit box
-long (WINAPI *EditWndProc)(HWND w,UINT msg,WPARAM wParam,LPARAM lParam); 
+//long (WINAPI *EditWndProc)(HWND w,UINT msg,WPARAM wParam,LPARAM lParam); 
 
 namespace editbox {
     static bool editBoxShifts=false;

@@ -16,6 +16,102 @@ extern ResourceContextRef rc;
 extern ImgListRef skin;
 
 
+long WINAPI ComboSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { 
+    WNDPROC OldWndProc=(WNDPROC) GetWindowLong(hWnd, GWL_USERDATA);
+    switch(msg) { 
+    case WM_LBUTTONDOWN:
+        {
+
+            SHRGINFO    shrg;
+            shrg.cbSize = sizeof(shrg);
+            shrg.hwndClient = hWnd;
+            shrg.ptDown.x = LOWORD(lParam);
+            shrg.ptDown.y = HIWORD(lParam);
+            shrg.dwFlags = SHRG_RETURNCMD /*| SHRG_NOANIMATION*/;
+
+            if (SHRecognizeGesture(&shrg) == GN_CONTEXTMENU) {
+
+                DWORD sel=SendMessage(hWnd, EM_GETSEL, 0, 0);
+
+                UINT paste = (IsClipboardFormatAvailable(CF_UNICODETEXT))?  MF_STRING : MF_STRING | MF_GRAYED;
+                UINT cut = (LOWORD(sel)!=HIWORD(sel))? MF_STRING : MF_STRING | MF_GRAYED;
+                UINT undo= (SendMessage(hWnd, EM_CANUNDO, 0, 0))? MF_STRING : MF_STRING | MF_GRAYED;;
+
+                HMENU hmenu = CreatePopupMenu();
+                if (hmenu==NULL) break;
+
+                //AppendMenu(hmenu, (smileParser->hasSmiles())? MF_STRING : MF_STRING | MF_GRAYED, WM_USER, TEXT("Add Smile"));
+                AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
+                AppendMenu(hmenu, cut, WM_CUT, TEXT("Cut") );
+                AppendMenu(hmenu, cut, WM_COPY, TEXT("Copy") );
+                AppendMenu(hmenu, paste, WM_PASTE, TEXT("Paste") );
+                AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
+                AppendMenu(hmenu, undo, EM_UNDO, TEXT("Undo") );
+
+                POINT pt={LOWORD(lParam), HIWORD(lParam) };
+                ClientToScreen(hWnd, &pt);
+
+                int cmdId=TrackPopupMenuEx(hmenu,
+                    TPM_BOTTOMALIGN | TPM_RETURNCMD,
+                    pt.x, pt.y,
+                    hWnd,
+                    NULL);
+
+                //if (cmdId==WM_USER) SmileBox::showSmileBox(hWnd, pt.x, pt.y, smileParser);
+
+                DestroyMenu(hmenu);
+
+                if (cmdId>0) PostMessage(hWnd, cmdId, 0, 0);
+
+                return 0;
+            }
+            break;
+        }
+
+    /*case WM_KEYDOWN:
+        if (wParam==VK_CONTROL) editbox::editBoxShifts=true;
+        if (wParam==VK_SHIFT)   editbox::editBoxShifts=true;
+        break; 
+    case WM_KEYUP:
+        editbox::editBoxShifts=false;
+        break;
+    case WM_CHAR:
+        if (wParam==VK_RETURN && !editbox::editBoxShifts) {
+            PostMessage(GetParent(hWnd), WM_COMMAND, IDS_SEND, 0);
+            return 0;
+        }
+        break;
+        */
+    } 
+    return CallWindowProc(OldWndProc,hWnd,msg,wParam,lParam); 
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+HWND WINAPI DoCreateComboControl(HWND hwndParent) {
+
+    HWND hwndCombo; 
+    //TCITEM tie; 
+
+    hwndCombo=CreateWindow(_T("COMBOBOX"), NULL, 
+        WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL
+        | CBS_DROPDOWN | CBS_LOWERCASE , 
+        0, 0, 32 /*CW_USEDEFAULT*/, CW_USEDEFAULT, 
+        hwndParent, NULL, g_hInst, NULL); 
+
+    POINT pt;
+    pt.x=6; pt.y=6;
+    HWND hWndEdit = ChildWindowFromPoint(hwndCombo, pt); 
+
+    WNDPROC OldEditWndProc = (WNDPROC)SetWindowLong(hWndEdit, GWL_WNDPROC,  (LONG)ComboSubClassProc); 
+    SetWindowLong(hWndEdit, GWL_USERDATA, (LONG)OldEditWndProc);
+
+    return hwndCombo;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+
 class DiscoCommand: public IconTextElementContainer {
 public:
     enum DiscoCmds {
@@ -131,24 +227,6 @@ ATOM ServiceDiscovery::RegisterWindowClass() {
     wc.lpszClassName = _T("BombusDisco");
 
     return RegisterClass(&wc);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-HWND WINAPI DoCreateComboControl(HWND hwndParent) {
-
-    HWND hWndEdit; 
-    //TCITEM tie; 
-
-    hWndEdit=CreateWindow(_T("COMBOBOX"), NULL, 
-        WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL
-        | CBS_DROPDOWN | CBS_LOWERCASE , 
-        0, 0, CW_USEDEFAULT, CW_USEDEFAULT, 
-        hwndParent, NULL, g_hInst, NULL); 
-
-    //WNDPROC OldEditWndProc = (WNDPROC)SetWindowLong(hWndEdit, GWL_WNDPROC,  (LONG)EditSubClassProc); 
-    //SetWindowLong(hWndEdit, GWL_USERDATA, (LONG)OldEditWndProc);
-
-    return hWndEdit;
 }
 
 

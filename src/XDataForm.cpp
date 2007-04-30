@@ -84,7 +84,7 @@ void XDataForm::onWmUserUpdate(){
                 JabberDataBlockRef opt=*l;
                 if (opt->getTagName()!="option") continue;
                 const std::string &val=opt->getChildText("value");
-                option(val.c_str(), opt->getAttribute("label"), field->hasChildByValue(val.c_str()));
+                option(val.c_str(), opt->getAttribute("label"), (val.length())? field->hasChildByValue(val.c_str()): false);
             }
             endSelectList();
             continue;
@@ -109,6 +109,8 @@ void XDataForm::onWmUserUpdate(){
         // last: text-single & jid-single
         textBox(var.c_str(), label, value);
     }
+    std::string &type=xdata->getAttribute("type");
+    if (type=="form") button("Submit");
 
     endForm();
 
@@ -116,7 +118,7 @@ void XDataForm::onWmUserUpdate(){
 }
 
 void XDataForm::onHotSpot(LPCSTR url, LPCSTR param){
-
+    xdata->getAttribute("type");
 }
 
 

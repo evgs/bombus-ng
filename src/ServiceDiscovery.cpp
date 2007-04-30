@@ -8,13 +8,14 @@
 #include "JabberStream.h"
 #include "TabCtrl.h"
 #include "Presence.h"
+#include "VcardForm.h"
 
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern HWND	g_hWndMenuBar;		// menu bar handle
 extern ResourceContextRef rc;
 extern ImgListRef skin;
-
+extern TabsCtrlRef tabs;
 
 long WINAPI ComboSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { 
     WNDPROC OldWndProc=(WNDPROC) GetWindowLong(hWnd, GWL_USERDATA);
@@ -109,25 +110,51 @@ HWND WINAPI DoCreateComboControl(HWND hwndParent) {
     return hwndCombo;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-
-
-class DiscoCommand: public IconTextElementContainer {
+class DiscoListView : public VirtualListView {
 public:
-    enum DiscoCmds {
-        REGISTER=1,
-        SEARCH=2,
-        EXECUTE=3,
-        VCARD=4,
-        JOINGC=5,
-        ADD=6
-    };
-    DiscoCommand(std::wstring cmdName, int icon, int cmdId);
-    DiscoCmds cmdId;
-
-    typedef boost::shared_ptr<DiscoCommand> ref;
-    virtual int getColor() const;
+    DiscoListView( HWND parent, const std::string & title );
+    void eventOk();
+    boost::weak_ptr<ServiceDiscovery> serviceDiscovery;
 };
+
+void DiscoListView::eventOk() {
+    ServiceDiscovery::ref sd=serviceDiscovery.lock();
+    if (!sd) return;
+    
+    Contact::ref c=boost::dynamic_pointer_cast<Contact> (cursorPos);
+    if (c) {
+        sd->discoverJid(c->jid.getBareJid());
+        sd->go();
+        return;
+    }
+
+    DiscoCommand::ref dc=boost::dynamic_pointer_cast<DiscoCommand> (cursorPos);
+    if (dc) {
+        switch (dc->cmdId) {
+        case DiscoCommand::BACK: 
+            sd->back();
+            return;
+        case DiscoCommand::VCARD:
+            sd->vcard();
+        }
+    }
+    VirtualListView::eventOk();
+}
+
+DiscoListView::DiscoListView( HWND parent, const std::string & title ) {
+    parentHWnd=parent;
+    init();
+
+    SetParent(thisHWnd, parent);
+
+    this->title=utf8::utf8_wchar(title);
+
+    wt=WndTitleRef(new WndTitle(this, 0));
+    cursorPos=ODRRef();//odrlist->front();
+    odrlist=ODRListRef(new ODRList());
+}
+
+////////////////////////////////////////////////////////////////////////////////
 
 DiscoCommand::DiscoCommand(std::wstring cmdName, int icon, int cmdId) {
     this->iconIndex=icon;
@@ -243,7 +270,11 @@ LRESULT CALLBACK ServiceDiscovery::WndProc( HWND hWnd, UINT message, WPARAM wPar
             p=(ServiceDiscovery *) (((CREATESTRUCT *)lParam)->lpCreateParams);
             SetWindowLong(hWnd, GWL_USERDATA, (LONG) p );
 
-            p->nodeList=VirtualListView::ref(new VirtualListView(hWnd, std::string("disco")));
+            //p->nodeList=VirtualListView::ref(new VirtualListView(hWnd, std::string("disco")));
+            DiscoListView * dlv = new DiscoListView(hWnd, std::string("disco"));
+            //dlv->serviceDiscovery=p->thisRef;
+
+            p->nodeList=VirtualListView::ref(dlv);
             p->nodeList->setParent(hWnd);
             p->nodeList->showWindow(true);
             //p->nodeList->wrapList=false;
@@ -325,8 +356,13 @@ LRESULT CALLBACK ServiceDiscovery::WndProc( HWND hWnd, UINT message, WPARAM wPar
         if ((GET_Y_LPARAM(lParam)) > p->editHeight) break;
         if (GET_X_LPARAM(lParam) > p->width-2-skin->getElementWidth()) {
             PostMessage(GetParent(hWnd), WM_COMMAND, TabsCtrl::CLOSETAB, 0);
+            break;
         }
         if (GET_X_LPARAM(lParam) > p->width-2-2*skin->getElementWidth()) {
+            //reset back-history
+            while (!p->nodes.empty()) p->nodes.pop();
+            p->nodeList->bindODRList(ODRListRef());
+
             p->go();
         }
         break;
@@ -403,6 +439,7 @@ void ServiceDiscovery::redraw(){
 ServiceDiscovery::ref ServiceDiscovery::createServiceDiscovery( HWND parent, ResourceContextRef rc, const std::string &jid ) {
     ServiceDiscovery::ref sd=ServiceDiscovery::ref(new ServiceDiscovery(parent));
     sd->thisRef=sd;
+    (boost::dynamic_pointer_cast<DiscoListView> (sd->nodeList))->serviceDiscovery=sd;
     sd->discoverJid(jid);
     sd->rc=rc;
     return sd;
@@ -415,18 +452,41 @@ void ServiceDiscovery::discoverJid( const std::string &jid ) {
 void ServiceDiscovery::go() {
     wchar_t buf[1024];
     SendMessage(editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
-    std::string jid=utf8::wchar_utf8(std::wstring(buf));
+    std::string newJid=utf8::wchar_utf8(std::wstring(buf));
 
-    GetDisco *gd=new GetDisco(jid, thisRef.lock());
+    GetDisco *gd=new GetDisco(newJid, thisRef.lock());
     rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(gd));
 
+    DiscoNode node;
+    node.jid=this->jid;
+    node.subnodes=nodeList->getODRList();
+    if (node.subnodes) if (node.subnodes->size()>0)
+        nodes.push(node);
+
+    this->jid=newJid;
     gd->doRequest(rc);
+}
+
+void ServiceDiscovery::back() {
+    if (nodes.empty()) return;
+
+    DiscoNode &node=nodes.top();
+    nodeList->bindODRList(node.subnodes);
+    jid=node.jid;
+    nodes.pop();
+    discoverJid(jid);
+
+    /*GetDisco *gd=new GetDisco(jid, thisRef.lock());
+    rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(gd));
+    gd->doRequest(rc);*/
+    nodeList->notifyListUpdate(true);
 }
 
 void ServiceDiscovery::parseResult() {
     //parsing items
     ODRList *list=new ODRList();
 
+    if (!nodes.empty()) list->push_back(DiscoCommand::ref(new DiscoCommand(L"..", icons::ICON_PROGRESS_INDEX, DiscoCommand::BACK)));
     if (infoReply) {
         JabberDataBlockRefList::iterator i=infoReply->getChilds()->begin();
         while (i!=infoReply->getChilds()->end()) {
@@ -459,5 +519,10 @@ void ServiceDiscovery::parseResult() {
     nodeList->notifyListUpdate(true);
 }
 
+void ServiceDiscovery::vcard() {
+    WndRef vc=VcardForm::createVcardForm(tabs->getHWnd(), jid, rc, false);
+    tabs->addWindow(vc);
+    tabs->switchByWndRef(vc);
+}
 ATOM ServiceDiscovery::windowClass=0;
 

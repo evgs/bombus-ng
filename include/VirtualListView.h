@@ -29,6 +29,7 @@ public:
     virtual const ODR * getODR() const;
 
     void bindODRList(ODRListRef odr) {  odrlist=odr; }
+    ODRListRef getODRList() { return odrlist; }
 
     void notifyListUpdate( bool redraw);
 

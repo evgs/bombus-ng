@@ -5,6 +5,7 @@
 #include <windows.h>
 
 #include <string>
+#include <stack>
 #include <utf8.hpp>
 
 #include "Wnd.h"
@@ -14,6 +15,30 @@
 #include "OwnerDrawRect.h"
 
 #include "ResourceContext.h"
+
+class DiscoCommand: public IconTextElementContainer {
+public:
+    enum DiscoCmds {
+        BACK=0,     //[v]
+        REGISTER=1, //[ ]
+        SEARCH=2,   //[ ]
+        EXECUTE=3,  //[ ]
+        VCARD=4,    //[v]
+        JOINGC=5,   //[ ]
+        ADD=6       //[ ]
+    };
+    DiscoCommand(std::wstring cmdName, int icon, int cmdId);
+    DiscoCmds cmdId;
+
+    typedef boost::shared_ptr<DiscoCommand> ref;
+    virtual int getColor() const;
+};
+
+struct DiscoNode {
+    std::string jid;
+    ODRListRef subnodes;
+};
+//////////////////////////////////////////////////////////////////////////
 
 class ServiceDiscovery : public Wnd{
 protected:
@@ -37,9 +62,13 @@ public:
     JabberDataBlockRef itemReply;
     JabberDataBlockRef infoReply;
 
+    void go();
+    void discoverJid(const std::string &jid);
+    void back();
+    void vcard();
 
 protected:
-    
+    std::stack<DiscoNode> nodes;
 
     VirtualListView::ref nodeList;
     HWND editWnd;
@@ -51,8 +80,6 @@ protected:
     boost::weak_ptr<ServiceDiscovery> thisRef;
 
     ResourceContextRef rc;
-    void go();
-    void discoverJid(const std::string &jid);
 
     void parseResult();
 

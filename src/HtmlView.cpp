@@ -293,9 +293,52 @@ void HtmlView::button( const char *name, const std::string &label ) {
     addText(label);
     addText("\">");
 }
+
+void HtmlView::selectList(const char *name, const std::string &label, bool multiple){
+    addText(label);
+    addText(":<BR>");
+    addText("<select name=\"");
+    addText(name);
+    addText("\" ");
+    if (multiple) addText("size=\"5\" multiple=\"multiple\"");
+    addText(">");
+}
+
+void HtmlView::endSelectList() { addText("</select><BR>"); }
+
+void HtmlView::option( const char *name, const std::string &label, bool checked ) {
+    addText("<option value=\"");
+    addText(name);
+    addText("\" ");
+    if (checked) addText("selected=\"selected\"");
+    addText(">");
+    addText(label);
+    addText("</option><BR>");
+}
+
+
+void HtmlView::checkBox( const char *name, const std::string &label, bool checked ) {
+    addText("<input type=\"checkbox\" name=\"");
+    addText(name);
+    addText("\" ");
+    if (checked) addText("checked");
+    addText(">");
+    addText(label);
+    addText("</input><BR>");
+}
+
 void HtmlView::textBox( const char *name, const std::string &label, const std::string &value ) {
     addText(label);
     addText(": <BR><input type=\"text\" name=\"");
+    addText(name);
+    addText("\" value=\"");
+    addText(value);
+    addText("\"><BR>");
+}
+
+void HtmlView::passBox( const char *name, const std::string &label, const std::string &value ) {
+    addText(label);
+    addText(": <BR><input type=\"password\" name=\"");
     addText(name);
     addText("\" value=\"");
     addText(value);

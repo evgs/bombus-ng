@@ -388,6 +388,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\XDataForm.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\XMLParser.cpp"
 				>
 			</File>
@@ -615,6 +619,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\Wnd.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\XDataForm.h"
 				>
 			</File>
 			<File

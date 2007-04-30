@@ -41,7 +41,16 @@ protected:
     void button(const std::string &label);
     void button(const char *name, const std::string &label);
 
+    void selectList(const char *name, const std::string &label, bool multiple);
+    void endSelectList();
+    void option(const char *name, const std::string &label, bool checked);
+
+
+    void checkBox(const char *name, const std::string &label, bool checked);
+
     void textBox(const char *name, const std::string &label, const std::string &value);
+    void passBox(const char *name, const std::string &label, const std::string &value);
+
     void textML(const char *name, const std::string &label, const std::string &value);
     void textConst(const std::string &label, const std::string &value);
     void url(const std::string &label, const std::string &url);

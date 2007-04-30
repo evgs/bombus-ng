@@ -35,7 +35,7 @@
 #include "VirtualListView.h"
 #include "ChatView.h"
 #include "TabCtrl.h"
-#include "HtmlView.h"
+#include "XDataForm.h"
 #include "VcardForm.h"
 #include "ServiceDiscovery.h"
 
@@ -61,7 +61,8 @@ TabsCtrlRef tabs;
 VirtualListView::ref odrLog;
 RosterView::ref rosterWnd;
 ResourceContextRef rc;
-HtmlView::ref htmlWnd;
+
+XDataForm::ref testXdata;
 
 ImgListRef skin;
 
@@ -343,17 +344,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             rosterWnd=RosterView::ref(new RosterView(tabs->getHWnd(), std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
-            //chatSample=ChatView::ref(new ChatView(tabs->getHWnd(), Contact::ref(new Contact("test@server","resource",""))));
-            //tabs->addWindow(chatSample);
-
             { 
                 odrLog = VirtualListView::ref(new VirtualListView(tabs->getHWnd(), std::string("Log")));
                 tabs->addWindow(odrLog);
                 Log::getInstance()->bindLV(odrLog); 
             }
 
-            /*htmlWnd=HtmlView::ref(new HtmlView(tabs->getHWnd(), std::string("html test")));
-            tabs->addWindow(htmlWnd);*/
+#ifdef DEBUG
+            testXdata=XDataForm::createXDataForm(tabs->getHWnd(), "", rc);
+            tabs->addWindow(testXdata);
+            testXdata->formTest();
+#endif
 
 			//listWnd=logWnd;
 			//dropdownWnd=DoCreateComboControl(hWnd);

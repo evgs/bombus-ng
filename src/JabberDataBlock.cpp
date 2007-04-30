@@ -28,10 +28,10 @@ JabberDataBlock::~JabberDataBlock(void)
 
 std::string JabberDataBlock::getAttribute( const std::string & byName ) 
 {
-	// TODO:
-	//StringMap::const_iterator i=attr.find(byName);
-	//return i->second;
-	return XMLStringExpand(attr[byName]);
+	StringMap::const_iterator i=attr.find(byName);
+    if (i==attr.end()) return std::string();
+	return i->second;
+	//return XMLStringExpand(attr[byName]);
 }
 
 bool JabberDataBlock::hasAttribute(const std::string & byName) {

@@ -100,6 +100,7 @@ void VcardForm::onWmUserUpdate() {
 
     if (editForm) button(std::string("Publish"));
     //button("reload",std::string("Reload")); 
+    endForm();
 
     endHtml();
 }

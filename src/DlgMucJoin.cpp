@@ -92,6 +92,8 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
 
             ProcessMuc::initMuc(roomNode.getJid(), pass, p->rc);
 
+
+
             JabberDataBlockRef joinPresence=constructPresence(
                 roomNode.getJid().c_str(), 
                 p->rc->status, 

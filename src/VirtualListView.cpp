@@ -352,6 +352,7 @@ bool VirtualListView::moveCursorEnd() {
 
 bool VirtualListView::cursorAtEnd() {
     if (odrlist.get()==NULL) return false;
+    if (odrlist->empty()) return false;
     return cursorPos==odrlist->back();
 }
 

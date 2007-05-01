@@ -511,13 +511,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
     switch (cmdId) {
         case RosterView::OPENCHAT: 
             {
-                WndRef chat=tabs->getWindowByODR(cursorPos);
-                if (!chat) {
-                    //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
-                    chat=WndRef(new ChatView(tabs->getHWnd(), focusedContact));
-                    tabs->addWindow(chat);
-                }
-                tabs->switchByWndRef(chat);
+                openChat(focusedContact);
                 break;
             }
 
@@ -591,4 +585,14 @@ void RosterView::showWindow( bool show ) {
 void RosterView::setIcon( int iconIndex ) {
     wt->setIcon(iconIndex);
     InvalidateRect(tabs->getHWnd(), NULL, false);
+}
+
+void RosterView::openChat(Contact::ref contact) {
+    WndRef chat=tabs->getWindowByODR(contact);
+    if (!chat) {
+        //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
+        chat=WndRef(new ChatView(tabs->getHWnd(), contact));
+        tabs->addWindow(chat);
+    }
+    tabs->switchByWndRef(chat);
 }

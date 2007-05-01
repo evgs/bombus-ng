@@ -6,7 +6,7 @@
 #include "ChatView.h"
 
 extern TabsCtrlRef tabs;
-
+extern RosterView::ref rosterWnd;
 
 //////////////////////////////////////////////////////////////////////////
 MucContact::ref getMucContactEntry(const std::string &jid, ResourceContextRef rc) {
@@ -279,6 +279,9 @@ void ProcessMuc::initMuc( const std::string &jid, const std::string &password, R
         room=MucRoom::ref(new MucRoom(jid));
         roomGrp->room=room;
     }
+
+    //rosterWnd->openChat(room); //todo
+    
 
     //3. selfcontact
     roomGrp->selfContact=getMucContactEntry(jid, rc);

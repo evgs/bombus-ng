@@ -125,6 +125,8 @@ public:
 
     void setIcon(int iconIndex);
 
+    void openChat(Contact::ref contact);
+
     enum actions {
         OPENCHAT=50000,
         LOGON, LOGOFF, RESOLVENICKNAMES,

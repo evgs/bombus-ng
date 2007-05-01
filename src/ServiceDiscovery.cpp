@@ -494,6 +494,8 @@ void ServiceDiscovery::go() {
 
     this->jid=newJid;
     this->node=newNode;
+    infoReply.reset();
+    itemReply.reset();
     gd->doRequest(rc);
 }
 
@@ -517,7 +519,7 @@ void ServiceDiscovery::parseResult() {
     //parsing items
     ODRList *list=new ODRList();
 
-    if (!nodes.empty()) list->push_back(DiscoCommand::ref(new DiscoCommand(L"..", icons::ICON_PROGRESS_INDEX, DiscoCommand::BACK)));
+    if (!nodes.empty()) list->push_back(DiscoCommand::ref(new DiscoCommand(L"..", icons::ICON_DISCO_BACK, DiscoCommand::BACK)));
     if (infoReply) {
         JabberDataBlockRefList::iterator i=infoReply->getChilds()->begin();
         while (i!=infoReply->getChilds()->end()) {

@@ -77,6 +77,7 @@ public:
     void discoverJid(const std::string &jid, const std::string &node);
     void back();
     void vcard();
+    void joingc();
 
 protected:
     std::stack<DiscoNode> nodes;

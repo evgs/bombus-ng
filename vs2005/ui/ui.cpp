@@ -278,7 +278,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 case ID_JABBER_JOINCONFERENCE:
                     if (rc->isLoggedIn())
-                        DlgMucJoin::createDialog(hWnd, rc);
+                        DlgMucJoin::createDialog(hWnd, rc, "bombus@conference.jabber.ru");
                     break;
 
                 case ID_TOOLS_MYVCARD:
@@ -462,6 +462,9 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
                 wchar_t buf[256];
                 LoadString(g_hInst, IDS_VERSION, buf, 256);
                 SetDlgItemText(hDlg, IDC_AVERSION, buf);
+
+
+                SetDlgItemText(hDlg, IDC_AHW, sysinfo::getOsVersion().c_str());
                 //SetDlgItemText(hDlg, IDC_AVERSION, MAKEINTRESOURCE(IDS_VERSION));
             }
             return (INT_PTR)TRUE;

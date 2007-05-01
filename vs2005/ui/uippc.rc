@@ -109,10 +109,12 @@ CAPTION "About Bombus"
 FONT 8, "MS Shell Dlg"
 BEGIN
     LTEXT           "Bombus",IDC_STATIC_2,47,7,26,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2006",IDC_STATIC_3,47,19,66,8
+    LTEXT           "(c) 2006-2007, Eugene Stahov (evgs)",IDC_STATIC_3,17,30,132,9
     ICON            IDI_BOMBUS,IDC_STATIC,15,7,20,20
     LTEXT           "$VERSION$",IDC_AVERSION,86,7,46,8
-    EDITTEXT        IDC_AREV,17,41,120,59,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_AREV,17,55,120,45,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "http://bombus-im.org",IDC_STATIC_4,17,40,132,9
+    LTEXT           "$HARDWARE$",IDC_AHW,46,18,91,8
 END
 
 IDD_STATUS DIALOG  0, 0, 156, 124

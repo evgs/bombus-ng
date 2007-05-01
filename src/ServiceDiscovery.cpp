@@ -10,6 +10,7 @@
 #include "Presence.h"
 #include "VcardForm.h"
 
+#include "DlgMucJoin.h"
 //#include "Contact.h"
 int identifyTransport(const std::string &jid);
 
@@ -139,6 +140,9 @@ void DiscoListView::eventOk() {
             return;
         case DiscoCommand::VCARD:
             sd->vcard();
+            return;
+        case DiscoCommand::JOINGC:
+            sd->joingc();
         }
     }
     VirtualListView::eventOk();
@@ -558,5 +562,9 @@ void ServiceDiscovery::vcard() {
     tabs->addWindow(vc);
     tabs->switchByWndRef(vc);
 }
+void ServiceDiscovery::joingc() {
+    DlgMucJoin::createDialog(tabs->getHWnd(), rc, jid);
+}
+
 ATOM ServiceDiscovery::windowClass=0;
 

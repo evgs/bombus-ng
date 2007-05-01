@@ -40,23 +40,24 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
 			shidi.hDlg = hDlg;
 			SHInitDialog(&shidi);
 
-            std::string room="bombus";
+            /*std::string room="bombus";
             std::string server="conference.jabber.ru";
-            std::string pass="";
+            std::string pass="";*/
             //std::string nick; //="evgs";
 
             /*for (int i=0; i<6; i++)
                 SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) statusNames[i]);
             SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_SETCURSEL, p->rc->status, 0);*/
 
-            SetDlgItemText(hDlg, IDC_E_ROOM, room);
-            SetDlgItemText(hDlg, IDC_E_SERVER, server);
-            SetDlgItemText(hDlg, IDC_E_PASSWORD, pass);
+            SetDlgItemText(hDlg, IDC_E_ROOM, p->jid.getUserName());
+            SetDlgItemText(hDlg, IDC_E_SERVER, p->jid.getServer());
+            SetDlgItemText(hDlg, IDC_E_PASSWORD, p->pass);
             mru::readMru(MRU_MUC_NICK, hDlg, IDC_C_NICK, NULL);
-            //SetDlgItemText(hDlg, IDC_C_NICK, nick);
+            if (p->jid.getResource().length())
+                SetDlgItemText(hDlg, IDC_C_NICK, p->jid.getResource());
 
-            SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_SETRANGE32, 0, 20);
-            SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_SETPOS, 0, 20 /*p->rc->priority*/);
+            SendDlgItemMessage(hDlg, IDC_SPIN_HIST_SZ, UDM_SETRANGE32, 0, 20);
+            SendDlgItemMessage(hDlg, IDC_SPIN_HIST_SZ, UDM_SETPOS, 0, 20 /*p->rc->priority*/);
 
             /*SetDlgItemText(hDlg, IDC_E_JID, dlgAccountParam->getBareJid());
             SetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
@@ -136,11 +137,12 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
 	return (INT_PTR)FALSE;
 }
 
-void DlgMucJoin::createDialog( HWND parent, ResourceContextRef rc) {
+void DlgMucJoin::createDialog( HWND parent, ResourceContextRef rc, const std::string &jid) {
     /*dlgAccountParam=accnt;*/
     DlgMucJoin *p=new DlgMucJoin();
     p->parent=parent;
     p->rc=rc;
+    p->jid.setJid(jid);
     //p->contact=contact;
 
     DialogBoxParam(g_hInst, (LPCTSTR)IDD_CONFERENCE, parent, dialogProc, (LPARAM)p);

@@ -29,6 +29,7 @@
 #define IDI_BOMBUS                      130
 #define IDC_STATIC_2                    202
 #define IDC_STATIC_3                    203
+#define IDC_STATIC_4                    204
 #define IDC_E_JID                       1003
 #define IDC_E_PASSWORD                  1004
 #define IDC_X_SSL                       1005
@@ -42,6 +43,8 @@
 #define IDC_AREV                        1013
 #define IDC_AVERSION                    1014
 #define IDC_E_PRIORITY                  1015
+#define IDC_AVERSION2                   1015
+#define IDC_AHW                         1015
 #define IDC_X_PRESAVE                   1016
 #define IDC_C_STATUS                    1017
 #define IDC_C_PRESET                    1018
@@ -93,7 +96,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32797
-#define _APS_NEXT_CONTROL_VALUE         1039
+#define _APS_NEXT_CONTROL_VALUE         1040
 #define _APS_NEXT_SYMED_VALUE           112
 #endif
 #endif

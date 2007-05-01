@@ -62,8 +62,6 @@ VirtualListView::ref odrLog;
 RosterView::ref rosterWnd;
 ResourceContextRef rc;
 
-XDataForm::ref testXdata;
-
 ImgListRef skin;
 
 SmileParser *smileParser;
@@ -351,9 +349,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
 
 #ifdef DEBUG
-            testXdata=XDataForm::createXDataForm(tabs->getHWnd(), "", rc);
-            tabs->addWindow(testXdata);
-            testXdata->formTest();
+            {
+                XDataForm::ref testXdata=XDataForm::createXDataForm(tabs->getHWnd(), "", rc);
+                tabs->addWindow(testXdata);
+                testXdata->formTest();
+            }
 #endif
 
 			//listWnd=logWnd;
@@ -602,6 +602,9 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
         body=roomNode.getResource()+">"+body;
 
     } else c=rc->roster->getContactEntry(from);
+
+    //drop composing events
+    if (body.empty()) return BLOCK_PROCESSED;
 
     Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING, Message::extractXDelay(block) ));
 

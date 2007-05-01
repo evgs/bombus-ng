@@ -6,7 +6,7 @@ XDataForm::ref XDataForm::createXDataForm( HWND parent, const std::string &jid, 
 
     xf->parentHWnd=parent;
     xf->title=utf8::utf8_wchar(jid);
-    xf->wt=WndTitleRef(new WndTitle(xf, icons::ICON_VCARD));
+    xf->wt=WndTitleRef(new WndTitle(xf, icons::ICON_COMPOSING_INDEX));
 
     xf->init();
 
@@ -118,7 +118,66 @@ void XDataForm::onWmUserUpdate(){
 }
 
 void XDataForm::onHotSpot(LPCSTR url, LPCSTR param){
-    xdata->getAttribute("type");
+    StringMapRef result=splitHREFtext(param);
+
+    JabberDataBlockRef reply=JabberDataBlockRef(new JabberDataBlock(xdata->getTagName().c_str(),NULL));
+    reply->setAttribute("xmlns","jabber:x:data");
+    reply->setAttribute("type", "result");
+    
+    JabberDataBlockRefList *childs=xdata->getChilds();
+
+    JabberDataBlockRefList::const_iterator i;
+    for (i=childs->begin(); i!=childs->end(); i++) {
+        JabberDataBlockRef field=*i;
+        if (field->getTagName()!="field") continue;
+
+        bool required=field->getChildByName("required");
+        //const std::string &value=field->getChildText("value");
+        //const std::string &label=field->getAttribute("label");
+        const std::string &var=field->getAttribute("var");
+        const std::string &type=field->getAttribute("type");
+
+        //hidden
+        if (type=="hidden") {
+            reply->addChild(field); //whole copy of "hidden"
+            continue;
+        }
+
+        //fixed
+        if (type=="fixed") continue; //drop all "fixed"
+
+        field=reply->addChild("field", NULL);
+        field->setAttribute("var", var.c_str());
+        field->setAttribute("type", type);
+
+        const std::string &value=result->operator [](var); 
+
+        //boolean
+        if (type=="boolean") {
+            bool checked=value.length()>0;
+            field->addChild("value", (checked)? "1" : "0" );
+            continue;
+        }
+
+        if (type=="text-multi" || type=="jid-multi" || type=="list-multi") {
+            std::string valbuf;
+            for (size_t i=0; i<value.length(); i++) {
+                char c=value[i];
+                if (c==0x0a) { 
+                    if (valbuf.length()) 
+                        field->addChild("value", valbuf.c_str()); 
+                    valbuf.clear();
+                } else valbuf+=c;
+            }
+            if (valbuf.length()) field->addChild("value", valbuf.c_str());
+            continue;
+        }
+
+        //text-private, text-single, jid-single, list-single
+        field->addChild("value", value.c_str());
+
+    }
+    StringRef out=reply->toXML();
 }
 
 
@@ -141,35 +200,35 @@ void XDataForm::formTest() {
     JabberDataBlockRef field;
     JabberDataBlockRef opt;
 
-    // + boolean
+    // ++ boolean
     field=xdata->addChild("field", NULL);
     field->setAttribute("type","boolean");
     field->setAttribute("var","boolbox");
     field->setAttribute("label","Boolean checkbox");
     field->addChild("value","1");
 
-    // + fixed
+    // ++ fixed
     field=xdata->addChild("field", NULL);
     field->setAttribute("type","fixed");
     field->addChild("value","this is constant text value");
 
-    // + hidden
+    // ++ hidden
     field=xdata->addChild("field", NULL);
     field->setAttribute("type","hidden");
     field->setAttribute("var","hvr");
-    field->addChild("value","this is constant text value");
+    field->addChild("value","this is hidden text");
 
-    // + jid-multi
+    // ++ jid-multi
     field=xdata->addChild("field", NULL);
     field->setAttribute("type","jid-multi");
-    field->setAttribute("var","jid");
+    field->setAttribute("var","jidm");
     field->setAttribute("label","Jabber ID");
     field->addChild("value","user1@jabber.ru");
     field->addChild("value","user2@jabber.ru");
     field->addChild("value","user3@jabber.ru");
     field->addChild("value","user4@jabber.ru");
 
-    // + jid-single
+    // ++ jid-single
     field=xdata->addChild("field", NULL);
     field->setAttribute("type","jid-single");
     field->setAttribute("var","jid");
@@ -188,7 +247,7 @@ void XDataForm::formTest() {
     opt=field->addChild("option", NULL); opt->setAttribute("label","option 3"); opt->addChild("value", "p3");
     opt=field->addChild("option", NULL); opt->setAttribute("label","option 4"); opt->addChild("value", "p4");
 
-    // + list-single
+    // ++ list-single
     field=xdata->addChild("field", NULL);
     field->setAttribute("type","list-single");
     field->setAttribute("var","combo");
@@ -210,14 +269,14 @@ void XDataForm::formTest() {
     field->addChild("value","line3");
     field->addChild("value","line4");
 
-    // + text-private
+    // ++ text-private
     field=xdata->addChild("field", NULL);
     field->setAttribute("type","text-private");
     field->setAttribute("var","passbox");
     field->setAttribute("label","Password");
     field->addChild("value","iddqd");
 
-    // + text-single
+    // ++ text-single
     field=xdata->addChild("field", NULL);
     field->setAttribute("type","text-single");
     field->setAttribute("var","textbox");

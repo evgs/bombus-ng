@@ -233,7 +233,15 @@ StringMapRef HtmlView::splitHREFtext( LPCSTR ht ) {
             switch (c) {
             case '+': buf+=' '; break;
             case '=': key=buf; buf.clear(); break;
-            case '&': m->operator [](key)=buf; buf.clear(); break; 
+            case '&': 
+                {
+                    std::string & val=m->operator [](key);
+                    if (val.length()) val+=(char)0x0a;
+                    val+=buf;
+                    //m->operator [](key)=buf; 
+                    buf.clear(); 
+                    break;
+                }
             case '%': { 
                 char c1=(char)(*ht++)-'0'; if (c1>9) c1+='0'-'A'+10;
                 char c2=(char)(*ht++)-'0'; if (c2>9) c2+='0'-'A'+10;
@@ -245,7 +253,10 @@ StringMapRef HtmlView::splitHREFtext( LPCSTR ht ) {
                 buf+=c;
             }
         }
-        m->operator [](key)=buf; 
+        std::string & val=m->operator [](key);
+        if (val.length()) val+=(char)0x0a;
+        val+=buf;
+        //m->operator [](key)=buf; 
     }
     return StringMapRef(m);
 }

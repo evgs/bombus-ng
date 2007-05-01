@@ -103,10 +103,19 @@ StringRef JabberDataBlock::toXML(){
 
 	if (childs.empty() && text.empty()) {
 		result->append("/>");
-		return result;
+
+        #ifdef DEBUG
+        result->append("\n");
+        #endif
+
+        return result;
 	}
 
 	result->append(">");
+
+    #ifdef DEBUG
+    if (!childs.empty()) result->append("\n");
+    #endif
 
     for (JabberDataBlockRefList::const_iterator c=childs.begin(); c!=childs.end(); c++) {
 		result->append( *((*c)->toXML()) );
@@ -116,7 +125,11 @@ StringRef JabberDataBlock::toXML(){
 	result->append("</");
 	result->append(getTagName());
 	result->append(">");
-	
+
+    #ifdef DEBUG
+    result->append("\n");
+    #endif
+
 	return result;
 
 }

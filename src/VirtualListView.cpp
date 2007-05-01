@@ -323,6 +323,7 @@ ODRRef VirtualListView::moveCursorTo( int x, int y )
 {
     y+=winTop;
     if (y<0) return ODRRef();
+    if (!odrlist) return ODRRef();
 
     int yTop=0;
 

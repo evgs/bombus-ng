@@ -10,6 +10,9 @@
 #include "Presence.h"
 #include "VcardForm.h"
 
+//#include "Contact.h"
+int identifyTransport(const std::string &jid);
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern HWND	g_hWndMenuBar;		// menu bar handle
@@ -121,9 +124,9 @@ void DiscoListView::eventOk() {
     ServiceDiscovery::ref sd=serviceDiscovery.lock();
     if (!sd) return;
     
-    Contact::ref c=boost::dynamic_pointer_cast<Contact> (cursorPos);
+    DiscoItem::ref c=boost::dynamic_pointer_cast<DiscoItem> (cursorPos);
     if (c) {
-        sd->discoverJid(c->jid.getBareJid());
+        sd->discoverJid(c->jid, c->node);
         sd->go();
         return;
     }
@@ -155,7 +158,20 @@ DiscoListView::DiscoListView( HWND parent, const std::string & title ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+DiscoItem::DiscoItem( const std::string &jid, const std::string &node, const std::string &name ) 
+{
+    this->jid=jid;
+    this->node=node;
+    this->name=name;
 
+    this->iconIndex=(node.empty())? 
+        identifyTransport(jid) : 
+        icons::ICON_COLLAPSED_INDEX;
+
+    this->wstr=utf8::utf8_wchar((name.empty())? jid : name);
+    init();
+}
+////////////////////////////////////////////////////////////////////////////////
 DiscoCommand::DiscoCommand(std::wstring cmdName, int icon, int cmdId) {
     this->iconIndex=icon;
     this->wstr=cmdName;
@@ -169,7 +185,7 @@ int DiscoCommand::getColor() const { return 0xff0000; }
 //////////////////////////////////////////////////////////////////////////
 class GetDisco : public JabberDataBlockListener {
 public:
-    GetDisco(const std::string &jid, ServiceDiscovery::ref form);
+    GetDisco(const std::string &jid, const std::string &node, ServiceDiscovery::ref form);
     ~GetDisco(){};
     virtual const char * getType() const{ return NULL; }
     virtual const char * getId() const{ return NULL; }
@@ -179,15 +195,19 @@ public:
 
 private:
     std::string jid;
+    std::string node;
     std::string idinfo;
     std::string iditems;
     ResourceContextRef rc;
     boost::weak_ptr<ServiceDiscovery> vf;
 };
 
-GetDisco::GetDisco(const std::string &jid, ServiceDiscovery::ref form){
+GetDisco::GetDisco( const std::string &jid, const std::string &node, ServiceDiscovery::ref form ) 
+{
     this->jid=jid;
     this->vf=form;
+    this->node=node;
+
     idinfo="info#"; idinfo+=jid;
     iditems="items#"; iditems+=jid;
 }
@@ -199,6 +219,8 @@ void GetDisco::doRequest(ResourceContextRef rc) {
     JabberDataBlockRef qry=req.addChild("query", NULL);
 
     qry->setAttribute("xmlns","http://jabber.org/protocol/disco#info");
+    if (node.length()) qry->setAttribute("node", node);
+
     req.setAttribute("id", idinfo);
     rc->jabberStream->sendStanza(req);
 
@@ -440,12 +462,14 @@ ServiceDiscovery::ref ServiceDiscovery::createServiceDiscovery( HWND parent, Res
     ServiceDiscovery::ref sd=ServiceDiscovery::ref(new ServiceDiscovery(parent));
     sd->thisRef=sd;
     (boost::dynamic_pointer_cast<DiscoListView> (sd->nodeList))->serviceDiscovery=sd;
-    sd->discoverJid(jid);
+    sd->discoverJid(jid, "");
     sd->rc=rc;
     return sd;
 }
 
-void ServiceDiscovery::discoverJid( const std::string &jid ) {
+void ServiceDiscovery::discoverJid( const std::string &jid, const std::string &node ) 
+{
+    this->newNode=node;
     SendMessage(editWnd, WM_SETTEXT, 0, (LPARAM)utf8::utf8_wchar(jid).c_str());
 }
 
@@ -454,16 +478,18 @@ void ServiceDiscovery::go() {
     SendMessage(editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
     std::string newJid=utf8::wchar_utf8(std::wstring(buf));
 
-    GetDisco *gd=new GetDisco(newJid, thisRef.lock());
+    GetDisco *gd=new GetDisco(newJid, this->newNode, thisRef.lock());
     rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(gd));
 
     DiscoNode node;
     node.jid=this->jid;
+    node.node=this->node;
     node.subnodes=nodeList->getODRList();
     if (node.subnodes) if (node.subnodes->size()>0)
         nodes.push(node);
 
     this->jid=newJid;
+    this->node=newNode;
     gd->doRequest(rc);
 }
 
@@ -472,9 +498,10 @@ void ServiceDiscovery::back() {
 
     DiscoNode &node=nodes.top();
     nodeList->bindODRList(node.subnodes);
-    jid=node.jid;
+    this->jid=node.jid;
+    //this->node=node.node;
     nodes.pop();
-    discoverJid(jid);
+    discoverJid(this->jid, this->node);
 
     /*GetDisco *gd=new GetDisco(jid, thisRef.lock());
     rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(gd));
@@ -509,8 +536,8 @@ void ServiceDiscovery::parseResult() {
             JabberDataBlockRef item=*(i++);
             std::string &jid=item->getAttribute("jid");
             std::string &name=item->getAttribute("name");
-            Contact::ref contact=Contact::ref(new Contact(jid, "", name));
-            contact->status=presence::ONLINE;
+            std::string &node=item->getAttribute("node");
+            DiscoItem::ref contact=DiscoItem::ref(new DiscoItem(jid, node, name));
             list->push_back(contact);
         }
     }

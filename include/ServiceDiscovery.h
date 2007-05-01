@@ -11,7 +11,6 @@
 #include "Wnd.h"
 #include "VirtualListView.h"
 
-#include "Contact.h"
 #include "OwnerDrawRect.h"
 
 #include "ResourceContext.h"
@@ -34,8 +33,20 @@ public:
     virtual int getColor() const;
 };
 
+class DiscoItem: public IconTextElementContainer {
+public:
+    DiscoItem(const std::string &jid, const std::string &node, const std::string &name);
+
+    std::string jid;
+    std::string node;
+    std::string name;
+
+    typedef boost::shared_ptr<DiscoItem> ref;
+};
+
 struct DiscoNode {
     std::string jid;
+    std::string node;
     ODRListRef subnodes;
 };
 //////////////////////////////////////////////////////////////////////////
@@ -63,7 +74,7 @@ public:
     JabberDataBlockRef infoReply;
 
     void go();
-    void discoverJid(const std::string &jid);
+    void discoverJid(const std::string &jid, const std::string &node);
     void back();
     void vcard();
 
@@ -76,6 +87,9 @@ protected:
     int width;
 
     std::string jid;
+    std::string node;
+
+    std::string newNode;
 
     boost::weak_ptr<ServiceDiscovery> thisRef;
 

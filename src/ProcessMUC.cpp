@@ -225,22 +225,37 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
         }
     }
 
-    c->processPresence(block);
+    {
+        ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
+
+        bool ascroll=(cv==NULL)? false: cv->autoScroll();
+
+        c->processPresence(block);
+
+        if (ascroll) {
+            cv->moveEnd();
+            cv->redraw();
+        }
+    }
     rc->roster->makeViewList();
 
-    Message::ref msg=Message::ref(new Message(message, from, Message::PRESENCE, Message::extractXDelay(block) ));
 
-    Contact::ref room=roomGrp->room;
-    
-    ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
+    {
+        Message::ref msg=Message::ref(new Message(message, from, Message::PRESENCE, Message::extractXDelay(block) ));
 
-    bool ascroll=(cv==NULL)? false: cv->autoScroll();
-    room->messageList->push_back(msg);
+        Contact::ref room=roomGrp->room;
 
-    if (ascroll) {
-        cv->moveEnd();
-        cv->redraw();
+        ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(room).get());
+
+        bool ascroll=(cv==NULL)? false: cv->autoScroll();
+        room->messageList->push_back(msg);
+
+        if (ascroll) {
+            cv->moveEnd();
+            cv->redraw();
+        }
     }
+
     return BLOCK_PROCESSED;
 }
 

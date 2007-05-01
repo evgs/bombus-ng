@@ -518,15 +518,22 @@ void ServiceDiscovery::parseResult() {
         JabberDataBlockRefList::iterator i=infoReply->getChilds()->begin();
         while (i!=infoReply->getChilds()->end()) {
             JabberDataBlockRef feature=*(i++);
+            if (feature->getTagName()!="feature") continue;
             std::string &var=feature->getAttribute("var");
             DiscoCommand *cmd=NULL;
             if (var=="jabber:iq:register") cmd=new DiscoCommand(L"Register", icons::ICON_REGISTER_INDEX, DiscoCommand::REGISTER);
             if (var=="jabber:iq:search") cmd=new DiscoCommand(L"Search", icons::ICON_SEARCH_INDEX, DiscoCommand::SEARCH);
-            //EXECUTE=3,
             if (var=="vcard-temp") cmd=new DiscoCommand(L"vCard", icons::ICON_VCARD, DiscoCommand::VCARD);
             if (var=="http://jabber.org/protocol/muc") cmd=new DiscoCommand(L"Join conference", icons::ICON_GCJOIN_INDEX, DiscoCommand::JOINGC);
             //    ADD=6
             if (cmd) list->push_back(DiscoCommand::ref(cmd));
+        }
+        JabberDataBlockRef identity=infoReply->getChildByName("identity");
+        if (identity) {
+            if (identity->getAttribute("type")=="command-node" && 
+                identity->getAttribute("category")=="automation") {
+                    list->push_back(DiscoCommand::ref(new DiscoCommand(L"Execute", icons::ICON_AD_HOC, DiscoCommand::EXECUTE)));
+            }
         }
     }
 

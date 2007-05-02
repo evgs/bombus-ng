@@ -30,7 +30,7 @@ std::string JabberDataBlock::getAttribute( const std::string & byName )
 {
 	StringMap::const_iterator i=attr.find(byName);
     if (i==attr.end()) return std::string();
-	return i->second;
+	return XMLStringExpand(i->second);
 	//return XMLStringExpand(attr[byName]);
 }
 

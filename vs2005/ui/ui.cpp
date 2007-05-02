@@ -628,8 +628,8 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
 
     if (ascroll) /*if (cv)*/ {
         cv->moveEnd();
-        cv->redraw();
     }
+    if (cv) if (IsWindowVisible(cv->getHWnd())) cv->redraw();
 
     //tabs->switchByODR(c); 
 
@@ -662,8 +662,8 @@ ProcessResult PresenceRecv::blockArrived(JabberDataBlockRef block, const Resourc
 
     if (ascroll) /*if(cv)*/ {
         cv->moveEnd();
-        cv->redraw();
     }
+    if (cv) if (IsWindowVisible(cv->getHWnd())) cv->redraw();
 
     return BLOCK_PROCESSED;
 }

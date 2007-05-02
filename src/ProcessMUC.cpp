@@ -234,8 +234,8 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
         if (ascroll) {
             cv->moveEnd();
-            cv->redraw();
         }
+        if (cv) if (IsWindowVisible(cv->getHWnd())) cv->redraw();
     }
     rc->roster->makeViewList();
 
@@ -252,8 +252,8 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
         if (ascroll) {
             cv->moveEnd();
-            cv->redraw();
         }
+        if (cv) if (IsWindowVisible(cv->getHWnd())) cv->redraw();
     }
 
     return BLOCK_PROCESSED;
@@ -280,7 +280,7 @@ void ProcessMuc::initMuc( const std::string &jid, const std::string &password, R
         roomGrp->room=room;
     }
 
-    //rosterWnd->openChat(room); //todo
+    rosterWnd->openChat(room);
     
 
     //3. selfcontact

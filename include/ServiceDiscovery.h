@@ -18,12 +18,13 @@
 class DiscoCommand: public IconTextElementContainer {
 public:
     enum DiscoCmds {
+        ERR=-1,   //[v]
         BACK=0,     //[v]
         REGISTER=1, //[ ]
         SEARCH=2,   //[ ]
         EXECUTE=3,  //[ ]
         VCARD=4,    //[v]
-        JOINGC=5,   //[ ]
+        JOINGC=5,   //[v]
         ADD=6       //[ ]
     };
     DiscoCommand(std::wstring cmdName, int icon, int cmdId);

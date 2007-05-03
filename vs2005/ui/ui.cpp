@@ -54,6 +54,7 @@
 HINSTANCE			g_hInst;			// current instance
 HWND				g_hWndMenuBar;		// menu bar handle
 HWND		mainWnd;
+HCURSOR     cursorWait;
 
 //ListViewRef logWnd;
 TabsCtrlRef tabs;
@@ -329,6 +330,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.nToolBarId = IDR_MENU;
             mbi.hInstRes   = g_hInst;
 
+            cursorWait=LoadCursor(NULL, IDC_WAIT);
             //skin=ImgListRef(new ImgArray(TEXT("skin.png"), 8, 6));
             skin=ImgListRef(new Skin(TEXT("")));
 

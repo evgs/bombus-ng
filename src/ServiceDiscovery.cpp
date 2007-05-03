@@ -242,22 +242,30 @@ ProcessResult GetDisco::blockArrived(JabberDataBlockRef block, const ResourceCon
         if (block->getAttribute("type")=="result") {
             if (sd) {
                 sd->infoReply=block->findChildNamespace("query", "http://jabber.org/protocol/disco#info");
-                SendMessage(sd->getHWnd(), WM_USER, 0,0);
             }
         } else {
-            //TODO: error
+            if (block->getAttribute("type")=="error") {
+                if (sd) {
+                    sd->infoReply=block->getChildByName("error");
+                }
+            }
         }
+        SendMessage(sd->getHWnd(), WM_USER, 0,0);
         return BLOCK_PROCESSED;
     }
     if (block->getAttribute("id")==iditems) {
         if (block->getAttribute("type")=="result") {
             if (sd) {
                 sd->itemReply=block->findChildNamespace("query", "http://jabber.org/protocol/disco#items");
-                SendMessage(sd->getHWnd(), WM_USER, 0,0);
             }
         } else {
-            //TODO: error
+            if (block->getAttribute("type")=="error") {
+                if (sd) {
+                    sd->itemReply=block->getChildByName("error");
+                }
+            }
         }
+        SendMessage(sd->getHWnd(), WM_USER, 0,0);
         return LAST_BLOCK_PROCESSED;
     }
 
@@ -521,40 +529,47 @@ void ServiceDiscovery::parseResult() {
 
     if (!nodes.empty()) list->push_back(DiscoCommand::ref(new DiscoCommand(L"..", icons::ICON_DISCO_BACK, DiscoCommand::BACK)));
     if (infoReply) {
-        JabberDataBlockRefList::iterator i=infoReply->getChilds()->begin();
-        while (i!=infoReply->getChilds()->end()) {
-            JabberDataBlockRef feature=*(i++);
-            if (feature->getTagName()!="feature") continue;
-            std::string &var=feature->getAttribute("var");
-            DiscoCommand *cmd=NULL;
-            if (var=="jabber:iq:register") cmd=new DiscoCommand(L"Register", icons::ICON_REGISTER_INDEX, DiscoCommand::REGISTER);
-            if (var=="jabber:iq:search") cmd=new DiscoCommand(L"Search", icons::ICON_SEARCH_INDEX, DiscoCommand::SEARCH);
-            if (var=="vcard-temp") cmd=new DiscoCommand(L"vCard", icons::ICON_VCARD, DiscoCommand::VCARD);
-            if (var=="http://jabber.org/protocol/muc") cmd=new DiscoCommand(L"Join conference", icons::ICON_GCJOIN_INDEX, DiscoCommand::JOINGC);
-            //    ADD=6
-            if (cmd) list->push_back(DiscoCommand::ref(cmd));
-        }
-        JabberDataBlockRef identity=infoReply->getChildByName("identity");
-        if (identity) {
-            if (identity->getAttribute("type")=="command-node" && 
-                identity->getAttribute("category")=="automation") {
-                    list->push_back(DiscoCommand::ref(new DiscoCommand(L"Execute", icons::ICON_AD_HOC, DiscoCommand::EXECUTE)));
+        if (infoReply->getTagName()=="query") {
+            JabberDataBlockRefList::iterator i=infoReply->getChilds()->begin();
+            while (i!=infoReply->getChilds()->end()) {
+                JabberDataBlockRef feature=*(i++);
+                if (feature->getTagName()!="feature") continue;
+                std::string &var=feature->getAttribute("var");
+                DiscoCommand *cmd=NULL;
+                if (var=="jabber:iq:register") cmd=new DiscoCommand(L"Register", icons::ICON_REGISTER_INDEX, DiscoCommand::REGISTER);
+                if (var=="jabber:iq:search") cmd=new DiscoCommand(L"Search", icons::ICON_SEARCH_INDEX, DiscoCommand::SEARCH);
+                if (var=="vcard-temp") cmd=new DiscoCommand(L"vCard", icons::ICON_VCARD, DiscoCommand::VCARD);
+                if (var=="http://jabber.org/protocol/muc") cmd=new DiscoCommand(L"Join conference", icons::ICON_GCJOIN_INDEX, DiscoCommand::JOINGC);
+                //    ADD=6
+                if (cmd) list->push_back(DiscoCommand::ref(cmd));
             }
+            JabberDataBlockRef identity=infoReply->getChildByName("identity");
+            if (identity) {
+                if (identity->getAttribute("type")=="command-node" && 
+                    identity->getAttribute("category")=="automation") {
+                        list->push_back(DiscoCommand::ref(new DiscoCommand(L"Execute", icons::ICON_AD_HOC, DiscoCommand::EXECUTE)));
+                }
+            }
+        } else {
+            list->push_back(DiscoCommand::ref(new DiscoCommand(L"Error", icons::ICON_ERROR_INDEX, DiscoCommand::ERR)));
         }
     }
 
     if (itemReply) {
-        JabberDataBlockRefList::iterator i=itemReply->getChilds()->begin();
-        while (i!=itemReply->getChilds()->end()) {
-            JabberDataBlockRef item=*(i++);
-            std::string &jid=item->getAttribute("jid");
-            std::string &name=item->getAttribute("name");
-            std::string &node=item->getAttribute("node");
-            DiscoItem::ref contact=DiscoItem::ref(new DiscoItem(jid, node, name));
-            list->push_back(contact);
+        if (infoReply->getTagName()=="query") {
+            JabberDataBlockRefList::iterator i=itemReply->getChilds()->begin();
+            while (i!=itemReply->getChilds()->end()) {
+                JabberDataBlockRef item=*(i++);
+                std::string &jid=item->getAttribute("jid");
+                std::string &name=item->getAttribute("name");
+                std::string &node=item->getAttribute("node");
+                DiscoItem::ref contact=DiscoItem::ref(new DiscoItem(jid, node, name));
+                list->push_back(contact);
+            }
+        } else {
+            list->push_back(DiscoCommand::ref(new DiscoCommand(L"Error", icons::ICON_ERROR_INDEX, DiscoCommand::ERR)));
         }
     }
-
     nodeList->bindODRList(ODRListRef(list));
     nodeList->notifyListUpdate(true);
 }

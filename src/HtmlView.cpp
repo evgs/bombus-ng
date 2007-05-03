@@ -12,6 +12,7 @@
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern ImgListRef skin;
+extern HCURSOR cursorWait;
 
 ATOM HtmlView::RegisterWindowClass() {
     WNDCLASS wc;
@@ -163,7 +164,9 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
         }
     case WM_DESTROY:
         //TODO: Destroy all child data associated eith this window
-
+        SetCursor(cursorWait);
+        DestroyWindow(p->htmlHWnd);
+        SetCursor(NULL);
         return 0;
 
     default:
@@ -177,6 +180,7 @@ HtmlView::HtmlView() { /*init(); - MUST NOT be called before setting up parentHW
 void HtmlView::init() {
     BOOST_ASSERT(parentHWnd);
 
+    SetCursor(cursorWait);
     if (htmlViewInstance==0) 
         htmlViewInstance=LoadLibrary(L"htmlview.dll");
 
@@ -192,6 +196,7 @@ void HtmlView::init() {
     thisHWnd=CreateWindow((LPCTSTR)windowClass, _T("HtmlView"), WS_CHILD | WS_VISIBLE,
         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, parentHWnd, NULL, g_hInst, (LPVOID)this);
 
+    SetCursor(NULL);
 }
 
 HtmlView::HtmlView( HWND parent, const std::string & title ) {
@@ -289,6 +294,7 @@ void HtmlView::endForm() { addText("</form>"); }
 void HtmlView::endHtml() {
     addText("</BODY></HTML>");
     SendMessage(htmlHWnd, DTM_ENDOFSOURCE, 0, (LPARAM)NULL);
+    SetCursor(NULL);
 }
 
 void HtmlView::button( const std::string &label ) {

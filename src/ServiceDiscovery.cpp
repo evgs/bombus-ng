@@ -11,6 +11,7 @@
 #include "VcardForm.h"
 
 #include "DlgMucJoin.h"
+#include "MRU.h"
 //#include "Contact.h"
 int identifyTransport(const std::string &jid);
 
@@ -20,6 +21,9 @@ extern HWND	g_hWndMenuBar;		// menu bar handle
 extern ResourceContextRef rc;
 extern ImgListRef skin;
 extern TabsCtrlRef tabs;
+
+#define MRU_DISCO_JIDS L"DiscoJids"
+
 
 long WINAPI ComboSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) { 
     WNDPROC OldWndProc=(WNDPROC) GetWindowLong(hWnd, GWL_USERDATA);
@@ -80,18 +84,29 @@ long WINAPI ComboSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_KEYUP:
         editbox::editBoxShifts=false;
         break;
+        */
     case WM_CHAR:
-        if (wParam==VK_RETURN && !editbox::editBoxShifts) {
-            PostMessage(GetParent(hWnd), WM_COMMAND, IDS_SEND, 0);
+        if (wParam==VK_RETURN) {
+            PostMessage(GetParent(GetParent(hWnd)), WM_COMMAND, IDOK, 0);
             return 0;
         }
         break;
-        */
     } 
     return CallWindowProc(OldWndProc,hWnd,msg,wParam,lParam); 
 }
 
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+void updateComboHistory(HWND comboWnd) {
+    wchar_t buf[1024];
+    SendMessage(comboWnd, WM_GETTEXT, 1024, (LPARAM) buf);
+    int idx=SendMessage(comboWnd, CB_FINDSTRINGEXACT, 1, (LPARAM) buf);
+    if (idx!=CB_ERR)
+        SendMessage(comboWnd, CB_DELETESTRING, idx, 0);
+    idx=SendMessage(comboWnd, CB_INSERTSTRING, 0, (LPARAM) buf);
+    SendMessage(comboWnd, CB_SETCURSEL, idx, 0);
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 HWND WINAPI DoCreateComboControl(HWND hwndParent) {
 
@@ -100,7 +115,7 @@ HWND WINAPI DoCreateComboControl(HWND hwndParent) {
 
     hwndCombo=CreateWindow(_T("COMBOBOX"), NULL, 
         WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL
-        | CBS_DROPDOWN | CBS_LOWERCASE , 
+        | CBS_DROPDOWN | CBS_LOWERCASE | CBS_HASSTRINGS, 
         0, 0, 32 /*CW_USEDEFAULT*/, CW_USEDEFAULT, 
         hwndParent, NULL, g_hInst, NULL); 
 
@@ -318,6 +333,7 @@ LRESULT CALLBACK ServiceDiscovery::WndProc( HWND hWnd, UINT message, WPARAM wPar
             p->editWnd=DoCreateComboControl(hWnd);
             GetWindowRect(p->editWnd, &rect);
             p->editHeight=rect.bottom-rect.top+2;
+            mru::readMru(MRU_DISCO_JIDS, p->editWnd, NULL);
 
             //p->msgList->bindODRList(p->contact->messageList);
             break;
@@ -382,22 +398,38 @@ LRESULT CALLBACK ServiceDiscovery::WndProc( HWND hWnd, UINT message, WPARAM wPar
 
     case WM_COMMAND: 
         {
-            break;             
+            switch (LOWORD(wParam)) {
+            case IDOK:
+                {
+                    updateComboHistory(p->editWnd);
+                    while (!p->nodes.empty()) p->nodes.pop();
+                    p->nodeList->bindODRList(ODRListRef());
+
+                    p->go();
+                    break;
+                }
+            }
         }
+        if (HIWORD(wParam)==CBN_DROPDOWN) {
+            int nitems=SendMessage(p->editWnd, CB_GETCOUNT, 0, 0);
+            if (nitems<=0) break;
+            int h=SendMessage(p->editWnd, CB_GETITEMHEIGHT, 0, 0)*10;//+p->editHeight;
+            RECT rc;
+            GetWindowRect((HWND)lParam, &rc);
+            int result=SetWindowPos((HWND)lParam, NULL, 0,0, rc.right-rc.left, h, SWP_NOZORDER | SWP_NOMOVE );
+        }
+        break;             
 
     case WM_LBUTTONDOWN:
         SetFocus(hWnd);
         if ((GET_Y_LPARAM(lParam)) > p->editHeight) break;
         if (GET_X_LPARAM(lParam) > p->width-2-skin->getElementWidth()) {
+            mru::saveMru(MRU_DISCO_JIDS, p->editWnd);
             PostMessage(GetParent(hWnd), WM_COMMAND, TabsCtrl::CLOSETAB, 0);
             break;
         }
         if (GET_X_LPARAM(lParam) > p->width-2-2*skin->getElementWidth()) {
-            //reset back-history
-            while (!p->nodes.empty()) p->nodes.pop();
-            p->nodeList->bindODRList(ODRListRef());
-
-            p->go();
+            SendMessage(hWnd, WM_COMMAND, IDOK, 0);
         }
         break;
 

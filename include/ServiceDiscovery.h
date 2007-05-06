@@ -49,6 +49,7 @@ struct DiscoNode {
     std::string jid;
     std::string node;
     ODRListRef subnodes;
+    ODRRef cursorPos;
 };
 //////////////////////////////////////////////////////////////////////////
 

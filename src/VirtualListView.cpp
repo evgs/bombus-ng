@@ -475,5 +475,11 @@ void VirtualListView::addODR( ODRRef odr, bool redraw ) {
 HMENU VirtualListView::getContextMenu() { return NULL; }
 void VirtualListView::OnCommand( int cmdId, LONG lParam ) {};
 
+void VirtualListView::setCursorPos( ODRRef newPos ) {
+    if (!odrlist) return;
+    cursorPos=newPos;
+    cursorFit();
+}
+
 ATOM VirtualListView::windowClass=0;
 

@@ -530,6 +530,7 @@ void ServiceDiscovery::go() {
     node.jid=this->jid;
     node.node=this->node;
     node.subnodes=nodeList->getODRList();
+    node.cursorPos=nodeList->getCursorPos();
     if (node.subnodes) if (node.subnodes->size()>0)
         nodes.push(node);
 
@@ -545,6 +546,7 @@ void ServiceDiscovery::back() {
 
     DiscoNode &node=nodes.top();
     nodeList->bindODRList(node.subnodes);
+    nodeList->setCursorPos(node.cursorPos);
     this->jid=node.jid;
     //this->node=node.node;
     nodes.pop();

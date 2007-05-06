@@ -40,6 +40,8 @@ public:
     virtual HMENU getContextMenu();
     virtual void OnCommand(int cmdId, LONG lParam);
 
+    ODRRef getCursorPos() { return cursorPos; }
+    void setCursorPos(ODRRef newPos);
     bool moveCursorEnd();
     bool cursorAtEnd();
 

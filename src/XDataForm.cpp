@@ -26,6 +26,15 @@ XDataForm::ref XDataForm::createXDataForm( HWND parent, const std::string &jid, 
 void XDataForm::onWmUserUpdate(){
     startHtml();
 
+    if (plainText.length()) {
+        addText(plainText);
+    }
+
+    if (!xdata) {
+        endHtml();
+        return;
+    }
+
     const std::string &title=xdata->getChildText("title");
     if (title.length()) {
         addText("<big><b>"); addText(title); addText("</b></big><br/><br/>");

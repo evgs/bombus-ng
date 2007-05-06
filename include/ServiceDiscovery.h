@@ -85,6 +85,7 @@ public:
     void back();
     void vcard();
     void joingc();
+    void execute();
 
 protected:
     std::stack<DiscoNode> nodes;

@@ -6,10 +6,9 @@
 #include <boost/shared_ptr.hpp>
 
 class XDataForm : public HtmlView {
-private:
+protected:
     XDataForm(){};
 public:
-    void vcardArrivedNotify(JabberDataBlockRef vcard);
     typedef boost::shared_ptr<XDataForm> ref;
     virtual void onWmUserUpdate();
 
@@ -18,12 +17,12 @@ public:
     void formTest();
 
 protected:
-    std::string jid;
-
     virtual void onHotSpot(LPCSTR url, LPCSTR param);
 
     boost::weak_ptr<XDataForm> formRef;
 
     JabberDataBlockRef xdata;
+    std::string plainText;
+
     boost::weak_ptr<ResourceContext> rc;
 };

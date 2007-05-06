@@ -9,6 +9,7 @@
 #include "TabCtrl.h"
 #include "Presence.h"
 #include "VcardForm.h"
+#include "AdHocForm.h"
 
 #include "DlgMucJoin.h"
 #include "MRU.h"
@@ -158,6 +159,10 @@ void DiscoListView::eventOk() {
             return;
         case DiscoCommand::JOINGC:
             sd->joingc();
+            return;
+        case DiscoCommand::EXECUTE:
+            sd->execute();
+            return;
         }
     }
     VirtualListView::eventOk();
@@ -618,5 +623,10 @@ void ServiceDiscovery::joingc() {
     DlgMucJoin::createDialog(tabs->getHWnd(), rc, jid);
 }
 
+void ServiceDiscovery::execute() {
+    WndRef vc=AdHocForm::createAdHocForm(tabs->getHWnd(), jid, node, rc);
+    tabs->addWindow(vc);
+    tabs->switchByWndRef(vc);
+}
 ATOM ServiceDiscovery::windowClass=0;
 

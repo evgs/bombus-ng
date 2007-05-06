@@ -96,6 +96,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
                     }
                     HBRUSH bkBrush=CreateSolidBrush(bkColor);
                     SetBkColor(hdc, bkColor);
+                    ritem.right=p->clientRect.right; //full window-wide cursor
                     FillRect(hdc, &ritem, bkBrush);
                     DeleteObject(bkBrush);
                     odr->draw(hdc, ritem);

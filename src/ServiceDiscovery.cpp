@@ -115,7 +115,7 @@ HWND WINAPI DoCreateComboControl(HWND hwndParent) {
 
     hwndCombo=CreateWindow(_T("COMBOBOX"), NULL, 
         WS_BORDER| WS_CHILD | WS_VISIBLE | WS_VSCROLL
-        | CBS_DROPDOWN | CBS_LOWERCASE | CBS_HASSTRINGS, 
+        | CBS_DROPDOWN /*| CBS_LOWERCASE*/ | CBS_HASSTRINGS, 
         0, 0, 32 /*CW_USEDEFAULT*/, CW_USEDEFAULT, 
         hwndParent, NULL, g_hInst, NULL); 
 
@@ -502,12 +502,13 @@ void ServiceDiscovery::redraw(){
     //InvalidateRect(msgList->getHWnd(), NULL, false);
 }
 
-ServiceDiscovery::ref ServiceDiscovery::createServiceDiscovery( HWND parent, ResourceContextRef rc, const std::string &jid ) {
+ServiceDiscovery::ref ServiceDiscovery::createServiceDiscovery( HWND parent, ResourceContextRef rc, const std::string &jid, const std::string &node, bool go ){
     ServiceDiscovery::ref sd=ServiceDiscovery::ref(new ServiceDiscovery(parent));
     sd->thisRef=sd;
     (boost::dynamic_pointer_cast<DiscoListView> (sd->nodeList))->serviceDiscovery=sd;
-    sd->discoverJid(jid, "");
+    sd->discoverJid(jid, node);
     sd->rc=rc;
+    if (go) sd->go();
     return sd;
 }
 

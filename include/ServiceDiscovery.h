@@ -69,7 +69,12 @@ public:
 
     void redraw();
 
-    static ServiceDiscovery::ref createServiceDiscovery(HWND parent, ResourceContextRef rc, const std::string &jid);
+    static ServiceDiscovery::ref createServiceDiscovery(
+        HWND parent, 
+        ResourceContextRef rc, 
+        const std::string &jid, 
+        const std::string &node, 
+        bool go);
 
     JabberDataBlockRef itemReply;
     JabberDataBlockRef infoReply;

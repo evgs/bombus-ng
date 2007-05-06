@@ -24,6 +24,7 @@
 #include "DlgStatus.h"
 #include "DlgAddEditContact.h"
 #include "VcardForm.h"
+#include "ServiceDiscovery.h"
 
 #include "utf8.hpp"
 
@@ -432,7 +433,7 @@ HMENU RosterView::getContextMenu() {
 
         AppendMenu(hmenu, MF_STRING, RosterView::VCARD,                    TEXT("VCard"));
         AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::CLIENTINFO,               TEXT("Client Info"));
-        AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::COMMANDS,                 TEXT("Commands"));
+        AppendMenu(hmenu, MF_STRING, RosterView::COMMANDS,                 TEXT("Commands"));
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
@@ -535,7 +536,18 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 tabs->switchByWndRef(vc);
             }
         case RosterView::CLIENTINFO: 
+            break;
         case RosterView::COMMANDS:
+            {
+                ServiceDiscovery::ref disco=ServiceDiscovery::createServiceDiscovery(
+                    tabs->getHWnd(), 
+                    rc, 
+                    focusedContact->jid.getJid(), 
+                    "http://jabber.org/protocol/commands", 
+                    true);
+                tabs->addWindow(disco);
+                tabs->switchByWndRef(disco);
+            }
             break;
         //case RosterView::SUBSCR: 
         case RosterView::SUBSCRIBE:

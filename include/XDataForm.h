@@ -17,6 +17,8 @@ public:
     void formTest();
 
 protected:
+    virtual void onSubmit(JabberDataBlockRef replyForm);
+
     virtual void onHotSpot(LPCSTR url, LPCSTR param);
 
     boost::weak_ptr<XDataForm> formRef;

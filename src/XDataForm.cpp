@@ -131,7 +131,7 @@ void XDataForm::onHotSpot(LPCSTR url, LPCSTR param){
 
     JabberDataBlockRef reply=JabberDataBlockRef(new JabberDataBlock(xdata->getTagName().c_str(),NULL));
     reply->setAttribute("xmlns","jabber:x:data");
-    reply->setAttribute("type", "result");
+    reply->setAttribute("type", "submit");
     
     JabberDataBlockRefList *childs=xdata->getChilds();
 
@@ -186,9 +186,14 @@ void XDataForm::onHotSpot(LPCSTR url, LPCSTR param){
         field->addChild("value", value.c_str());
 
     }
-    StringRef out=reply->toXML();
+    onSubmit(reply);
 }
 
+void XDataForm::onSubmit(JabberDataBlockRef replyForm) {
+#ifdef DEBUG
+    StringRef out=replyForm->toXML();
+#endif
+}
 
 
 
@@ -294,5 +299,6 @@ void XDataForm::formTest() {
 
     onWmUserUpdate();
 }
+
 #endif
 

@@ -164,9 +164,7 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
         }
     case WM_DESTROY:
         //TODO: Destroy all child data associated eith this window
-        SetCursor(cursorWait);
-        DestroyWindow(p->htmlHWnd);
-        SetCursor(NULL);
+        //WARNING! do not place virtual member calls here - object is already destructed 
         return 0;
 
     default:
@@ -214,14 +212,17 @@ const wchar_t * HtmlView::getWindowTitle() const{
     return title.c_str();
 }
 
-HtmlView::~HtmlView() {}
+HtmlView::~HtmlView() {
+    SetCursor(cursorWait);
+    DestroyWindow(htmlHWnd);
+    SetCursor(NULL);
+}
 
 const ODR * HtmlView::getODR() const { return wt.get(); }
 
 void HtmlView::onWmUserUpdate() {}
 
-HBITMAP HtmlView::getImage( LPCTSTR url, DWORD cookie ) 
-{
+HBITMAP HtmlView::getImage( LPCTSTR url, DWORD cookie ) {
     return NULL;
 }
 

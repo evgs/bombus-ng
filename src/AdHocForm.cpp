@@ -82,9 +82,10 @@ AdHocForm::ref AdHocForm::createAdHocForm(HWND parent, const std::string &jid, c
     AdHocForm::ref afRef=AdHocForm::ref(af);
     af->formRef=afRef;
 
-    GetAdHoc *getah=new GetAdHoc(jid, node, afRef);
+    /*GetAdHoc *getah=new GetAdHoc(jid, node, afRef);
     rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(getah));
-    getah->doRequest(rc, "", "execute", JabberDataBlockRef());
+    getah->doRequest(rc, "", "execute", JabberDataBlockRef());*/
+    af->sendCommand("execute", JabberDataBlockRef());
 
     return afRef;
 }
@@ -105,7 +106,33 @@ void AdHocForm::AdHocResultNotify(JabberDataBlockRef block) {
 
     this->xdata=command->findChildNamespace("x","jabber:x:data");
 
+    //non-descriptive result
+    if (!xdata && plainText.empty())
+        plainText=status; //todo: make more informative and localizabe
+
     PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
     return;
 }
 
+void AdHocForm::onSubmit( JabberDataBlockRef replyForm ) {
+    if (status!="executing") return;
+    sendCommand("execute", replyForm);
+}
+
+void AdHocForm::onCancel() {
+    if (status!="executing") return;
+    sendCommand("cancel", JabberDataBlockRef());
+}
+
+void AdHocForm::sendCommand( const std::string &command, JabberDataBlockRef childData ) {
+    ResourceContextRef rc=this->rc.lock();
+    if (!rc) return;
+
+    GetAdHoc *getah=new GetAdHoc(jid, node, formRef.lock());
+    rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(getah));
+    getah->doRequest(rc, sessionId, command, childData);
+}
+
+AdHocForm::~AdHocForm() {
+    onCancel();
+}

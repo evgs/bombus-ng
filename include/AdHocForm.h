@@ -9,12 +9,18 @@ class AdHocForm : public XDataForm {
 protected:
     AdHocForm(){};
 public:
+    virtual ~AdHocForm();
     void AdHocResultNotify(JabberDataBlockRef block);
     typedef boost::shared_ptr<AdHocForm> ref;
 
     static AdHocForm::ref createAdHocForm(HWND parent, const std::string &jid, const std::string node, ResourceContextRef rc);
 
 protected:
+    virtual void onSubmit(JabberDataBlockRef replyForm);
+    virtual void onCancel();
+
+    void sendCommand(const std::string &command, JabberDataBlockRef childData);
+
     std::string jid;
     std::string node;
 

@@ -1,28 +1,6 @@
 #include "XDataForm.h"
 #include "utf8.hpp"
 //////////////////////////////////////////////////////////////////////////
-XDataForm::ref XDataForm::createXDataForm( HWND parent, const std::string &jid, ResourceContextRef rc) {
-    XDataForm *xf=new XDataForm();
-
-    xf->parentHWnd=parent;
-    xf->title=utf8::utf8_wchar(jid);
-    xf->wt=WndTitleRef(new WndTitle(xf, icons::ICON_COMPOSING_INDEX));
-
-    xf->init();
-
-    SetParent(xf->thisHWnd, parent);
-
-    xf->rc=rc;
-
-    XDataForm::ref xdRef=XDataForm::ref(xf);
-
-    //GetVcard *getv=new GetVcard(jid, vfRef);
-    //rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(getv));
-    //getv->doRequest(rc);
-
-    return xdRef;
-}
-
 void XDataForm::onWmUserUpdate(){
     startHtml();
 
@@ -202,6 +180,29 @@ void XDataForm::onSubmit(JabberDataBlockRef replyForm) {
 // THIS IS TEMPORARY DEBUG CODE
 //////////////////////////////////////////////////////////////////////////
 #ifdef DEBUG
+
+XDataForm::ref XDataForm::createXDataForm( HWND parent, const std::string &title, ResourceContextRef rc) {
+    XDataForm *xf=new XDataForm();
+
+    xf->parentHWnd=parent;
+    xf->title=utf8::utf8_wchar(title);
+    xf->wt=WndTitleRef(new WndTitle(xf, icons::ICON_COMPOSING_INDEX));
+
+    xf->init();
+
+    SetParent(xf->thisHWnd, parent);
+
+    xf->rc=rc;
+
+    XDataForm::ref xdRef=XDataForm::ref(xf);
+
+    //GetVcard *getv=new GetVcard(jid, vfRef);
+    //rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(getv));
+    //getv->doRequest(rc);
+
+    return xdRef;
+}
+
 void XDataForm::formTest() {
     xdata=JabberDataBlockRef(new JabberDataBlock("x"));
     xdata->setAttribute("xmlns","jabber:x:data");

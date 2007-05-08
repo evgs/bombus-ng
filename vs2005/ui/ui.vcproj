@@ -316,6 +316,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\RegisterForm.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\ResourceContext.cpp"
 				>
 			</File>
@@ -555,6 +559,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\ProcessMUC.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\RegisterForm.h"
 				>
 			</File>
 			<File

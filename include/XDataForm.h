@@ -12,9 +12,10 @@ public:
     typedef boost::shared_ptr<XDataForm> ref;
     virtual void onWmUserUpdate();
 
-    static XDataForm::ref createXDataForm(HWND parent, const std::string &jid, ResourceContextRef rc);
-
+#ifdef DEBUG
+    static XDataForm::ref createXDataForm(HWND parent, const std::string &title, ResourceContextRef rc);
     void formTest();
+#endif
 
 protected:
     virtual void onSubmit(JabberDataBlockRef replyForm);

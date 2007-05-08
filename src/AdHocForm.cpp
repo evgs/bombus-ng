@@ -64,7 +64,7 @@ ProcessResult GetAdHoc::blockArrived(JabberDataBlockRef block, const ResourceCon
 }
 
 //////////////////////////////////////////////////////////////////////////
-AdHocForm::ref AdHocForm::createAdHocForm(HWND parent, const std::string &jid, const std::string node, ResourceContextRef rc) {
+AdHocForm::ref AdHocForm::createAdHocForm(HWND parent, const std::string &jid, const std::string &node, ResourceContextRef rc) {
     AdHocForm *af=new AdHocForm();
 
     af->parentHWnd=parent;

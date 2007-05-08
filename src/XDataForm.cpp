@@ -84,7 +84,6 @@ void XDataForm::constructForm(){
     }
 
     if (!xdata) {
-        endHtml();
         return;
     }
 

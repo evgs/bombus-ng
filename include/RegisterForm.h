@@ -19,7 +19,7 @@ protected:
     virtual void onSubmit(JabberDataBlockRef replyForm);
     virtual void onCancel();
 
-    void sendCommand(const std::string &command, JabberDataBlockRef childData);
+    virtual void constructForm();
 
     std::string jid;
     std::string pass;
@@ -27,5 +27,7 @@ protected:
     boost::weak_ptr<RegisterForm> formRef;
 
     boost::weak_ptr<ResourceContext> rc;
+
+    JabberDataBlockRef iqRegisterData;
     //JabberDataBlockListenerRef listener;
 };

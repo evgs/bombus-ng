@@ -84,6 +84,44 @@ RegisterForm::ref RegisterForm::createRegisterForm(HWND parent, const std::strin
     return afRef;
 }
 
+//REG_FILTER "registered" "key" "instructions" "x"
+void RegisterForm::constructForm() {
+    if (xdata) XDataForm::constructForm();
+
+    else if (iqRegisterData) {
+        //instructions
+        const std::string &instr=iqRegisterData->getChildText("instructions");
+        addText("<i>"); addText(instr); addText("</i><br/>");
+
+        beginForm("jabber:iq:register","send");
+        //child fields
+        JabberDataBlockRefList *childs=iqRegisterData->getChilds();
+
+        JabberDataBlockRefList::const_iterator i;
+        for (i=childs->begin(); i!=childs->end(); i++) {
+            JabberDataBlockRef field=*i;
+            const std::string &tagname=field->getTagName();
+            if (tagname=="registered") continue;
+            if (tagname=="key") continue;
+            if (tagname=="instructions") continue;
+            if (tagname=="x") continue;
+
+            const std::string &value=field->getText();
+
+            if (tagname=="password") 
+                passBox(tagname.c_str(), tagname.c_str(), value);
+            else
+                textBox(tagname.c_str(), tagname.c_str(), value);
+        }
+        button("Register");
+        endForm();
+    }
+    
+    if (iqRegisterData) if (iqRegisterData->getChildByName("registered")) {
+        button("unregister","Remove registration");
+    }
+}
+
 void RegisterForm::RegisterResultNotify(JabberDataBlockRef block) {
     if (block->getAttribute("type")=="error") {
         //todo: error handling
@@ -96,15 +134,16 @@ void RegisterForm::RegisterResultNotify(JabberDataBlockRef block) {
     if (qryRegister) {
         this->xdata=qryRegister->findChildNamespace("x","jabber:x:data");
     } else {
-        plainText="iq:register is not fully supported yet";
         xdata.reset();
     }
+    this->iqRegisterData=qryRegister;
 
     PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
     return;
 }
 
 void RegisterForm::onSubmit( JabberDataBlockRef replyForm ) {
+
     //if (status!="executing") return;
     //sendCommand("execute", replyForm);
 }

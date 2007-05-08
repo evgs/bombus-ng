@@ -46,6 +46,10 @@ void IqRegister::doRequest(ResourceContextRef rc, JabberDataBlockRef childData) 
     }
     req.setAttribute("id", id);
 
+#ifdef DEBUG
+    StringRef out=req.toXML();
+#endif
+
     rc->jabberStream->sendStanza(req);
 }
 
@@ -129,7 +133,7 @@ void RegisterForm::RegisterResultNotify(JabberDataBlockRef block) {
         return;
     }
 
-
+    //todo: ok result handling
     JabberDataBlockRef qryRegister=block->findChildNamespace("query", "jabber:iq:register");
     if (qryRegister) {
         this->xdata=qryRegister->findChildNamespace("x","jabber:x:data");
@@ -143,9 +147,16 @@ void RegisterForm::RegisterResultNotify(JabberDataBlockRef block) {
 }
 
 void RegisterForm::onSubmit( JabberDataBlockRef replyForm ) {
+    JabberDataBlockRef reply=JabberDataBlockRef(new JabberDataBlock(xdata->getTagName().c_str(),NULL));
+    reply->setAttribute("xmlns","jabber:x:data");
+    reply->addChild(replyForm);
 
-    //if (status!="executing") return;
-    //sendCommand("execute", replyForm);
+    IqRegister *regListener=new IqRegister(jid, formRef.lock());
+    ResourceContextRef rc=this->rc.lock();
+    if (rc) {
+        rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(regListener));
+        regListener->doRequest(rc, reply);
+    }
 }
 
 void RegisterForm::onCancel() {
@@ -155,4 +166,56 @@ void RegisterForm::onCancel() {
 
 RegisterForm::~RegisterForm() {
     onCancel();
+}
+
+void RegisterForm::onHotSpot( LPCSTR url, LPCSTR param ) {
+    JabberDataBlockRef reply=JabberDataBlockRef(new JabberDataBlock("query",NULL));
+    reply->setAttribute("xmlns","jabber:iq:register");
+
+    if (strcmp(url, "unregister")==0) {
+        reply->addChild("remove",NULL);
+
+        IqRegister *regListener=new IqRegister(jid, formRef.lock());
+        ResourceContextRef rc=this->rc.lock();
+        if (rc) {
+            rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(regListener));
+            regListener->doRequest(rc, reply);
+        }
+
+        return;
+    }
+
+    if (xdata) {
+        XDataForm::onHotSpot(url, param);
+        return;
+    }
+
+
+    StringMapRef result=splitHREFtext(param);
+
+    //constructing result
+    JabberDataBlockRefList *childs=iqRegisterData->getChilds();
+
+    JabberDataBlockRefList::const_iterator i;
+    for (i=childs->begin(); i!=childs->end(); i++) {
+        JabberDataBlockRef field=*i;
+        const std::string &tagname=field->getTagName();
+        const std::string &value=result->operator [](tagname);
+
+        if (tagname=="registered") continue;
+        if (tagname=="instructions") continue;
+        if (tagname=="x") continue;
+        //copy key
+        if (tagname=="key") { reply->addChild(field); continue; }
+
+        reply->addChild(tagname.c_str(), value.c_str());
+    }
+
+    //send
+    IqRegister *regListener=new IqRegister(jid, formRef.lock());
+    ResourceContextRef rc=this->rc.lock();
+    if (rc) {
+        rc->jabberStanzaDispatcherRT->addListener(JabberDataBlockListenerRef(regListener));
+        regListener->doRequest(rc, reply);
+    }
 }

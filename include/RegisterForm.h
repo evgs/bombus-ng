@@ -16,6 +16,8 @@ public:
     static RegisterForm::ref createRegisterForm(HWND parent, const std::string &jid, ResourceContextRef rc);
 
 protected:
+    virtual void onHotSpot(LPCSTR url, LPCSTR param);
+    
     virtual void onSubmit(JabberDataBlockRef replyForm);
     virtual void onCancel();
 

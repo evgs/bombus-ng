@@ -35,7 +35,6 @@ IqRegister::IqRegister(const std::string &jid, RegisterForm::ref form){
 void IqRegister::doRequest(ResourceContextRef rc, JabberDataBlockRef childData) {
     JabberDataBlock req("iq");
     req.setAttribute("to", jid);
-    req.setAttribute("id", id);
 
     if (childData) {
         req.setAttribute("type", "set");
@@ -45,6 +44,7 @@ void IqRegister::doRequest(ResourceContextRef rc, JabberDataBlockRef childData) 
         id="reg#get";
         req.addChild("query", NULL)->setAttribute("xmlns", "jabber:iq:register");
     }
+    req.setAttribute("id", id);
 
     rc->jabberStream->sendStanza(req);
 }

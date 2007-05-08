@@ -11,7 +11,6 @@ protected:
 public:
     typedef boost::shared_ptr<XDataForm> ref;
     virtual void onWmUserUpdate();
-
 #ifdef DEBUG
     static XDataForm::ref createXDataForm(HWND parent, const std::string &title, ResourceContextRef rc);
     void formTest();
@@ -21,6 +20,8 @@ protected:
     virtual void onSubmit(JabberDataBlockRef replyForm);
 
     virtual void onHotSpot(LPCSTR url, LPCSTR param);
+
+    virtual void constructForm();
 
     boost::weak_ptr<XDataForm> formRef;
 

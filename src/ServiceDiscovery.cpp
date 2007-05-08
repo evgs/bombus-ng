@@ -10,6 +10,7 @@
 #include "Presence.h"
 #include "VcardForm.h"
 #include "AdHocForm.h"
+#include "RegisterForm.h"
 
 #include "DlgMucJoin.h"
 #include "MRU.h"
@@ -163,6 +164,8 @@ void DiscoListView::eventOk() {
         case DiscoCommand::EXECUTE:
             sd->execute();
             return;
+        case DiscoCommand::REGISTER:
+            sd->registerForm();
         }
     }
     VirtualListView::eventOk();
@@ -615,18 +618,26 @@ void ServiceDiscovery::parseResult() {
 }
 
 void ServiceDiscovery::vcard() {
-    WndRef vc=VcardForm::createVcardForm(tabs->getHWnd(), jid, rc, false);
-    tabs->addWindow(vc);
-    tabs->switchByWndRef(vc);
+    WndRef vcardForm=VcardForm::createVcardForm(tabs->getHWnd(), jid, rc, false);
+    tabs->addWindow(vcardForm);
+    tabs->switchByWndRef(vcardForm);
 }
+
 void ServiceDiscovery::joingc() {
     DlgMucJoin::createDialog(tabs->getHWnd(), rc, jid);
 }
 
 void ServiceDiscovery::execute() {
-    WndRef vc=AdHocForm::createAdHocForm(tabs->getHWnd(), jid, node, rc);
-    tabs->addWindow(vc);
-    tabs->switchByWndRef(vc);
+    WndRef exeForm=AdHocForm::createAdHocForm(tabs->getHWnd(), jid, node, rc);
+    tabs->addWindow(exeForm);
+    tabs->switchByWndRef(exeForm);
 }
+
+void ServiceDiscovery::registerForm() {
+    WndRef rform=RegisterForm::createRegisterForm(tabs->getHWnd(), jid, rc);
+    tabs->addWindow(rform);
+    tabs->switchByWndRef(rform);
+}
+
 ATOM ServiceDiscovery::windowClass=0;
 

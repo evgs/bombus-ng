@@ -22,7 +22,7 @@ public:
         BACK=0,     //[v]
         REGISTER=1, //[ ]
         SEARCH=2,   //[ ]
-        EXECUTE=3,  //[ ]
+        EXECUTE=3,  //[v]
         VCARD=4,    //[v]
         JOINGC=5,   //[v]
         ADD=6       //[ ]
@@ -86,6 +86,7 @@ public:
     void vcard();
     void joingc();
     void execute();
+    void registerForm();
 
 protected:
     std::stack<DiscoNode> nodes;

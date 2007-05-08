@@ -4,6 +4,81 @@
 void XDataForm::onWmUserUpdate(){
     startHtml();
 
+    constructForm();
+
+    endHtml();
+}
+
+void XDataForm::onHotSpot(LPCSTR url, LPCSTR param){
+    StringMapRef result=splitHREFtext(param);
+
+    JabberDataBlockRef reply=JabberDataBlockRef(new JabberDataBlock(xdata->getTagName().c_str(),NULL));
+    reply->setAttribute("xmlns","jabber:x:data");
+    reply->setAttribute("type", "submit");
+    
+    JabberDataBlockRefList *childs=xdata->getChilds();
+
+    JabberDataBlockRefList::const_iterator i;
+    for (i=childs->begin(); i!=childs->end(); i++) {
+        JabberDataBlockRef field=*i;
+        if (field->getTagName()!="field") continue;
+
+        //const std::string &value=field->getChildText("value");
+        //const std::string &label=field->getAttribute("label");
+        const std::string &var=field->getAttribute("var");
+        const std::string &type=field->getAttribute("type");
+
+        //hidden
+        if (type=="hidden") {
+            reply->addChild(field); //whole copy of "hidden"
+            continue;
+        }
+
+        //fixed
+        if (type=="fixed") continue; //drop all "fixed"
+
+        field=reply->addChild("field", NULL);
+        field->setAttribute("var", var.c_str());
+        field->setAttribute("type", type);
+
+        const std::string &value=result->operator [](var); 
+
+        //boolean
+        if (type=="boolean") {
+            bool checked=value.length()>0;
+            field->addChild("value", (checked)? "1" : "0" );
+            continue;
+        }
+
+        if (type=="text-multi" || type=="jid-multi" || type=="list-multi") {
+            std::string valbuf;
+            for (size_t i=0; i<value.length(); i++) {
+                char c=value[i];
+                if (c==0x0a) { 
+                    if (valbuf.length()) 
+                        field->addChild("value", valbuf.c_str()); 
+                    valbuf.clear();
+                } else valbuf+=c;
+            }
+            if (valbuf.length()) field->addChild("value", valbuf.c_str());
+            continue;
+        }
+
+        //text-private, text-single, jid-single, list-single
+        field->addChild("value", value.c_str());
+
+    }
+    onSubmit(reply);
+}
+
+void XDataForm::onSubmit(JabberDataBlockRef replyForm) {
+#ifdef DEBUG
+    StringRef out=replyForm->toXML();
+#endif
+}
+
+
+void XDataForm::constructForm(){
     if (plainText.length()) {
         addText(plainText);
     }
@@ -33,9 +108,10 @@ void XDataForm::onWmUserUpdate(){
 
         bool required=field->getChildByName("required");
         const std::string &value=field->getChildText("value");
-        const std::string &label=field->getAttribute("label");
         const std::string &var=field->getAttribute("var");
         const std::string &type=field->getAttribute("type");
+        std::string label=field->getAttribute("label");
+        if (required) label+=" *";
 
         //hidden
         if (type=="hidden") continue;
@@ -98,82 +174,10 @@ void XDataForm::onWmUserUpdate(){
     }
     std::string &type=xdata->getAttribute("type");
     if (type=="form") button("Submit");
+    //if (type.empty()) button("Submit");
 
     endForm();
-
-    endHtml();
 }
-
-void XDataForm::onHotSpot(LPCSTR url, LPCSTR param){
-    StringMapRef result=splitHREFtext(param);
-
-    JabberDataBlockRef reply=JabberDataBlockRef(new JabberDataBlock(xdata->getTagName().c_str(),NULL));
-    reply->setAttribute("xmlns","jabber:x:data");
-    reply->setAttribute("type", "submit");
-    
-    JabberDataBlockRefList *childs=xdata->getChilds();
-
-    JabberDataBlockRefList::const_iterator i;
-    for (i=childs->begin(); i!=childs->end(); i++) {
-        JabberDataBlockRef field=*i;
-        if (field->getTagName()!="field") continue;
-
-        bool required=field->getChildByName("required");
-        //const std::string &value=field->getChildText("value");
-        //const std::string &label=field->getAttribute("label");
-        const std::string &var=field->getAttribute("var");
-        const std::string &type=field->getAttribute("type");
-
-        //hidden
-        if (type=="hidden") {
-            reply->addChild(field); //whole copy of "hidden"
-            continue;
-        }
-
-        //fixed
-        if (type=="fixed") continue; //drop all "fixed"
-
-        field=reply->addChild("field", NULL);
-        field->setAttribute("var", var.c_str());
-        field->setAttribute("type", type);
-
-        const std::string &value=result->operator [](var); 
-
-        //boolean
-        if (type=="boolean") {
-            bool checked=value.length()>0;
-            field->addChild("value", (checked)? "1" : "0" );
-            continue;
-        }
-
-        if (type=="text-multi" || type=="jid-multi" || type=="list-multi") {
-            std::string valbuf;
-            for (size_t i=0; i<value.length(); i++) {
-                char c=value[i];
-                if (c==0x0a) { 
-                    if (valbuf.length()) 
-                        field->addChild("value", valbuf.c_str()); 
-                    valbuf.clear();
-                } else valbuf+=c;
-            }
-            if (valbuf.length()) field->addChild("value", valbuf.c_str());
-            continue;
-        }
-
-        //text-private, text-single, jid-single, list-single
-        field->addChild("value", value.c_str());
-
-    }
-    onSubmit(reply);
-}
-
-void XDataForm::onSubmit(JabberDataBlockRef replyForm) {
-#ifdef DEBUG
-    StringRef out=replyForm->toXML();
-#endif
-}
-
-
 
 
 //////////////////////////////////////////////////////////////////////////

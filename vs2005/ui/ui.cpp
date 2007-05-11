@@ -589,6 +589,22 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     std::string from=block->getAttribute("from");
     std::string body=block->getChildText("body");
 
+    JabberDataBlockRef xfwd=block->findChildNamespace("x","jabber:x:forward");
+    if (xfwd) {
+        std::string ofrom=xfwd->getChildText("from");
+
+        // xep-0033 Extended stanza addressing (used by psi)
+        JabberDataBlockRef addresses=xfwd->findChildNamespace("addresses", "http://jabber.org/protocol/address");
+        if (addresses) {
+            JabberDataBlockRefList::iterator i=addresses->getChilds()->begin();
+            while (i!=addresses->getChilds()->end()) {
+                JabberDataBlockRef addr=*(i++);
+                if (addr->getAttribute("type")=="ofrom") ofrom=addr->getAttribute("jid");
+            }
+        }
+
+        if (ofrom.length()) from=ofrom;
+    }
     //StringRef orig=block->toXML();
 	Log::getInstance()->msg("Message from ", from.c_str()); 
 

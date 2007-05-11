@@ -43,6 +43,8 @@ public:
     std::string name;
 
     typedef boost::shared_ptr<DiscoItem> ref;
+
+    static bool compare(ODRRef left, ODRRef right);
 };
 
 struct DiscoNode {

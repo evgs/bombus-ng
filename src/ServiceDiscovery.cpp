@@ -1,4 +1,7 @@
 #include "ServiceDiscovery.h"
+
+#include "stringutils.h"
+
 #include <commctrl.h>
 #include <windowsx.h>
 #include <aygshell.h>
@@ -190,13 +193,17 @@ DiscoItem::DiscoItem( const std::string &jid, const std::string &node, const std
     this->jid=jid;
     this->node=node;
     this->name=name;
-
+    
     this->iconIndex=(node.empty())? 
         identifyTransport(jid) : 
         icons::ICON_COLLAPSED_INDEX;
 
     this->wstr=utf8::utf8_wchar((name.empty())? jid : name);
     init();
+}
+
+bool DiscoItem::compare( ODRRef left, ODRRef right ) {
+    return (_wcsicmp(left->getText(), right->getText()) < 0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 DiscoCommand::DiscoCommand(std::wstring cmdName, int icon, int cmdId) {
@@ -500,8 +507,13 @@ void ServiceDiscovery::showWindow( bool show ) {
     if (show) nodeList->notifyListUpdate(true);
     //if (show) InvalidateRect(msgList->getHWnd(), NULL, false);
 
-    if (show) SetFocus(nodeList->getHWnd());
-
+    if (show) {
+        if (nodeList->getODRList()) if (nodeList->getODRList()->size()) {
+            SetFocus(nodeList->getHWnd());
+            return;
+        }
+        SetFocus(editWnd);
+    }
 }
 
 void ServiceDiscovery::redraw(){
@@ -596,23 +608,27 @@ void ServiceDiscovery::parseResult() {
         } else {
             list->push_back(DiscoCommand::ref(new DiscoCommand(L"Error", icons::ICON_ERROR_INDEX, DiscoCommand::ERR)));
         }
-    }
 
-    if (itemReply) {
-        if (infoReply->getTagName()=="query") {
-            JabberDataBlockRefList::iterator i=itemReply->getChilds()->begin();
-            while (i!=itemReply->getChilds()->end()) {
-                JabberDataBlockRef item=*(i++);
-                std::string &jid=item->getAttribute("jid");
-                std::string &name=item->getAttribute("name");
-                std::string &node=item->getAttribute("node");
-                DiscoItem::ref contact=DiscoItem::ref(new DiscoItem(jid, node, name));
-                list->push_back(contact);
+        int b=list->size();
+        if (itemReply) {
+            if (infoReply->getTagName()=="query") {
+                JabberDataBlockRefList::iterator i=itemReply->getChilds()->begin();
+                while (i!=itemReply->getChilds()->end()) {
+                    JabberDataBlockRef item=*(i++);
+                    const std::string &jid=item->getAttribute("jid");
+                    std::string name=item->getAttribute("name"); std::trim(name);
+                    const std::string &node=item->getAttribute("node");
+                    DiscoItem::ref contact=DiscoItem::ref(new DiscoItem(jid, node, name));
+                    list->push_back(contact);
+                }
+                std::stable_sort(list->begin()+b, list->end(), DiscoItem::compare);
+
+            } else {
+                list->push_back(DiscoCommand::ref(new DiscoCommand(L"Error", icons::ICON_ERROR_INDEX, DiscoCommand::ERR)));
             }
-        } else {
-            list->push_back(DiscoCommand::ref(new DiscoCommand(L"Error", icons::ICON_ERROR_INDEX, DiscoCommand::ERR)));
         }
     }
+
     nodeList->bindODRList(ODRListRef(list));
     nodeList->notifyListUpdate(true);
 }

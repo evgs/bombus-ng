@@ -368,6 +368,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\src\stringutils.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Sysinfo.cpp"
 				>
 			</File>
@@ -599,6 +603,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\stringutils.h"
 				>
 			</File>
 			<File

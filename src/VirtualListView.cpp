@@ -465,6 +465,7 @@ void VirtualListView::moveCursor( int direction ) {
             return;
         }
     }
+    if (odrlist->size()) cursorPos=odrlist->front();
 }
 
 void VirtualListView::addODR( ODRRef odr, bool redraw ) {

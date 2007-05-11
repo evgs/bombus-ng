@@ -349,6 +349,17 @@ Roster::ContactListRef Roster::getHotContacts() {
     return hots;
 }
 
+Roster::ContactListRef Roster::getGroupContacts( RosterGroup::ref group ) {
+    ContactListRef gcl=ContactListRef(new ContactList());
+    for (ContactList::const_iterator ci=contacts.begin(); ci!=contacts.end(); ci++) {
+        Contact::ref contact=*ci;
+        if (contact->group==group->getName()) {
+            gcl->push_back(contact);
+        }
+    }
+    return gcl;
+}
+
 RosterGroup::RosterGroup( const std::string &name, Type type ) {
     groupName=name;
     this->type=type;

@@ -21,6 +21,7 @@ public:
 
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     void sendJabberMessage();
+    void mucNickComplete();
     //virtual const wchar_t * getWindowTitle() const;
     virtual const ODR * getODR() const;
 

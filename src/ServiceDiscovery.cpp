@@ -405,7 +405,6 @@ LRESULT CALLBACK ServiceDiscovery::WndProc( HWND hWnd, UINT message, WPARAM wPar
                 SWP_NOZORDER 
                 );
 
-
             EndDeferWindowPos(hdwp); 
 
             break; 
@@ -419,7 +418,7 @@ LRESULT CALLBACK ServiceDiscovery::WndProc( HWND hWnd, UINT message, WPARAM wPar
                     updateComboHistory(p->editWnd);
                     while (!p->nodes.empty()) p->nodes.pop();
                     p->nodeList->bindODRList(ODRListRef());
-
+                    p->newNode.clear();
                     p->go();
                     break;
                 }
@@ -559,6 +558,7 @@ void ServiceDiscovery::go() {
     infoReply.reset();
     itemReply.reset();
     gd->doRequest(rc);
+    SetFocus(nodeList->getHWnd());
 }
 
 void ServiceDiscovery::back() {
@@ -629,6 +629,7 @@ void ServiceDiscovery::parseResult() {
         }
     }
 
+    SetFocus(nodeList->getHWnd());
     nodeList->bindODRList(ODRListRef(list));
     nodeList->notifyListUpdate(true);
 }

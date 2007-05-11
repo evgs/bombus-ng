@@ -97,6 +97,7 @@ public:
     void setStatusByFilter(const std::string & bareJid, int status);
     void setAllOffline();
     Roster::ContactListRef getHotContacts();
+    Roster::ContactListRef getGroupContacts(RosterGroup::ref group);
 
     void rosterSet(const char * nick, const char *jid, const char *group, const char *subscr );
     typedef boost::shared_ptr<Roster> ref;

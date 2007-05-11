@@ -111,6 +111,10 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             PostMessage(GetParent(hWnd), WM_COMMAND, IDS_SEND, 0);
             return 0;
         }
+        if (wParam==VK_TAB) {
+            PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPLETE, 0);
+            return 0;
+        }
         break;
     } 
     return CallWindowProc(OldWndProc,hWnd,msg,wParam,lParam); 
@@ -233,6 +237,9 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
         {
             if (wParam==IDS_SEND) {
                 p->sendJabberMessage();
+            }
+            if (wParam==IDC_COMPLETE) {
+                p->mucNickComplete();
             }
             break;             
         }
@@ -375,6 +382,88 @@ void ChatView::calcEditHeight() {
     GetWindowRect(editWnd, &rect);
 }
 
+//////////////////////////////////////////////////////////////////////////
+bool nickCompare( std::wstring left, std::wstring right ) {
+    return (_wcsicmp(left.c_str(), right.c_str()) < 0);
+}
+
+void ChatView::mucNickComplete() {
+    //step 1 - verify if this chat is muc-chat
+    MucGroup::ref roomGrp;
+    roomGrp=boost::dynamic_pointer_cast<MucGroup> (rc->roster->findGroup(contact->jid.getBareJid()));
+    if (!roomGrp) return;
+    if (roomGrp->room!=contact) return;
+
+    //step 4 - extracting data for autocomplete
+    wchar_t buf[1024];
+    int len=SendMessage(editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
+    size_t mbegin;
+    size_t mend;
+    SendMessage(editWnd, EM_GETSEL, (WPARAM)&mbegin, (LPARAM)&mend);
+
+    //step 5 - search nick begin and end
+    size_t nbegin=mbegin;
+    while (nbegin>0) {
+        nbegin--;
+        if (iswspace(buf[nbegin])) { nbegin++; break; }
+    }
+
+    size_t nend=mend;
+    while (nend>mbegin) {
+        nend--;
+        if (buf[nend]==':') continue;
+        if (!iswspace(buf[nend])) { nend++; break; }
+    }
+
+    //now: [nbegin..mbegin) - constant part (case may be altered)
+    size_t clen=mbegin-nbegin;
+    //     [mbegin..mend) - may be fully rewritten, selection will be kept
+    //     [nend..mend) = ':' + whitespaces
+    size_t nlen=nend-nbegin;
+
+
+    //step 2 - pull and filter nicknames
+    WStringVector nicks;
+    {
+        Roster::ContactListRef participants=rc->roster->getGroupContacts(roomGrp);
+
+        for (Roster::ContactList::iterator i=participants->begin(); i!=participants->end(); i++) {
+            std::wstring &ws=utf8::utf8_wchar( (*i)->jid.getResource() );
+
+            if (ws.length()<clen) continue;
+            if (clen>0) if (_wcsnicmp(buf+nbegin, ws.c_str(), clen)!=0) continue;
+
+            nicks.push_back(ws);
+        }
+    }
+    if (nicks.empty()) return;
+    //step 3 - sorting
+    stable_sort(nicks.begin(), nicks.end(), nickCompare);
+
+
+    int loop=nicks.size();
+    WStringVector::iterator i=nicks.begin();
+
+    //search for nick instance
+
+    bool found=false;
+
+    while (loop) {
+        std::wstring &s=(*i);
+        if (s.length()==nlen) {
+            found=(_wcsnicmp(buf+nbegin, s.c_str(), nlen)==0);
+        } 
+
+        i++; if (i==nicks.end()) i=nicks.begin();
+        loop--;
+        if (found) break;
+    }
+    std::wstring &s=(*i);
+    s+=L": ";
+    SendMessage(editWnd, EM_SETSEL, nbegin, mend);
+    SendMessage(editWnd, EM_REPLACESEL, TRUE, (LPARAM)s.c_str());
+    SendMessage(editWnd, EM_SETSEL, mbegin, nbegin+s.length());
+}
 //////////////////////////////////////////////////////////////////////////
 class FontMetricCache {
 public: 

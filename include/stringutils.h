@@ -3,5 +3,5 @@
 #include <string>
 
 namespace std {
-    void trim(std::string &string);
+    void trim(std::string &str);
 }

@@ -17,6 +17,7 @@
 
 #include "basetypes.h"
 #include "utf8.hpp"
+#include "stringutils.h"
 
 extern HINSTANCE	g_hInst;			// current instance
 extern RosterView::ref rosterWnd;
@@ -124,6 +125,7 @@ INT_PTR CALLBACK DlgAddEditContact::dialogProc(HWND hDlg, UINT message, WPARAM w
 		if (LOWORD(wParam) == IDOK)
 		{
             std::string jid; GetDlgItemText(hDlg, IDC_E_JID, jid);
+            std::trim(jid);
             if (!verifyJid(hDlg, jid)) return TRUE;
             std::string group; GetDlgItemText(hDlg, IDC_C_GROUP, group);
             std::string nick; GetDlgItemText(hDlg, IDC_E_NICK, nick);

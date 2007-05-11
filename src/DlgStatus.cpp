@@ -17,6 +17,7 @@
 
 
 #include "utf8.hpp"
+#include "stringutils.h"
 
 extern HINSTANCE	g_hInst;			// current instance
 extern RosterView::ref rosterWnd;
@@ -83,7 +84,7 @@ INT_PTR CALLBACK DlgStatus::dialogProc(HWND hDlg, UINT message, WPARAM wParam, L
             //direct presences
             if (p->contact) {
                 std::string to;
-                GetDlgItemText(hDlg, IDC_E_JID, to);
+                GetDlgItemText(hDlg, IDC_E_JID, to); std::trim(to);
                 p->rc->sendPresence(to.c_str(), status, pmessage, priority);
             } else {
                 //store selected presence

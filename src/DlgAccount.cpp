@@ -13,6 +13,7 @@
 #include "..\vs2005\ui\resourceppc.h"
 
 #include "utf8.hpp"
+#include "stringutils.h"
 
 static JabberAccountRef dlgAccountParam;
 
@@ -64,12 +65,13 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK)
 		{
-            const std::string &myjid=GetDlgItemText(hDlg, IDC_E_JID);
+            std::string myjid=GetDlgItemText(hDlg, IDC_E_JID);
+            std::trim(myjid);
             if (!verifyJid(hDlg, myjid)) return TRUE;
             dlgAccountParam->setBareJid(myjid);
             GetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
             dlgAccountParam->setResource(GetDlgItemText(hDlg, IDC_E_RESOURCE));
-            GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);
+            GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp); std::trim(dlgAccountParam->hostNameIp);
 
             dlgAccountParam->port=GetDlgItemInt(hDlg, IDC_E_PORT, NULL, false);
 

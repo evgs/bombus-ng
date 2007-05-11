@@ -16,8 +16,8 @@
 
 #include "..\vs2005\ui\resourceppc.h"
 
-
 #include "utf8.hpp"
+#include "stringutils.h"
 
 extern HINSTANCE	g_hInst;			// current instance
 extern RosterView::ref rosterWnd;
@@ -75,10 +75,10 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
 	case WM_COMMAND:
 		if (LOWORD(wParam) == IDOK)
 		{
-            std::string room;  GetDlgItemText(hDlg, IDC_E_ROOM, room);
-            std::string server; GetDlgItemText(hDlg, IDC_E_SERVER, server);
+            std::string room;  GetDlgItemText(hDlg, IDC_E_ROOM, room); std::trim(room);
+            std::string server; GetDlgItemText(hDlg, IDC_E_SERVER, server); std::trim(server);
             std::string pass; GetDlgItemText(hDlg, IDC_E_PASSWORD, pass);
-            std::string nick; GetDlgItemText(hDlg, IDC_C_NICK, nick);
+            std::string nick; GetDlgItemText(hDlg, IDC_C_NICK, nick); std::trim(nick);
             mru::saveMru(MRU_MUC_NICK, hDlg, IDC_C_NICK);
 
             int histSz=SendDlgItemMessage(hDlg, IDC_SPIN_HIST_SZ, UDM_GETPOS, 0, 0);

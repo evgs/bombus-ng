@@ -25,6 +25,7 @@
 #include "DlgAddEditContact.h"
 #include "VcardForm.h"
 #include "ServiceDiscovery.h"
+#include "MucConfigForm.h"
 
 #include "utf8.hpp"
 
@@ -429,8 +430,11 @@ HMENU RosterView::getContextMenu() {
     }
     
     Contact * c = dynamic_cast<Contact *>(cursorPos.get());
+
     if (c) {
         RosterGroup::Type type=roster.lock()->findGroup(c->group)->type;
+
+        MucRoom * mr= dynamic_cast<MucRoom *>(cursorPos.get());
 
         if (type==RosterGroup::TRANSPORTS) {
             AppendMenu(hmenu, MF_STRING, RosterView::LOGON,                TEXT("Logon"));
@@ -442,42 +446,65 @@ HMENU RosterView::getContextMenu() {
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
-        AppendMenu(hmenu, MF_STRING, RosterView::VCARD,                    TEXT("VCard"));
-        AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::CLIENTINFO,               TEXT("Client Info"));
-        AppendMenu(hmenu, MF_STRING, RosterView::COMMANDS,                 TEXT("Commands"));
+        if (!mr) {
 
-        AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-
-        if (type==RosterGroup::ROSTER) {
-            AppendMenu(hmenu, MF_STRING, RosterView::EDITCONTACT,          TEXT("Edit contact"));
-
-            HMENU subscrMenu=CreatePopupMenu();
-            AppendMenu(subscrMenu, MF_STRING, RosterView::SUBSCRIBE, TEXT("Ask subscription"));
-            AppendMenu(subscrMenu, MF_STRING, RosterView::SUBSCRIBED, TEXT("Grant subscription"));
-            AppendMenu(subscrMenu, MF_STRING, RosterView::UNSUBSCRIBED, TEXT("Revoke subscription"));
-
-            AppendMenu(hmenu, MF_POPUP, (LPARAM)subscrMenu,               TEXT("Subscription"));
-        }
-
-        if (type==RosterGroup::NOT_IN_LIST)
-            AppendMenu(hmenu, MF_STRING, RosterView::ADDCONTACT,           TEXT("Add contact"));
-
-        if (type!=RosterGroup::MUC && type!=RosterGroup::SELF_CONTACT) {
-            AppendMenu(hmenu, MF_STRING, RosterView::DELETECONTACT,            TEXT("Delete"));
+            AppendMenu(hmenu, MF_STRING, RosterView::VCARD,                    TEXT("VCard"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::CLIENTINFO,               TEXT("Client Info"));
+            AppendMenu(hmenu, MF_STRING, RosterView::COMMANDS,                 TEXT("Commands"));
 
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
-            AppendMenu(hmenu, MF_STRING, RosterView::SENDSTATUS,               TEXT("Send status"));
+            if (type==RosterGroup::ROSTER) {
+                AppendMenu(hmenu, MF_STRING, RosterView::EDITCONTACT,          TEXT("Edit contact"));
+
+                HMENU subscrMenu=CreatePopupMenu();
+                AppendMenu(subscrMenu, MF_STRING, RosterView::SUBSCRIBE, TEXT("Ask subscription"));
+                AppendMenu(subscrMenu, MF_STRING, RosterView::SUBSCRIBED, TEXT("Grant subscription"));
+                AppendMenu(subscrMenu, MF_STRING, RosterView::UNSUBSCRIBED, TEXT("Revoke subscription"));
+
+                AppendMenu(hmenu, MF_POPUP, (LPARAM)subscrMenu,               TEXT("Subscription"));
+            }
+
+            if (type==RosterGroup::NOT_IN_LIST)
+                AppendMenu(hmenu, MF_STRING, RosterView::ADDCONTACT,           TEXT("Add contact"));
+
+            if (type!=RosterGroup::MUC && type!=RosterGroup::SELF_CONTACT) {
+                AppendMenu(hmenu, MF_STRING, RosterView::DELETECONTACT,            TEXT("Delete"));
+
+                AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+
+                AppendMenu(hmenu, MF_STRING, RosterView::SENDSTATUS,               TEXT("Send status"));
+            }
+            if (type!=RosterGroup::TRANSPORTS) {
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::SENDFILE,             TEXT("Send file"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::INVITE,               TEXT("Invite"));
+            }
         }
-        if (type!=RosterGroup::TRANSPORTS) {
-            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::SENDFILE,             TEXT("Send file"));
-            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::INVITE,               TEXT("Invite"));
+
+        if (mr) {
+            AppendMenu(hmenu, MF_STRING, RosterView::SENDSTATUS,               TEXT("Send status"));
+
+            MucGroup::ref roomGrp;
+            roomGrp=boost::dynamic_pointer_cast<MucGroup> (roster.lock()->findGroup(mr->group));
+            MucContact::Role myRole=roomGrp->selfContact->role;
+            MucContact::Affiliation myAff=roomGrp->selfContact->affiliation;
+            if (myAff==MucContact::OWNER || myAff==MucContact::ADMIN) {
+                AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MLOUTCASTS,           TEXT("Outcasts/Banned"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MLMEMBERS,            TEXT("Members"));
+            }
+            if (myAff==MucContact::OWNER) {
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MLADMINS,             TEXT("Admins"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MLOWNERS,             TEXT("Owners"));
+                AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
+                AppendMenu(hmenu, MF_STRING, RosterView::MUCCONFIG,               TEXT("Configure room"));
+            }
         }
 
         MucContact * mc= dynamic_cast<MucContact *>(cursorPos.get());
         if (mc) {
             MucGroup::ref roomGrp;
-            roomGrp=boost::dynamic_pointer_cast<MucGroup> (roster.lock()->findGroup(mc->jid.getBareJid()));
+            roomGrp=boost::dynamic_pointer_cast<MucGroup> (roster.lock()->findGroup(mc->group));
             MucContact::Role myRole=roomGrp->selfContact->role;
             MucContact::Affiliation myAff=roomGrp->selfContact->affiliation;
 
@@ -520,7 +547,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
     ResourceContextRef rc=roster.lock()->rc;
 
     if (focusedContact) {
-    switch (cmdId) {
+        switch (cmdId) {
         case RosterView::OPENCHAT: 
             {
                 openChat(focusedContact);
@@ -560,7 +587,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 tabs->switchByWndRef(disco);
             }
             break;
-        //case RosterView::SUBSCR: 
+            //case RosterView::SUBSCR: 
         case RosterView::SUBSCRIBE:
         case RosterView::SUBSCRIBED: 
         case RosterView::UNSUBSCRIBED: 
@@ -591,10 +618,22 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
 
         case RosterView::SENDFILE: 
         case RosterView::INVITE:
-        //case RosterView::RENAMEGRP:
+            break;
+
+        case RosterView::MUCCONFIG:
+            {
+                MucConfigForm::ref mucconf=MucConfigForm::createMucConfigForm(
+                    tabs->getHWnd(), 
+                    focusedContact->jid.getBareJid(), 
+                    rc);
+                tabs->addWindow(mucconf);
+                tabs->switchByWndRef(mucconf);
+                break;
+            }
+            //case RosterView::RENAMEGRP:
         default:
             break;
-    }
+        }
     }
 
     if (cmdId==ID_JABBER_ADDACONTACT){

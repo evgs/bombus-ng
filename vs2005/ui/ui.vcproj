@@ -308,6 +308,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\MucConfigForm.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\Notify.cpp"
 				>
 			</File>
@@ -547,6 +551,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\MRU.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\MucConfigForm.h"
 				>
 			</File>
 			<File

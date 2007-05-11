@@ -278,6 +278,7 @@ void ProcessMuc::initMuc( const std::string &jid, const std::string &password, R
     if (!room) {
         room=MucRoom::ref(new MucRoom(jid));
         roomGrp->room=room;
+        room->group=roomGrp->getName();
     }
 
     rosterWnd->openChat(room);

@@ -5,29 +5,25 @@
 #include "JabberDataBlockListener.h"
 #include <boost/shared_ptr.hpp>
 
-class AdHocForm : public XDataForm {
+class MucConfigForm : public XDataForm {
 protected:
-    AdHocForm(){};
+    MucConfigForm(){};
 public:
-    virtual ~AdHocForm();
-    void AdHocResultNotify(JabberDataBlockRef block);
-    typedef boost::shared_ptr<AdHocForm> ref;
+    virtual ~MucConfigForm();
+    void MucConfigResultNotify(JabberDataBlockRef block);
+    typedef boost::shared_ptr<MucConfigForm> ref;
 
-    static AdHocForm::ref createAdHocForm(HWND parent, const std::string &jid, const std::string &node, ResourceContextRef rc);
+    static MucConfigForm::ref createMucConfigForm(HWND parent, const std::string &roomJid, ResourceContextRef rc);
 
 protected:
     virtual void onSubmit(JabberDataBlockRef replyForm);
     virtual void onCancel();
 
-    void sendCommand(const std::string &command, JabberDataBlockRef childData);
+    void sendIq(JabberDataBlockRef childData);
 
-    std::string jid;
-    std::string node;
+    std::string roomJid;
 
-    std::string sessionId;
-    std::string status;
-
-    boost::weak_ptr<AdHocForm> formRef;
+    boost::weak_ptr<MucConfigForm> formRef;
 
     boost::weak_ptr<ResourceContext> rc;
     //JabberDataBlockListenerRef listener;

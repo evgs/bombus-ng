@@ -394,14 +394,14 @@ void ChatView::mucNickComplete() {
     if (!roomGrp) return;
     if (roomGrp->room!=contact) return;
 
-    //step 4 - extracting data for autocomplete
+    //step 2 - extracting data for autocomplete
     wchar_t buf[1024];
     int len=SendMessage(editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
     size_t mbegin;
     size_t mend;
     SendMessage(editWnd, EM_GETSEL, (WPARAM)&mbegin, (LPARAM)&mend);
 
-    //step 5 - search nick begin and end
+    //step 3 - search nick begin and end
     size_t nbegin=mbegin;
     while (nbegin>0) {
         nbegin--;
@@ -422,7 +422,7 @@ void ChatView::mucNickComplete() {
     size_t nlen=nend-nbegin;
 
 
-    //step 2 - pull and filter nicknames
+    //step 4 - pull and filter nicknames
     WStringVector nicks;
     {
         Roster::ContactListRef participants=rc->roster->getGroupContacts(roomGrp);
@@ -437,27 +437,28 @@ void ChatView::mucNickComplete() {
         }
     }
     if (nicks.empty()) return;
-    //step 3 - sorting
+
+    //step 5 - sorting
     stable_sort(nicks.begin(), nicks.end(), nickCompare);
 
-
+    //step 6 - search for nick instance
     int loop=nicks.size();
     WStringVector::iterator i=nicks.begin();
 
-    //search for nick instance
-
-    bool found=false;
-
     while (loop) {
         std::wstring &s=(*i);
-        if (s.length()==nlen) {
-            found=(_wcsnicmp(buf+nbegin, s.c_str(), nlen)==0);
-        } 
 
-        i++; if (i==nicks.end()) i=nicks.begin();
+        i++; 
+        if (i==nicks.end()) 
+            i=nicks.begin();
         loop--;
-        if (found) break;
+
+        if (s.length()==nlen) {
+            if (_wcsnicmp(buf+nbegin, s.c_str(), nlen)==0) break;
+        } 
     }
+
+
     std::wstring &s=(*i);
     s+=L": ";
     SendMessage(editWnd, EM_SETSEL, nbegin, mend);

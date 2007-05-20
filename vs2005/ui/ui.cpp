@@ -101,7 +101,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_UI));
 
 	// Main message loop:
-	while (GetMessage(&msg, NULL, 0, 0)) {
+    while (GetMessage(&msg, NULL, 0, 0)) {
+	//while (true) {
+    //    if (!PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {  Sleep(50); continue; }
+    //    if (msg.message==WM_QUIT) break;
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
@@ -545,18 +548,18 @@ ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceCo
 class Version : public JabberDataBlockListener {
 public:
     Version() {}
-	~Version(){};
-	virtual const char * getType() const{ return "get"; }
-	virtual const char * getId() const{ return NULL; }
-	virtual const char * getTagName() const { return "iq"; }
-	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+    ~Version(){};
+    virtual const char * getType() const{ return "get"; }
+    virtual const char * getId() const{ return NULL; }
+    virtual const char * getTagName() const { return "iq"; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 };
 ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-    
+
     JabberDataBlockRef query=block->getChildByName("query");
     if (!query) return BLOCK_REJECTED;
     if (query->getAttribute("xmlns")!="jabber:iq:version") return BLOCK_REJECTED;
-    
+
     Log::getInstance()->msg("version request ", block->getAttribute("from").c_str());
 
     std::string version=utf8::wchar_utf8(sysinfo::getOsVersion());
@@ -568,12 +571,37 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
     result.setAttribute("id", block->getAttribute("id"));
     result.addChild(query);
 
-	query->addChild("name","Bombus-ng");
+    query->addChild("name","Bombus-ng");
     query->addChild("version",::appVersion.c_str());
-	query->addChild("os",version.c_str());
+    query->addChild("os",version.c_str());
 
-	rc->jabberStream->sendStanza(result);
-	return BLOCK_PROCESSED;
+    rc->jabberStream->sendStanza(result);
+    return BLOCK_PROCESSED;
+}
+//////////////////////////////////////////////////////////////
+class Ping : public JabberDataBlockListener {
+public:
+    Ping() {}
+    ~Ping(){};
+    virtual const char * getType() const{ return "get"; }
+    virtual const char * getId() const{ return NULL; }
+    virtual const char * getTagName() const { return "iq"; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+};
+ProcessResult Ping::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+
+    JabberDataBlockRef ping=block->findChildNamespace("ping","http://www.xmpp.org/extensions/xep-0199.html#ns");
+    if (!ping) return BLOCK_REJECTED;
+
+    Log::getInstance()->msg("Ping from ", block->getAttribute("from").c_str());
+
+    JabberDataBlock result("iq");
+    result.setAttribute("to", block->getAttribute("from"));
+    result.setAttribute("type", "result");
+    result.setAttribute("id", block->getAttribute("id"));
+
+    rc->jabberStream->sendStanza(result);
+    return BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
 class MessageRecv : public JabberDataBlockListener {

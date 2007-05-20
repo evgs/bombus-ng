@@ -755,6 +755,7 @@ void JabberStreamEvents::loginSuccess(){
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new PresenceRecv() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Ping() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new EntityCaps() ));
 
     JabberDataBlock getRoster("iq");

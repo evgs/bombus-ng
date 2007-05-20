@@ -5,7 +5,13 @@
 
 extern std::string appVersion;
 
-char *features[]={"jabber:iq:version", "jabber:x:data", "http://jabber.org/protocol/disco#info" };
+char *features[]={
+    "jabber:iq:version", 
+    "jabber:x:data", 
+    "http://jabber.org/protocol/disco#info",
+    "http://jabber.org/protocol/muc",
+    "http://www.xmpp.org/extensions/xep-0199.html#ns"
+};
 
 ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
     JabberDataBlockRef query=block->getChildByName("query");

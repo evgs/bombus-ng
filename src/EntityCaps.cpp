@@ -7,6 +7,8 @@ extern std::string appVersion;
 
 char *features[]={
     "jabber:iq:version", 
+    //"jabber:iq:last", //todo:
+    //"jabber:iq:time", //todo:
     "jabber:x:data", 
     "http://jabber.org/protocol/disco#info",
     "http://jabber.org/protocol/muc",

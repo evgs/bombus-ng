@@ -315,9 +315,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
 
 
-				case IDM_WINDOWS_ROSTER:
+				/*case IDM_WINDOWS_ROSTER:
                     tabs->switchByWndRef(rosterWnd);
-					break;
+					break;*/
+                case IDS_WINDOWS:
+                    SendMessage(tabs->getHWnd(), WM_COMMAND, IDS_WINDOWS, 0);
 
                 default:
                     if (tabs) tabs->fwdWMCommand(wmId);

@@ -86,6 +86,8 @@
 #define ID_TOOLS_STREAMINFO             32794
 #define ID_TOOLS_MYVCARD                32795
 #define ID_Menu                         32796
+#define ID_HELP                         32797
+#define ID_WINDOWS                      32798
 #define IDM_EXIT                        40000
 #define IDM_HELP_ABOUT                  40002
 #define IDC_STATIC                      -1
@@ -96,7 +98,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        135
-#define _APS_NEXT_COMMAND_VALUE         32797
+#define _APS_NEXT_COMMAND_VALUE         32799
 #define _APS_NEXT_CONTROL_VALUE         1040
 #define _APS_NEXT_SYMED_VALUE           115
 #endif

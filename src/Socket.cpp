@@ -53,9 +53,14 @@ Socket::Socket(const std::string &url, const int port) {
 	name.sin_addr.S_un.S_addr=resolveUrl();
 	name.sin_port= htons(port); // internet byte order
 
+    //bool keepAlive=true;
+    //int optres=setsockopt(sock, SOL_SOCKET, SO_KEEPALIVE, (const char *)&keepAlive, 1);
+    //if (optres==SOCKET_ERROR) throwSocketError();
+
 	int result=connect(sock, (sockaddr*)(&name), sizeof(name));
 
 	if (result==SOCKET_ERROR) throwSocketError();
+
 }
 
 int Socket::read(char * buf, int len) {

@@ -43,6 +43,7 @@ BEGIN
             MENUITEM "File transfers",              ID_TOOLS_FILETRANSFERS, GRAYED
             MENUITEM "My vCard",                    ID_TOOLS_MYVCARD
             MENUITEM SEPARATOR
+            MENUITEM "Log",                         IDM_WINDOWS_LOG
             MENUITEM "Stream Info",                 IDM_JABBER_STREAMINFO
         END
         MENUITEM SEPARATOR
@@ -51,12 +52,8 @@ BEGIN
         MENUITEM "About",                       IDM_HELP_ABOUT
         MENUITEM "Exit",                        IDM_EXIT
     END
-    MENUITEM "Help",                        0
-    POPUP "Windows"
-    BEGIN
-        MENUITEM "Roster",                      IDM_WINDOWS_ROSTER
-        MENUITEM "Log",                         IDM_WINDOWS_LOG
-    END
+    MENUITEM "Help",                        ID_HELP
+    MENUITEM "Windows",                     IDS_WINDOWS
 END
 
 

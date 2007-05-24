@@ -38,6 +38,8 @@ protected:
 
     HMENU getContextMenu();
 
+    void processPopupMenu(bool cmdBar, int posX, int posY);
+
     struct TabInfo {
         int tabWidth;
         //int tabDispWidth;

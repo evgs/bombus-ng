@@ -56,7 +56,8 @@ const std::string CompressedSocket::getStatistics(){
 }
 int CompressedSocket::read(char *buf, int len){
 
-	if (istr.avail_out!=0){
+	//if (istr.avail_out!=0){
+    if (istr.avail_in==0){
 		istr.avail_in=pack->read(zinbuf, CHUNK);
 		istr.next_in= (unsigned char *) const_cast<char *>( zinbuf );
 	}

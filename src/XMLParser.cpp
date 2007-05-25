@@ -105,7 +105,6 @@ void XMLParser::parse( const char * buf, int size ) {
 void XMLParser::parseStream() {
     while (true) {
         prebuffered=inStream->read(inbuf, XML_PREBUF_SZ);
-        if (prebuffered<=0) throw std::exception("Unexpected end of XML");
         parse(inbuf, prebuffered);
     }
 }

@@ -78,6 +78,8 @@ int Socket::read(char * buf, int len) {
 	int rb=recv(sock, buf, len, 0);
     if (rb==SOCKET_ERROR) throwSocketError();
 	bytesRecvd+=rb;
+
+    if (rb<=0) throw std::exception("Socket closed");
 	return rb;
 }
 

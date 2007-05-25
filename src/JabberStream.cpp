@@ -54,7 +54,8 @@ void JabberStream::tagStart(const std::string & tagname, const StringMap &attr) 
 
 bool JabberStream::tagEnd(const std::string & tagname) {
     if (xmlStack.empty()) {
-        return (tagname=="stream:stream");
+        if (tagname=="stream:stream") throw std::exception("Stream normal shutdown");
+        else throw std::exception("XML Stack underflow");
     }
 	JabberDataBlockRef stanza=xmlStack.top();
 	xmlStack.pop();

@@ -15,3 +15,9 @@ void std::trim(std::string &str) {
         if (iswspace(str[pos])) str.erase(pos, pos+1); else break;
     }
 }
+
+void std::strAppendInt(std::string &s, int n){
+    char tmpbuf[10];
+    sprintf(tmpbuf, "%d", n);
+    s+=tmpbuf;
+}

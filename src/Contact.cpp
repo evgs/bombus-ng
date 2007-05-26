@@ -5,6 +5,7 @@
 #include "utf8.hpp"
 #include "Image.h"
 #include "TimeFunc.h"
+#include "stringutils.h"
 //////////////////////////////////////////////////////////////////////////
 extern ImgListRef skin;
 
@@ -138,7 +139,10 @@ void Contact::processPresence( JabberDataBlockRef block ) {
     std::string body=type;
     body+=" (";
     body+=status;
-    body+=") [#]"; //todo: priority
+    body+=") [";
+    //std::strAppendInt(body, priority);
+    body+=priority;
+    body+=']';
 
     Message::ref msg=Message::ref(new Message(body, block->getAttribute("from"), false, msgType, Message::extractXDelay(block) ));
 

@@ -7,6 +7,7 @@
 #include "wmuser.h"
 #include "ResourceContext.h"
 #include "JabberStream.h"
+#include "JabberAccount.h"
 #include "TabCtrl.h"
 #include "ProcessMUC.h"
 
@@ -357,7 +358,7 @@ void ChatView::sendJabberMessage() {
     if (len==0) return;
     std::string body=utf8::wchar_utf8(buf);
 
-    Message::ref msg=Message::ref(new Message(body, "", false, Message::SENT, strtime::getCurrentUtc() ));
+    Message::ref msg=Message::ref(new Message(body, rc->account->getNickname(), false, Message::SENT, strtime::getCurrentUtc() ));
     bool muc=boost::dynamic_pointer_cast<MucRoom>(contact);
 
     if (!muc) contact->messageList->push_back(msg);

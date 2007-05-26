@@ -19,6 +19,8 @@ public:
 	const std::string & getJid(void) const {return jid.getJid(); };
 	const std::string & getBareJid(void) const {return jid.getBareJid(); };
 
+    const std::string & getNickname(void) const {return jid.getUserName(); /*stub*/}
+
 	void setUserName(const std::string &userName) { jid.setUserName(userName); };
 	void setServer(const std::string &server){ jid.setServer(server); };
 	void setResource(const std::string &resource){ jid.setResource(resource); };

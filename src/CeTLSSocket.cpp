@@ -11,7 +11,7 @@
 #include <schnlsp.h>
 
 #include "TimeFunc.h"
-
+#include "stringutils.h"
 // load SslCrackCertificate and SslFreeCertificate
 #define SSL_CRACK_CERTIFICATE_NAME TEXT("SslCrackCertificate")
 #define SSL_FREE_CERTIFICATE_NAME TEXT("SslFreeCertificate")
@@ -61,14 +61,6 @@ HRESULT FreeSSL()
     }
     return S_OK;
 }
-
-
-void strAppendInt(std::string &s, int n){
-    char tmpbuf[10];
-    sprintf(tmpbuf, "%d", n);
-    s+=tmpbuf;
-}
-
 
 int CeTLSSocket::SslValidate (
                  DWORD  dwType,
@@ -189,7 +181,7 @@ const std::string CeTLSSocket::getStatistics(){
     case SSL_PROT_SSL2_CLIENT: stats+="SSL2"; break;
     case SSL_PROT_SSL3_CLIENT: stats+="SSL3"; break;
     case SSL_PROT_TLS1_CLIENT: stats+="TLS1"; break;
-    default: strAppendInt(stats, SSLConnectionInfo.dwProtocol |0x80);
+    default: std::strAppendInt(stats, SSLConnectionInfo.dwProtocol |0x80);
     }
     stats+="\nChiper: ";
 
@@ -199,19 +191,19 @@ const std::string CeTLSSocket::getStatistics(){
         case CALG_DES: stats+="DES"; break;
         case CALG_3DES: stats+="Triple DES"; break;
         case CALG_SKIPJACK: stats+="Skipjack"; break;
-        default: strAppendInt(stats, SSLConnectionInfo.aiCipher | 0x80);
+        default: std::strAppendInt(stats, SSLConnectionInfo.aiCipher | 0x80);
     }
     stats+=", ";
-    strAppendInt(stats, SSLConnectionInfo.dwCipherStrength);
+    std::strAppendInt(stats, SSLConnectionInfo.dwCipherStrength);
 
     stats+="\nHash: ";
     switch(SSLConnectionInfo.aiHash) {
     case CALG_MD5: stats+="MD5"; break;
     case CALG_SHA: stats+="SHA"; break;
-    default: strAppendInt(stats, SSLConnectionInfo.aiHash);
+    default: std::strAppendInt(stats, SSLConnectionInfo.aiHash);
     }
     stats+=", ";
-    strAppendInt(stats, SSLConnectionInfo.dwHashStrength);
+    std::strAppendInt(stats, SSLConnectionInfo.dwHashStrength);
 
     stats+="\nKey Exchange: ";
 
@@ -221,10 +213,10 @@ const std::string CeTLSSocket::getStatistics(){
     case CALG_RSA_SIGN: stats+="RSA"; break;
 
     case CALG_KEA_KEYX: stats+="KEA"; break;
-    default: strAppendInt(stats, SSLConnectionInfo.aiExch);
+    default: std::strAppendInt(stats, SSLConnectionInfo.aiExch);
     }
     stats+=", ";
-    strAppendInt(stats, SSLConnectionInfo.dwExchStrength);
+    std::strAppendInt(stats, SSLConnectionInfo.dwExchStrength);
 
     stats+="\n";
 

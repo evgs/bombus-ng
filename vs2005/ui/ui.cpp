@@ -356,13 +356,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 Log::getInstance()->bindLV(odrLog); 
             }
 
-#ifdef DEBUG
+            /*#ifdef DEBUG
             {
                 XDataForm::ref testXdata=XDataForm::createXDataForm(tabs->getHWnd(), "", rc);
                 tabs->addWindow(testXdata);
                 testXdata->formTest();
             }
-#endif
+            #endif*/
 
 			//listWnd=logWnd;
 			//dropdownWnd=DoCreateComboControl(hWnd);

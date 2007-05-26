@@ -5,6 +5,8 @@
 #include <aygshell.h>
 #include "utf8.hpp"
 
+#include "wmuser.h"
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 
@@ -297,7 +299,7 @@ LRESULT CALLBACK VirtualListView::WndProc( HWND hWnd, UINT message, WPARAM wPara
             break;
         }
 
-    case WM_USER+1:
+    case WM_VIRTUALLIST_REPLACE:
         {
             //TODO: create interconnecting message object to avoid pointers
             ODRListRef r=ODRListRef((ODRList *)lParam);

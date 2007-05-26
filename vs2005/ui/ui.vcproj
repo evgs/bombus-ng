@@ -650,6 +650,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\include\wmuser.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\include\Wnd.h"
 				>
 			</File>

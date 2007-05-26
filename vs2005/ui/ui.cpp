@@ -11,6 +11,7 @@
 #include <windowsx.h>
 #include <aygshell.h>
 
+#include "wmuser.h"
 #include "Notify.h"
 
 #include "Log.h"
@@ -436,10 +437,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}*/
 
-        case WM_USER:
+        case SHELLNOTIFYICON:
             SetForegroundWindow((HWND)((ULONG) hWnd | 0x00000001));            
             break;
-        case WM_USER+2:
+        case WM_FORWARD_STANZA:
             {
                 JabberDataBlockRef *rf=(JabberDataBlockRef *)lParam; //ÀÕÒÓÍÃ
                 if (rf==NULL) break; 
@@ -515,7 +516,7 @@ public:
 ProcessResult MTForwarder::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
     JabberDataBlockRef *p=new JabberDataBlockRef(block); //ÀÕÒÓÍÃ
     //rc->jabberStanzaDispatcher2->dispatchDataBlock(block);
-    PostMessage(mainWnd, WM_USER+2, 0, (LPARAM)p);
+    PostMessage(mainWnd, WM_FORWARD_STANZA, 0, (LPARAM)p);
 
     return BLOCK_PROCESSED;
 }*/
@@ -638,6 +639,8 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     //StringRef orig=block->toXML();
 	Log::getInstance()->msg("Message from ", from.c_str()); 
 
+    std::string nick;
+
     bool mucMessage= block->getAttribute("type")=="groupchat";
     Contact::ref c;
     if (mucMessage) {
@@ -650,14 +653,17 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
         if (!roomGrp) return BLOCK_PROCESSED;
         c=roomGrp->room;
 
-        body=roomNode.getResource()+">"+body;
+        nick=roomNode.getResource();
 
-    } else c=rc->roster->getContactEntry(from);
+    } else {
+        c=rc->roster->getContactEntry(from);
+        nick=c->getName();
+    }
 
     //drop composing events
     if (body.empty()) return BLOCK_PROCESSED;
 
-    Message::ref msg=Message::ref(new Message(body, from, Message::INCOMING, Message::extractXDelay(block) ));
+    Message::ref msg=Message::ref(new Message(body, nick, mucMessage, Message::INCOMING, Message::extractXDelay(block) ));
 
     std::wstring soundName(appRootPath);
     soundName+=TEXT("sounds\\message.wav");
@@ -849,7 +855,7 @@ void Shell_NotifyIcon(bool show, HWND hwnd){
         nid.uID = 100;      // Per WinCE SDK docs, values from 0 to 12 are reserved and should not be used.
         nid.uFlags = NIF_ICON | NIF_MESSAGE;
         nid.hIcon = LoadIcon(g_hInst, MAKEINTRESOURCE(IDI_BOMBUS));
-        nid.uCallbackMessage=WM_USER;
+        nid.uCallbackMessage=SHELLNOTIFYICON;
         nid.hWnd=hwnd;
 
         //Add the notification to the tray

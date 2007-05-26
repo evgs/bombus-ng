@@ -6,6 +6,7 @@
 #include "MucConfigForm.h"
 #include "JabberStream.h"
 
+#include "wmuser.h"
 #include "utf8.hpp"
 #include "base64.h"
 #include "../gsgetfile/include/gsgetlib.h"
@@ -105,7 +106,7 @@ void MucConfigForm::MucConfigResultNotify(JabberDataBlockRef block) {
     if (!xdata && plainText.empty())
         plainText="done"; //todo: make more informative and localizabe
 
-    PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
+    PostMessage(getHWnd(), WM_HTML_UPDATE, 0, (LPARAM)"");
     return;
 }
 

@@ -3,6 +3,7 @@
 #include <htmlctrl.h>
 #include <commdlg.h>
 
+#include "wmuser.h"
 #include "AdHocForm.h"
 #include "JabberStream.h"
 
@@ -110,7 +111,7 @@ void AdHocForm::AdHocResultNotify(JabberDataBlockRef block) {
     if (!xdata && plainText.empty())
         plainText=status; //todo: make more informative and localizabe
 
-    PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
+    PostMessage(getHWnd(), WM_HTML_UPDATE, 0, (LPARAM)"");
     return;
 }
 

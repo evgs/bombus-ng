@@ -3,6 +3,7 @@
 #include <htmlctrl.h>
 #include <commdlg.h>
 
+#include "wmuser.h"
 #include "RegisterForm.h"
 #include "JabberStream.h"
 
@@ -142,7 +143,7 @@ void RegisterForm::RegisterResultNotify(JabberDataBlockRef block) {
     }
     this->iqRegisterData=qryRegister;
 
-    PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
+    PostMessage(getHWnd(), WM_HTML_UPDATE, 0, (LPARAM)"");
     return;
 }
 

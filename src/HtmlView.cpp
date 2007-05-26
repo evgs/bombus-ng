@@ -4,6 +4,8 @@
 #include <htmlctrl.h>
 #include <windowsx.h>
 #include <aygshell.h>
+
+#include "wmuser.h"
 #include "utf8.hpp"
 #include "basetypes.h"
 
@@ -157,7 +159,7 @@ LRESULT CALLBACK HtmlView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
         }
         break;
 
-    case WM_USER:
+    case WM_HTML_UPDATE:
         {
             p->onWmUserUpdate();
             break;

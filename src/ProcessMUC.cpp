@@ -241,7 +241,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
 
     {
-        Message::ref msg=Message::ref(new Message(message, from, Message::PRESENCE, Message::extractXDelay(block) ));
+        Message::ref msg=Message::ref(new Message(message, from, false, Message::PRESENCE, Message::extractXDelay(block) ));
 
         Contact::ref room=roomGrp->room;
 

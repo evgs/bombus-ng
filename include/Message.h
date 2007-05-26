@@ -52,7 +52,7 @@ public:
     typedef boost::shared_ptr<Message> ref;
 
 public:
-    Message(std::string body, std::string fromName, int type, const PackedTime &time);
+    Message(std::string body, std::string fromName, bool appendFrom, int type, const PackedTime &time);
 
     JabberDataBlockRef constructStanza(const std::string &to) const;
 

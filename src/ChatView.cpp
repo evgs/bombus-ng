@@ -4,6 +4,7 @@
 #include <aygshell.h>
 #include "../vs2005/ui/ui.h"
 
+#include "wmuser.h"
 #include "ResourceContext.h"
 #include "JabberStream.h"
 #include "TabCtrl.h"
@@ -71,7 +72,7 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                 HMENU hmenu = CreatePopupMenu();
                 if (hmenu==NULL) break;
 
-                AppendMenu(hmenu, (smileParser->hasSmiles())? MF_STRING : MF_STRING | MF_GRAYED, WM_USER, TEXT("Add Smile"));
+                AppendMenu(hmenu, (smileParser->hasSmiles())? MF_STRING : MF_STRING | MF_GRAYED, ADD_SMILE, TEXT("Add Smile"));
                 AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
                 AppendMenu(hmenu, cut, WM_CUT, TEXT("Cut") );
                 AppendMenu(hmenu, cut, WM_COPY, TEXT("Copy") );
@@ -88,7 +89,7 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
                     hWnd,
                     NULL);
 
-                if (cmdId==WM_USER) SmileBox::showSmileBox(hWnd, pt.x, pt.y, smileParser);
+                if (cmdId==ADD_SMILE) SmileBox::showSmileBox(hWnd, pt.x, pt.y, smileParser);
 
                 DestroyMenu(hmenu);
 
@@ -356,7 +357,7 @@ void ChatView::sendJabberMessage() {
     if (len==0) return;
     std::string body=utf8::wchar_utf8(buf);
 
-    Message::ref msg=Message::ref(new Message(body, "", Message::SENT, strtime::getCurrentUtc() ));
+    Message::ref msg=Message::ref(new Message(body, "", false, Message::SENT, strtime::getCurrentUtc() ));
     bool muc=boost::dynamic_pointer_cast<MucRoom>(contact);
 
     if (!muc) contact->messageList->push_back(msg);

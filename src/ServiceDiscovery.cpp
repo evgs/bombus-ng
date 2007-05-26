@@ -7,6 +7,7 @@
 #include <aygshell.h>
 #include "../vs2005/ui/ui.h"
 
+#include "wmuser.h"
 #include "ResourceContext.h"
 #include "JabberStream.h"
 #include "TabCtrl.h"
@@ -55,7 +56,7 @@ long WINAPI ComboSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 if (hmenu==NULL) break;
 
                 //AppendMenu(hmenu, (smileParser->hasSmiles())? MF_STRING : MF_STRING | MF_GRAYED, WM_USER, TEXT("Add Smile"));
-                AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
+                //AppendMenu(hmenu, MF_SEPARATOR, 0, NULL);
                 AppendMenu(hmenu, cut, WM_CUT, TEXT("Cut") );
                 AppendMenu(hmenu, cut, WM_COPY, TEXT("Copy") );
                 AppendMenu(hmenu, paste, WM_PASTE, TEXT("Paste") );
@@ -280,7 +281,7 @@ ProcessResult GetDisco::blockArrived(JabberDataBlockRef block, const ResourceCon
                 }
             }
         }
-        SendMessage(sd->getHWnd(), WM_USER, 0,0);
+        SendMessage(sd->getHWnd(), WM_NOTIFY_BLOCKARRIVED, 0,0);
         return BLOCK_PROCESSED;
     }
     if (block->getAttribute("id")==iditems) {
@@ -295,7 +296,7 @@ ProcessResult GetDisco::blockArrived(JabberDataBlockRef block, const ResourceCon
                 }
             }
         }
-        SendMessage(sd->getHWnd(), WM_USER, 0,0);
+        SendMessage(sd->getHWnd(), WM_NOTIFY_BLOCKARRIVED, 0,0);
         return LAST_BLOCK_PROCESSED;
     }
 
@@ -447,7 +448,7 @@ LRESULT CALLBACK ServiceDiscovery::WndProc( HWND hWnd, UINT message, WPARAM wPar
         }
         break;
 
-    case WM_USER:
+    case WM_NOTIFY_BLOCKARRIVED:
         p->parseResult();
         return 0;
 

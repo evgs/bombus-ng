@@ -18,6 +18,7 @@
 #include "Presence.h"
 #include "ProcessMUC.h"
 
+#include "wmuser.h"
 #include "TabCtrl.h"
 #include "ChatView.h"
 
@@ -270,7 +271,7 @@ void Roster::makeViewList() {
 
     needUpdateView=false;
     //roster->bindODRList(odrlist);
-    PostMessage(roster->getHWnd(), WM_USER+1, 0, (LPARAM)list); //ÀÕÒÓÍÃ ¹2
+    PostMessage(roster->getHWnd(), WM_VIRTUALLIST_REPLACE, 0, (LPARAM)list); //ÀÕÒÓÍÃ ¹2
     //roster->notifyListUpdate(false);
 }
 

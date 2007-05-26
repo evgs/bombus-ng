@@ -4,7 +4,7 @@
 
 boost::regex e1("((?:(?:ht|f)tps?://|www\\.)[^<\\s\\n]+)(?<![]\\.,:;!\\})<-])");
 
-Message::Message( std::string body, std::string fromName, int type, const PackedTime &time ) 
+Message::Message( std::string body, std::string fromName, bool appendFrom, int type, const PackedTime &time ) 
 {
     this->body=body;
     this->fromName=fromName;
@@ -14,6 +14,15 @@ Message::Message( std::string body, std::string fromName, int type, const Packed
     //TODO: xml escaping
     
     std::string tmp=boost::regex_replace(body, e1, std::string("\x01\\1\x02"));
+    if (tmp.find("/me")==0) {
+        if (tmp.length()==3 || tmp[3]==' ') {
+            tmp.replace(0, 3, fromName);
+            tmp.insert(0, "*");
+        }
+    } else if (appendFrom) {
+        tmp.insert(0, "> ");
+        tmp.insert(0, fromName);
+    }
     tmp.insert(0,"[] ");
     tmp.insert(1, strtime::toTime(time));
     wstr=utf8::utf8_wchar(tmp);

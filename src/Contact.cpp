@@ -67,6 +67,11 @@ const std::string Contact::getFullName() const{
     if (nickname.length()==0) return rosterJid;
     return nickname+" <"+rosterJid+">";
 }
+
+const std::string Contact::getName() const{
+    if (nickname.length()==0) return rosterJid;
+    return nickname;
+}
 //////////////////////////////////////////////////////////////////////////
 bool Contact::compare( Contact::ref left, Contact::ref right ) {
     Contact *l=left.get();
@@ -135,7 +140,7 @@ void Contact::processPresence( JabberDataBlockRef block ) {
     body+=status;
     body+=") [#]"; //todo: priority
 
-    Message::ref msg=Message::ref(new Message(body, block->getAttribute("from"), msgType, Message::extractXDelay(block) ));
+    Message::ref msg=Message::ref(new Message(body, block->getAttribute("from"), false, msgType, Message::extractXDelay(block) ));
 
     if (messageList->size()==1) {
         //verify if it is presence;

@@ -3,6 +3,7 @@
 #include <htmlctrl.h>
 #include <commdlg.h>
 
+#include "wmuser.h"
 #include "VcardForm.h"
 #include "JabberStream.h"
 
@@ -143,7 +144,7 @@ VcardForm::ref VcardForm::createVcardForm( HWND parent, const std::string &jid, 
 void VcardForm::vcardArrivedNotify(JabberDataBlockRef vcard){
     this->vcard=vcard;
 
-    PostMessage(getHWnd(), WM_USER, 0, (LPARAM)"");
+    PostMessage(getHWnd(), WM_HTML_UPDATE, 0, (LPARAM)"");
 }
 
 void VcardForm::addHtmlField( const char *ns1, const char *ns2, const char *description, int flags ) {

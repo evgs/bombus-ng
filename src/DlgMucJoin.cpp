@@ -99,7 +99,7 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
                 p->rc->status, 
                 p->rc->presenceMessage, 
                 p->rc->priority); 
-            joinPresence->addChild("x",NULL)->setAttribute("xmlns","http://jabber.org/protocol/muc");
+            joinPresence->addChildNS("x", "http://jabber.org/protocol/muc");
             if (p->rc->isLoggedIn())
                 p->rc->jabberStream->sendStanza(joinPresence);
 

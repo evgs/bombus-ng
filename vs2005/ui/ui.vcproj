@@ -252,6 +252,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\History.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\HtmlView.cpp"
 				>
 			</File>
@@ -483,6 +487,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\EntityCaps.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\History.h"
 				>
 			</File>
 			<File

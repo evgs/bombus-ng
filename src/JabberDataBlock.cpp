@@ -56,6 +56,11 @@ JabberDataBlockRef JabberDataBlock::addChild(const char *_tagName, const char *_
 	return child;
 }
 
+JabberDataBlockRef JabberDataBlock::addChildNS( const char *_tagName, const char *xmlns ) {
+    JabberDataBlockRef child=addChild(_tagName, NULL);
+    child->setAttribute("xmlns", xmlns);
+    return child;
+}
 
 JabberDataBlockRef JabberDataBlock::getChildByName(const char * tagName) const{
     for (JabberDataBlockRefList::const_iterator c=childs.begin(); c!=childs.end(); c++) {
@@ -155,3 +160,4 @@ JabberDataBlockRef JabberDataBlock::findChildNamespace( const char *tagName, con
     }
     return JabberDataBlockRef();
 }
+

@@ -42,7 +42,8 @@ public:
 
     JabberDataBlockRefList * getChilds() {return &childs;};
 	void addChild(JabberDataBlockRef child);
-	JabberDataBlockRef addChild(const char *_tagName, const char *_text);
+    JabberDataBlockRef addChild(const char *_tagName, const char *_text);
+    JabberDataBlockRef addChildNS(const char *_tagName, const char *xmlns);
 
     JabberDataBlockRef getChildByName(const char * tagName) const;
     void removeChild(const char * tagName);

@@ -1,4 +1,5 @@
 #include "TimeFunc.h"
+#include "stringutils.h"
 
 PackedTime strtime::getCurrentUtc(){
     PackedTime result;
@@ -57,4 +58,10 @@ PackedTime strtime::PackIso8601(const std::string &time) {
     } //TODO CCYY-MM-DDThh:mm:ss[.sss]TZD
     SystemTimeToFileTime(&st, &t);
     return t;
+}
+
+std::string strtime::getRandom() {
+    std::string ts;
+    strAppendInt(ts, getCurrentUtc().dwLowDateTime);
+    return ts;
 }

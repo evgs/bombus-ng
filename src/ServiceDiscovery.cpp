@@ -251,9 +251,7 @@ void GetDisco::doRequest(ResourceContextRef rc) {
     JabberDataBlock req("iq");
     req.setAttribute("to", jid);
     req.setAttribute("type", "get");
-    JabberDataBlockRef qry=req.addChild("query", NULL);
-
-    qry->setAttribute("xmlns","http://jabber.org/protocol/disco#info");
+    JabberDataBlockRef qry=req.addChildNS("query", "http://jabber.org/protocol/disco#info");
     if (node.length()) qry->setAttribute("node", node);
 
     req.setAttribute("id", idinfo);

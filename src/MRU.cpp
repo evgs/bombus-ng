@@ -31,11 +31,13 @@ void mru::saveMru(const wchar_t * mruName, HWND hDlg, int itemId) {
 }
 
 void mru::saveMru(const wchar_t * mruName, HWND hComboBox) {
+    //using absolute path;
     std::wstring name=appRootPath;
     name+=L"config";
     CreateDirectory(name.c_str(), NULL);
     name+=L"\\mru";
     CreateDirectory(name.c_str(), NULL);
+    //using relative path;
     name=L"config\\mru\\mru-";
     name+=mruName;
     Serialize s(name.c_str(), false);

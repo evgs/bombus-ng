@@ -55,7 +55,7 @@ void GetVcardNick::doRequest(ResourceContextRef rc) {
     req.setAttribute("type", "get");
     req.setAttribute("id", id);
 
-    req.addChild("vCard", NULL)->setAttribute("xmlns","vcard-temp");
+    req.addChildNS("vCard", "vcard-temp");
 
     rc->jabberStream->sendStanza(req);
 }

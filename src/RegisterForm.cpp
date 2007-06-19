@@ -43,7 +43,7 @@ void IqRegister::doRequest(ResourceContextRef rc, JabberDataBlockRef childData) 
     } else {
         req.setAttribute("type", "get");
         id="reg#get";
-        req.addChild("query", NULL)->setAttribute("xmlns", "jabber:iq:register");
+        req.addChildNS("query", "jabber:iq:register");
     }
     req.setAttribute("id", id);
 

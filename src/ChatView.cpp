@@ -12,6 +12,7 @@
 #include "ProcessMUC.h"
 
 #include "Smiles.h"
+#include "History.h"
 
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
@@ -361,7 +362,10 @@ void ChatView::sendJabberMessage() {
     Message::ref msg=Message::ref(new Message(body, rc->account->getNickname(), false, Message::SENT, strtime::getCurrentUtc() ));
     bool muc=boost::dynamic_pointer_cast<MucRoom>(contact);
 
-    if (!muc) contact->messageList->push_back(msg);
+    if (!muc) {
+        contact->messageList->push_back(msg);
+        History::getInstance()->appendHistory(contact, msg);
+    }
 
     msgList->moveCursorEnd();
     redraw();
@@ -370,7 +374,13 @@ void ChatView::sendJabberMessage() {
 
     std::string to=(muc)?contact->jid.getBareJid() : contact->jid.getJid();
     JabberDataBlockRef out=msg->constructStanza(to);
-    if (muc) out->setAttribute("type","groupchat");
+    if (muc) out->setAttribute("type","groupchat"); 
+    else {
+        JabberDataBlockRef x=out->addChildNS("x", "jabber:x:event");
+        //x->addChild("id", block->getAttribute("id").c_str() );
+        x->addChild("delivered", NULL);
+        x->addChild("composing", NULL);
+    }
 
     //Reset form
     rc->jabberStream->sendStanza(*out);

@@ -9,6 +9,7 @@ Message::Message( std::string body, std::string fromName, bool appendFrom, int t
     this->body=body;
     this->fromName=fromName;
     this->type=(Message::MsgType)type;
+    this->time=time;
     unread=(type==Message::INCOMING);
 
     //TODO: xml escaping
@@ -33,6 +34,7 @@ JabberDataBlockRef Message::constructStanza(const std::string &to) const {
     JabberDataBlockRef out=JabberDataBlockRef(new JabberDataBlock("message"));
     out->setAttribute("type", "chat");
     out->setAttribute("to", to);
+    out->setAttribute("id", strtime::getRandom());
     out->addChild("body", body.c_str());
     return out;
 }
@@ -52,4 +54,10 @@ PackedTime Message::extractXDelay( JabberDataBlockRef stanza ) {
     JabberDataBlockRef xdelay=stanza->findChildNamespace("x","jabber:x:delay");
     if (!xdelay) return strtime::getCurrentUtc();
     return strtime::PackIso8601(xdelay->getAttribute("stamp"));
+}
+
+std::string Message::getMessageText() {
+    std::string r=utf8::wchar_utf8(getText());
+    r.erase(0,10);
+    return r;
 }

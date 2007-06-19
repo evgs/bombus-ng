@@ -38,8 +38,7 @@ void GetMucConfig::doRequest( ResourceContextRef rc, JabberDataBlockRef childDat
     JabberDataBlock req("iq");
     req.setAttribute("to", jid);
 
-    JabberDataBlockRef qry=req.addChild("query", NULL);
-    qry->setAttribute("xmlns","http://jabber.org/protocol/muc#owner");
+    JabberDataBlockRef qry=req.addChildNS("query", "http://jabber.org/protocol/muc#owner");
 
     if (childData) { 
         qry->addChild(childData);

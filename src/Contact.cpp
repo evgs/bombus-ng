@@ -32,6 +32,9 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
 
     transpIndex=identifyTransport(jid);
 
+    composing=false;
+    acceptComposing=false;
+
     update();
     messageList=ODRListRef(new ODRList);
 }
@@ -56,7 +59,8 @@ Contact::ref Contact::clone() {
 }*/
 
 int Contact::getColor() const{ return 0; }
-int Contact::getIconIndex() const{ 
+int Contact::getIconIndex() const{
+    if (composing) return icons::ICON_COMPOSING_INDEX;
     if (nUnread>0) return icons::ICON_MESSAGE_INDEX;
     int icon=(status==presence::OFFLINE)? offlineIcon: status;
     if (icon<=presence::UNKNOWN) return icon+transpIndex; 

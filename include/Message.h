@@ -25,6 +25,8 @@ public:
     virtual HMENU getContextMenu(HMENU menu);
     virtual bool OnMenuCommand(int cmdId, HWND parent);
 
+    virtual const wchar_t * getText() const;
+
 protected:
     std::wstring wstr;
     int width;
@@ -32,7 +34,6 @@ protected:
     bool singleLine;
     bool smiles;
     void init();
-    virtual const wchar_t * getText() const;
 };
 
 
@@ -64,6 +65,8 @@ public:
     bool unread;
 
     MsgType type;
+
+    std::string getMessageText();
 
     static PackedTime extractXDelay(JabberDataBlockRef stanza);
 };

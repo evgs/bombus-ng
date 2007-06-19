@@ -11,5 +11,7 @@ namespace strtime {
 
     PackedTime PackIso8601 (const std::string &time);
     PackedTime getCurrentUtc();
+
+    std::string getRandom();
 }
 

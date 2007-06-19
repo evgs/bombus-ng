@@ -186,8 +186,7 @@ void Roster::rosterSet(const char * nick, const char *jid, const char *group, co
     JabberDataBlock iqSet("iq");
     iqSet.setAttribute("type","set");
     iqSet.setAttribute("id","roster_set");
-    JabberDataBlockRef qry=iqSet.addChild("query", NULL);
-    qry->setAttribute("xmlns","jabber:iq:roster");
+    JabberDataBlockRef qry=iqSet.addChildNS("query", "jabber:iq:roster");
     JabberDataBlockRef item=qry->addChild("item", NULL);
 
     item->setAttribute("jid", jid);

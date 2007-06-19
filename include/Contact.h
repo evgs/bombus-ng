@@ -34,6 +34,9 @@ public:
 
     ODRListRef messageList;
 
+    bool composing;
+    bool acceptComposing;
+
     //bool hasUnreadMsgs();
 
     int nUnread;

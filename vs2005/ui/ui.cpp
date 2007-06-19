@@ -46,6 +46,7 @@
 
 #include "Image.h"
 #include "Smiles.h"
+#include "History.h"
 
 #include "utf8.hpp"
 
@@ -660,6 +661,34 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
         nick=c->getName();
     }
 
+    //processing jabber:x:event
+    JabberDataBlockRef x=block->findChildNamespace("x","jabber:x:event");
+    if (x) {
+        std::string xid=x->getChildText("id");
+        //delivery notifications
+        if (x->getChildByName("delivered")) {
+            if (xid.empty()) {
+                JabberDataBlock delivered("message");
+                delivered.setAttribute("to", from);
+                JabberDataBlockRef x=delivered.addChildNS("x", "jabber:x:event");
+                x->addChild("id", block->getAttribute("id").c_str() );
+                x->addChild("delivered", NULL);
+                rc->jabberStream->sendStanza(delivered);
+            }
+        }
+        //composing events
+        bool composing = false;
+        if (x->getChildByName("composing")) {
+            c->acceptComposing=true;
+            composing=body.empty();
+        }
+        c->composing=composing;
+
+        if (composing) {
+            //todo: repaint
+        }
+    }
+
     //drop composing events
     if (body.empty()) return BLOCK_PROCESSED;
 
@@ -677,6 +706,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
 
     c->nUnread++;
     c->messageList->push_back(msg);
+    if (!mucMessage) History::getInstance()->appendHistory(c, msg);
 
     if (rc->roster->needUpdateView) rc->roster->makeViewList();
 
@@ -770,8 +800,7 @@ void JabberStreamEvents::loginSuccess(){
     getRoster.setAttribute("type","get");
     getRoster.setAttribute("id","roster");
 
-    JabberDataBlockRef qry =getRoster.addChild("query", NULL); 
-    qry->setAttribute("xmlns","jabber:iq:roster");
+    getRoster.addChildNS("query", "jabber:iq:roster");
 
     rc->jabberStream->sendStanza(getRoster);
 }

@@ -64,8 +64,7 @@ JabberDataBlockRef NonSASLAuth::loginStanza( bool get, bool sha1 ) {
     JabberDataBlockRef login = JabberDataBlockRef(new JabberDataBlock("iq"));
     login->setAttribute("type", (get)? "get"   : "set" );
     login->setAttribute("id",   (get)? "auth1" : "auth2" );
-    JabberDataBlockRef qry=login->addChild("query",NULL);
-    qry->setAttribute("xmlns","jabber:iq:auth");
+    JabberDataBlockRef qry=login->addChildNS("query", "jabber:iq:auth");
     
     qry->addChild("username",rc->account->getUserName().c_str());
     
@@ -182,8 +181,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 			JabberDataBlock bindIq("iq");
 			bindIq.setAttribute("type", "set");
 			bindIq.setAttribute("id", "bind");
-			JabberDataBlockRef bind=bindIq.addChild("bind", NULL);
-			bind->setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-bind");
+			JabberDataBlockRef bind=bindIq.addChildNS("bind", "urn:ietf:params:xml:ns:xmpp-bind");
 			bind->addChild("resource", rc->account->getResource().c_str() );
 			rc->jabberStream->sendStanza(bindIq);
 			return BLOCK_PROCESSED;
@@ -268,8 +266,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 			JabberDataBlock session("iq");
 			session.setAttribute("type", "set");
 			session.setAttribute("id", "sessionInit");
-			session.addChild("session", NULL)
-				->setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-session");
+			session.addChildNS("session", "urn:ietf:params:xml:ns:xmpp-session");
 			rc->jabberStream->sendStanza(session);
 			return BLOCK_PROCESSED;
 		}

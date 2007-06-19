@@ -45,8 +45,7 @@ void GetAdHoc::doRequest(ResourceContextRef rc, const std::string &sid, const st
     req.setAttribute("type", "set");
     req.setAttribute("id", id);
 
-    JabberDataBlockRef cmd=req.addChild("command", NULL);
-    cmd->setAttribute("xmlns","http://jabber.org/protocol/commands");
+    JabberDataBlockRef cmd=req.addChildNS("command", "http://jabber.org/protocol/commands");
     cmd->setAttribute("node", node);
     if (sid.length()) cmd->setAttribute("sessionid", sid);
     if (action.length()) cmd->setAttribute("action", action);

@@ -10,6 +10,7 @@ char *features[]={
     //"jabber:iq:last", //todo:
     //"jabber:iq:time", //todo:
     "jabber:x:data", 
+    "jabber:x:event",
     "http://jabber.org/protocol/disco#info",
     "http://jabber.org/protocol/muc",
     "http://www.xmpp.org/extensions/xep-0199.html#ns"
@@ -34,6 +35,7 @@ ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceC
     JabberDataBlockRef identity=query->addChild("identity",NULL);
     identity->setAttribute("category","client");
     identity->setAttribute("type","handheld");
+    identity->setAttribute("name","Bombus-ng");
 
     for (int i=0; i<sizeof(features)/sizeof(char *); i++) {
         query->addChild("feature", NULL)->setAttribute("var", features[i]);

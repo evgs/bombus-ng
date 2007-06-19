@@ -22,7 +22,7 @@ void History::appendHistory( Contact::ref c, Message::ref msg ) {
     t+=' ';
     t+=strtime::toTime(msg->time);
 
-    fprintf(f, "[%s] (%s)%s\n", t.c_str(), msg->fromName, msg->getMessageText().c_str());
+    fprintf(f, "[%s] (%s)%s\n", t.c_str(), msg->fromName.c_str(), msg->getMessageText().c_str());
     fclose(f);
 }
 

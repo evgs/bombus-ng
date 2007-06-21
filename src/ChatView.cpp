@@ -118,6 +118,10 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPLETE, 0);
             return 0;
         }
+        PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPOSING, true);
+        break;
+    case WM_KILLFOCUS:
+        PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPOSING, false);
         break;
     } 
     return CallWindowProc(OldWndProc,hWnd,msg,wParam,lParam); 
@@ -191,6 +195,10 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
         EndPaint(hWnd, &ps);
         break;
 
+    //case WM_KILLFOCUS:
+    //    p->contact->nUnread=0;
+    //    break;
+
     case WM_SIZE: 
         { 
             HDWP hdwp; 
@@ -243,6 +251,10 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             }
             if (wParam==IDC_COMPLETE) {
                 p->mucNickComplete();
+            }
+
+            if (wParam==IDC_COMPOSING) {
+                p->setComposingState(lParam!=0);
             }
             break;             
         }
@@ -381,7 +393,7 @@ void ChatView::sendJabberMessage() {
         x->addChild("delivered", NULL);
         x->addChild("composing", NULL);
     }
-
+    composing=false;
     //Reset form
     rc->jabberStream->sendStanza(*out);
 
@@ -476,6 +488,20 @@ void ChatView::mucNickComplete() {
     SendMessage(editWnd, EM_SETSEL, nbegin, mend);
     SendMessage(editWnd, EM_REPLACESEL, TRUE, (LPARAM)s.c_str());
     SendMessage(editWnd, EM_SETSEL, mbegin, nbegin+s.length());
+}
+
+void ChatView::setComposingState( bool composing ) {
+    if (!contact->acceptComposing) return;
+    if (composing==this->composing) return;
+    this->composing=composing;
+
+    std::string to=contact->jid.getJid();
+    JabberDataBlockRef out=JabberDataBlockRef(new JabberDataBlock("message", NULL)); 
+    out->setAttribute("to", to);
+    JabberDataBlockRef x=out->addChildNS("x", "jabber:x:event");
+    x->addChild("id", NULL);
+    if (composing) x->addChild("composing", NULL);
+    rc->jabberStream->sendStanza(*out);
 }
 //////////////////////////////////////////////////////////////////////////
 class FontMetricCache {

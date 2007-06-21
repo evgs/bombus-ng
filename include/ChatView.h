@@ -22,6 +22,7 @@ public:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
     void sendJabberMessage();
     void mucNickComplete();
+    void setComposingState(bool composing);
     //virtual const wchar_t * getWindowTitle() const;
     virtual const ODR * getODR() const;
 
@@ -40,6 +41,7 @@ protected:
     HWND		editWnd;
     int editHeight;
     int width;
+    bool composing;
 
     Contact::ref contact;
 

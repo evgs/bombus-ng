@@ -620,6 +620,7 @@ public:
 ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     std::string from=block->getAttribute("from");
     std::string body=block->getChildText("body");
+    std::string subj=block->getChildText("subject");
 
     JabberDataBlockRef xfwd=block->findChildNamespace("x","jabber:x:forward");
     if (xfwd) {
@@ -638,7 +639,6 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
         if (ofrom.length()) from=ofrom;
     }
     //StringRef orig=block->toXML();
-	Log::getInstance()->msg("Message from ", from.c_str()); 
 
     std::string nick;
 
@@ -689,33 +689,43 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
         }
     }
 
-    //drop composing events
-    if (body.empty()) return BLOCK_PROCESSED;
+    Message::ref msg;
 
-    Message::ref msg=Message::ref(new Message(body, nick, mucMessage, Message::INCOMING, Message::extractXDelay(block) ));
+    if (body.length() || subj.length() ) {
+        //constructing message and raising message event
+        Log::getInstance()->msg("Message from ", from.c_str()); 
 
-    std::wstring soundName(appRootPath);
-    soundName+=TEXT("sounds\\message.wav");
-    
-    Notify::PlayNotify();
-    
-    PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
+        msg=Message::ref(new Message(body, nick, mucMessage, Message::INCOMING, Message::extractXDelay(block) ));
+
+        std::wstring soundName(appRootPath);
+        soundName+=TEXT("sounds\\message.wav");
+
+        Notify::PlayNotify();
+
+        PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
+    }
 
     ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());
     bool ascroll=(cv==NULL)? false: cv->autoScroll();
 
-    c->nUnread++;
-    c->messageList->push_back(msg);
-    if (!mucMessage) History::getInstance()->appendHistory(c, msg);
+    if (msg) {
+        c->nUnread++;
+        c->messageList->push_back(msg);
+        if (!mucMessage) History::getInstance()->appendHistory(c, msg);
 
+        if (ascroll) /*if (cv)*/ {
+            cv->moveEnd();
+        }
+        //tabs->switchByODR(c); 
+    }
+
+    //repainting
     if (rc->roster->needUpdateView) rc->roster->makeViewList();
 
-    if (ascroll) /*if (cv)*/ {
-        cv->moveEnd();
+    if (cv) { 
+        if (IsWindowVisible(cv->getHWnd())) cv->redraw();
+        InvalidateRect(tabs->getHWnd(), NULL, FALSE);
     }
-    if (cv) if (IsWindowVisible(cv->getHWnd())) cv->redraw();
-
-    //tabs->switchByODR(c); 
 
     InvalidateRect(rosterWnd->getHWnd(),NULL, FALSE);
 

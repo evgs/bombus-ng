@@ -336,6 +336,9 @@ MucContact::MucContact( const std::string &jid )
     this->status=presence::OFFLINE;
     offlineIcon=presence::OFFLINE;
 
+    composing=false;
+    acceptComposing=false;
+
     nUnread=0;
 
     transpIndex=0;

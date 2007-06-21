@@ -157,7 +157,7 @@ void Contact::processPresence( JabberDataBlockRef block ) {
         body+=status;
         body+=')';
     }
-    if (priority!=0) {
+    if (priority.length()) {
         body+=" [";
         //std::strAppendInt(body, priority);
         body+=priority;

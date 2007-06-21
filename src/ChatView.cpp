@@ -328,8 +328,9 @@ void ChatView::addMessage(const std::string & msg) {
     msgList->addODR(r, true);
 }
 
-void ChatView::showWindow( bool show ) {
-    Wnd::showWindow(show);
+bool ChatView::showWindow( bool show ) {
+    bool oldState=Wnd::showWindow(show);
+    if (oldState!=show) contact->nUnread=0;
 
     TBBUTTONINFO tbbi;
     tbbi.cbSize = sizeof(tbbi);
@@ -345,6 +346,7 @@ void ChatView::showWindow( bool show ) {
 
     if (show) SetFocus(editWnd);
 
+    return oldState;
 }
 
 void ChatView::redraw(){

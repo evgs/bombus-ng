@@ -60,13 +60,18 @@ public:
     std::string body;
     std::string fromName;
 
+    std::string id;
+
     PackedTime time;
     
     bool unread;
+    bool delivered;
 
     MsgType type;
 
     std::string getMessageText();
+
+    virtual void draw(HDC hdc, RECT &rt) const;
 
     static PackedTime extractXDelay(JabberDataBlockRef stanza);
 };

@@ -14,7 +14,7 @@ public:
 
     HWND getHWnd() const{ return thisHWnd; }
 
-    virtual void showWindow(bool show);
+    virtual bool showWindow(bool show); //returns old window state
     void setParent(HWND parent);
 
     virtual const wchar_t * getWindowTitle() const;

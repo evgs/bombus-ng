@@ -228,6 +228,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\contact.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\DlgAccount.cpp"
 				>
 			</File>

@@ -490,7 +490,7 @@ ServiceDiscovery::~ServiceDiscovery() {
 
 const ODR * ServiceDiscovery::getODR() const { return nodeList->getODR(); }
 
-void ServiceDiscovery::showWindow( bool show ) {
+bool ServiceDiscovery::showWindow( bool show ) {
     Wnd::showWindow(show);
 
     /*TBBUTTONINFO tbbi;
@@ -508,10 +508,11 @@ void ServiceDiscovery::showWindow( bool show ) {
     if (show) {
         if (nodeList->getODRList()) if (nodeList->getODRList()->size()) {
             SetFocus(nodeList->getHWnd());
-            return;
+            return false;
         }
         SetFocus(editWnd);
     }
+    return false;
 }
 
 void ServiceDiscovery::redraw(){

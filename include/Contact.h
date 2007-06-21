@@ -47,6 +47,7 @@ public:
     const std::string getName() const;
 
     virtual void processPresence(JabberDataBlockRef block);
+    void messageDelivered(const std::string & id);
     //////////////////////////////////////////////////////////////////////////
 
     virtual int getColor() const;

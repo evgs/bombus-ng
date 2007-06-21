@@ -32,7 +32,7 @@ public:
     bool autoScroll();
     void moveEnd();
 
-    virtual void showWindow(bool show);
+    virtual bool showWindow(bool show);
 
     void ChatView::redraw();
 

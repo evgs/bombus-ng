@@ -68,7 +68,7 @@ public:
 
     typedef boost::shared_ptr<ServiceDiscovery> ref;
 
-    virtual void showWindow(bool show);
+    virtual bool showWindow(bool show);
 
     void redraw();
 

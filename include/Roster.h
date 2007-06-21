@@ -122,7 +122,7 @@ public:
     virtual HMENU getContextMenu();
     virtual void OnCommand(int cmdId, LONG lParam);
 
-    virtual void showWindow(bool show);
+    virtual bool showWindow(bool show);
 
     void setIcon(int iconIndex);
 

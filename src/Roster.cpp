@@ -640,9 +640,10 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
         DlgAddEditContact::createDialog(getHWnd(), rc, Contact::ref());
     }
 }
-void RosterView::showWindow( bool show ) {
+bool RosterView::showWindow( bool show ) {
     Wnd::showWindow(show);
     if (show) SetFocus(getHWnd());
+    return false;
 }
 void RosterView::setIcon( int iconIndex ) {
     wt->setIcon(iconIndex);

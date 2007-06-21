@@ -674,6 +674,8 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
                 x->addChild("id", block->getAttribute("id").c_str() );
                 x->addChild("delivered", NULL);
                 rc->jabberStream->sendStanza(delivered);
+            } else {
+                c->messageDelivered(xid);
             }
         }
         //composing events

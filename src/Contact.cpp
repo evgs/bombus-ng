@@ -95,6 +95,17 @@ void Contact::update() {
     init();
 }
 
+void Contact::messageDelivered(const std::string & id){
+    for (size_t index=0; index<messageList->size(); index++) {
+        Message::ref msg=boost::dynamic_pointer_cast<Message>(messageList->operator [](index));
+        if (!msg) continue;
+        if (msg->type!=Message::SENT) continue;
+        if (id!=msg->id) continue;
+        msg->delivered=true;
+    }    
+}
+
+
 void Contact::processPresence( JabberDataBlockRef block ) {
 
     std::string type=block->getAttribute("type");

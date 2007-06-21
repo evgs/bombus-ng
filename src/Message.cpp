@@ -1,8 +1,11 @@
 #include "Message.h"
 #include <utf8.hpp>
 #include <boost/regex.hpp>
+#include "Image.h"
 
 boost::regex e1("((?:(?:ht|f)tps?://|www\\.)[^<\\s\\n]+)(?<![]\\.,:;!\\})<-])");
+
+extern ImgListRef skin;
 
 Message::Message( std::string body, std::string fromName, bool appendFrom, int type, const PackedTime &time ) 
 {
@@ -11,6 +14,10 @@ Message::Message( std::string body, std::string fromName, bool appendFrom, int t
     this->type=(Message::MsgType)type;
     this->time=time;
     unread=(type==Message::INCOMING);
+    delivered=false;
+
+    if (type==Message::SENT) id=strtime::getRandom();
+
 
     //TODO: xml escaping
     
@@ -34,7 +41,7 @@ JabberDataBlockRef Message::constructStanza(const std::string &to) const {
     JabberDataBlockRef out=JabberDataBlockRef(new JabberDataBlock("message"));
     out->setAttribute("type", "chat");
     out->setAttribute("to", to);
-    out->setAttribute("id", strtime::getRandom());
+    out->setAttribute("id", id);
     out->addChild("body", body.c_str());
     return out;
 }
@@ -60,4 +67,9 @@ std::string Message::getMessageText() {
     std::string r=utf8::wchar_utf8(getText());
     r.erase(0,10);
     return r;
+}
+
+void Message::draw( HDC hdc, RECT &rt ) const{
+    MessageElement::draw(hdc, rt);
+    if (delivered) skin->drawElement(hdc, icons::ICON_DELIVERED_INDEX, rt.right-skin->getElementWidth()-2, rt.top );
 }

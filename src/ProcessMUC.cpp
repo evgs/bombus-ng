@@ -157,9 +157,11 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                 {
                     message+=" has left the channel";
                     const std::string & status=block->getChildText("status");
-                    message+="(";
-                    message+=status;
-                    message+=")";
+                    if (status.length) {
+                        message+=" (";
+                        message+=status;
+                        message+=")";
+                    }
                 }
             }
         } else { //onlines
@@ -167,7 +169,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
             if (c->status>=presence::OFFLINE) {
                 // first online
                 std::string realJid=item->getAttribute("jid");
-                if (realJid.length()>0) {
+                if (realJid.length()) {
                     c->realJid=realJid;
                     message+=" (";
                     message+=realJid;  //for moderating purposes
@@ -181,9 +183,11 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                     message+=affiliationName[affiliation-MucContact::OUTCAST];
 
                     const std::string & status=block->getChildText("status");
-                    message+=" (";
-                    message+=status;
-                    message+=")";
+                    if (status.length) {
+                        message+=" (";
+                        message+=status;
+                        message+=")";
+                    }
                 }
             } else {
                 //change status
@@ -201,9 +205,11 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                     else message+=show;
 
                     const std::string & status=block->getChildText("status");
-                    message+=" (";
-                    message+=status;
-                    message+=")";
+                    if (status.length) {
+                        message+=" (";
+                        message+=status;
+                        message+=")";
+                    }
 
                 }
             }

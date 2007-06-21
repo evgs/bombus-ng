@@ -152,12 +152,17 @@ void Contact::processPresence( JabberDataBlockRef block ) {
     update();
 
     std::string body=type;
-    body+=" (";
-    body+=status;
-    body+=") [";
-    //std::strAppendInt(body, priority);
-    body+=priority;
-    body+=']';
+    if (status.length()) {
+        body+=" (";
+        body+=status;
+        body+=')';
+    }
+    if (priority!=0) {
+        body+=" [";
+        //std::strAppendInt(body, priority);
+        body+=priority;
+        body+=']';
+    }
 
     Message::ref msg=Message::ref(new Message(body, block->getAttribute("from"), false, msgType, Message::extractXDelay(block) ));
 

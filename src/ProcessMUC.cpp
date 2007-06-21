@@ -157,7 +157,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                 {
                     message+=" has left the channel";
                     const std::string & status=block->getChildText("status");
-                    if (status.length) {
+                    if (status.length()) {
                         message+=" (";
                         message+=status;
                         message+=")";
@@ -183,7 +183,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                     message+=affiliationName[affiliation-MucContact::OUTCAST];
 
                     const std::string & status=block->getChildText("status");
-                    if (status.length) {
+                    if (status.length()) {
                         message+=" (";
                         message+=status;
                         message+=")";
@@ -205,7 +205,7 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
                     else message+=show;
 
                     const std::string & status=block->getChildText("status");
-                    if (status.length) {
+                    if (status.length()) {
                         message+=" (";
                         message+=status;
                         message+=")";

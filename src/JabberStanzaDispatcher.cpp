@@ -17,7 +17,7 @@ BOOL JabberStanzaDispatcher::dispatchDataBlock(JabberDataBlockRef block){
 	const std::string & blockTagName=block->getTagName();
 
 
-    int i=0;
+    size_t i=0;
     while (i<listeners.size()) 
 	{
         JabberDataBlockListener *p=listeners[i].get();
@@ -51,7 +51,7 @@ void JabberStanzaDispatcher::addListener(JabberDataBlockListenerRef listener){
 }
 
 void JabberStanzaDispatcher::removeListener(const std::string& byId){
-    int index=0;
+    size_t index=0;
     while (index<listeners.size()) {
 		const char * id=listeners[index].get()->getId();
         if (id!=NULL) if (!byId.compare(byId)) {

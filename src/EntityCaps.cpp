@@ -7,10 +7,11 @@ extern std::string appVersion;
 
 char *features[]={
     "jabber:iq:version", 
-    //"jabber:iq:last", //todo:
-    //"jabber:iq:time", //todo:
+    "jabber:iq:last",   // last activity
+    "jabber:iq:time",  //todo: replace with "urn:xmpp:time"
+    //"urn:xmpp:time", //todo
     "jabber:x:data", 
-    "jabber:x:event",
+    "jabber:x:event",   // composing, delivered
     "http://jabber.org/protocol/disco#info",
     "http://jabber.org/protocol/muc",
     "http://www.xmpp.org/extensions/xep-0199.html#ns"

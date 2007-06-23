@@ -9,7 +9,7 @@ PackedTime strtime::getCurrentUtc(){
     return result;
 }
 
-std::string strtime::toDate(const PackedTime &utcTime) {
+std::string strtime::toLocalDate(const PackedTime &utcTime) {
     PackedTime local;
     SYSTEMTIME st;
     FileTimeToLocalFileTime(&utcTime, &local);
@@ -21,7 +21,7 @@ std::string strtime::toDate(const PackedTime &utcTime) {
     return std::string(timeBuf);
 }
 
-std::string strtime::toTime(const PackedTime &utcTime) {
+std::string strtime::toLocalTime(const PackedTime &utcTime) {
     PackedTime local;
     SYSTEMTIME st;
     FileTimeToLocalFileTime(&utcTime, &local);
@@ -33,6 +33,11 @@ std::string strtime::toTime(const PackedTime &utcTime) {
     return std::string(timeBuf);
 }
 
+std::string strtime::toLocalDateTime(const PackedTime &utcTime) {
+    return toLocalDate(utcTime)+", "+toLocalTime(utcTime);
+}
+
+
 int extractInt(const std::string &s, int nbegin, int nend) {
     int result=0;
     for (int index=nbegin; index<nend; index++) {
@@ -41,6 +46,7 @@ int extractInt(const std::string &s, int nbegin, int nend) {
     }
     return result;
 }
+
 PackedTime strtime::PackIso8601(const std::string &time) {
     SYSTEMTIME st;
     memset(&st, 0, sizeof(SYSTEMTIME));
@@ -60,8 +66,40 @@ PackedTime strtime::PackIso8601(const std::string &time) {
     return t;
 }
 
+std::string strtime::toIso8601(const PackedTime &utcTime) {
+    SYSTEMTIME st;
+    FileTimeToSystemTime(&utcTime, &st);
+
+    char timeBuf[18];
+    sprintf(timeBuf, "%04d%02d%02dT%02d:%02d:%02d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond );
+
+    return std::string(timeBuf);
+}
+
+
 std::string strtime::getRandom() {
     std::string ts;
     strAppendInt(ts, getCurrentUtc().dwLowDateTime);
     return ts;
+}
+
+std::string strtime::getLocalZoneOffset() {
+    TIME_ZONE_INFORMATION tinfo;
+    DWORD tzi=GetTimeZoneInformation(&tinfo);
+    LONG bias=tinfo.Bias;
+    switch (tzi) {
+        case TIME_ZONE_ID_INVALID: bias=0; break;
+        case TIME_ZONE_ID_STANDARD: bias+=tinfo.StandardBias; break;
+        case TIME_ZONE_ID_DAYLIGHT: bias+=tinfo.DaylightBias; break;
+    }
+    if (bias==0) return std::string("Z");
+
+    // because UTC=local+bias, we need invert bias' sign
+    char sign='-';
+    if (bias<0) {
+        sign='+'; bias=-bias;
+    }
+    char timeBuf[7];
+    sprintf(timeBuf,"%c%02d:%02d",sign, bias/60, bias%60);
+    return std::string(timeBuf);
 }

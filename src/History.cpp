@@ -18,9 +18,7 @@ void History::appendHistory( Contact::ref c, Message::ref msg ) {
 
     FILE *f=_wfopen(filePath.c_str(), L"a");
     if (f==NULL) return;
-    std::string t=strtime::toDate(msg->time);
-    t+=' ';
-    t+=strtime::toTime(msg->time);
+    std::string t=strtime::toLocalDateTime(msg->time);
 
     fprintf(f, "[%s] (%s)%s\n", t.c_str(), msg->fromName.c_str(), msg->getMessageText().c_str());
     fclose(f);

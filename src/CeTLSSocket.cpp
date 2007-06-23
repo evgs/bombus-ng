@@ -93,8 +93,8 @@ int CeTLSSocket::SslValidate (
         std::string certInfo="\nCertificate Issuer unknown";
         certInfo+="\nIssuer: "; certInfo+=pCert->pszIssuer;
         certInfo+="\nSubject: "; certInfo+=pCert->pszSubject;
-        certInfo+="\nValid from: "; certInfo+=strtime::toDate(pCert->ValidFrom);
-        certInfo+="\nValid until: "; certInfo+=strtime::toDate(pCert->ValidUntil);
+        certInfo+="\nValid from: "; certInfo+=strtime::toLocalDate(pCert->ValidFrom);
+        certInfo+="\nValid until: "; certInfo+=strtime::toLocalDate(pCert->ValidUntil);
 
         certInfo+="\n\nAccept this certificate?";
 

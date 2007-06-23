@@ -608,6 +608,64 @@ ProcessResult Ping::blockArrived(JabberDataBlockRef block, const ResourceContext
     return BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
+class LastActivity : public JabberDataBlockListener {
+public:
+    LastActivity() {}
+    ~LastActivity(){};
+    virtual const char * getType() const{ return "get"; }
+    virtual const char * getId() const{ return NULL; }
+    virtual const char * getTagName() const { return "iq"; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+};
+ProcessResult LastActivity::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+
+    JabberDataBlockRef query=block->findChildNamespace("query","jabber:iq:last");
+    if (!query) return BLOCK_REJECTED;
+
+    //Log::getInstance()->msg("Last Activity query: ", block->getAttribute("from").c_str());
+
+    JabberDataBlock result("iq");
+    result.setAttribute("to", block->getAttribute("from"));
+    result.setAttribute("type", "result");
+    result.setAttribute("id", block->getAttribute("id"));
+    result.addChild(query);
+    query->setAttribute("seconds","0"); //todo: replace this stub time
+    query->setText("This is stub time");//todo: remove stub message
+
+    rc->jabberStream->sendStanza(result);
+    return BLOCK_PROCESSED;
+}
+//////////////////////////////////////////////////////////////
+class EntityTime : public JabberDataBlockListener {
+public:
+    EntityTime() {}
+    ~EntityTime(){};
+    virtual const char * getType() const{ return "get"; }
+    virtual const char * getId() const{ return NULL; }
+    virtual const char * getTagName() const { return "iq"; }
+    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
+};
+ProcessResult EntityTime::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
+
+    JabberDataBlockRef query=block->findChildNamespace("query","jabber:iq:time"); //todo: urn:xmpp:time
+    if (!query) return BLOCK_REJECTED;
+
+    //Log::getInstance()->msg("Time query: ", block->getAttribute("from").c_str());
+
+    JabberDataBlock result("iq");
+    result.setAttribute("to", block->getAttribute("from"));
+    result.setAttribute("type", "result");
+    result.setAttribute("id", block->getAttribute("id"));
+    result.addChild(query);
+    PackedTime ct=strtime::getCurrentUtc();
+    query->addChild("utc",strtime::toIso8601(ct).c_str());
+    query->addChild("display",strtime::toLocalDateTime(ct).c_str());
+    query->addChild("tz",strtime::getLocalZoneOffset().c_str());
+
+    rc->jabberStream->sendStanza(result);
+    return BLOCK_PROCESSED;
+}
+//////////////////////////////////////////////////////////////
 class MessageRecv : public JabberDataBlockListener {
 public:
 	MessageRecv() {}
@@ -806,6 +864,8 @@ void JabberStreamEvents::loginSuccess(){
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Ping() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new LastActivity() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new EntityTime() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new EntityCaps() ));
 
     JabberDataBlock getRoster("iq");

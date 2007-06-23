@@ -32,7 +32,7 @@ Message::Message( std::string body, std::string fromName, bool appendFrom, int t
         tmp.insert(0, fromName);
     }
     tmp.insert(0,"[] ");
-    tmp.insert(1, strtime::toTime(time));
+    tmp.insert(1, strtime::toLocalTime(time));
     wstr=utf8::utf8_wchar(tmp);
     init();
 }

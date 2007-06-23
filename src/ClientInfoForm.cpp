@@ -128,11 +128,7 @@ void ClientInfoForm::onWmUserUpdate() {
         void *i64ct=&ct;
         (*( (__int64*)i64ct ))-=delay;
         
-        std::string t=strtime::toDate(ct);
-        t+=' ';
-        t+=strtime::toTime(ct);
-
-        addText("<br><strong>Last activity:</strong><br>Time: "); addText(t);
+        addText("<br><strong>Last activity:</strong><br>Time: "); addText(strtime::toLocalDateTime(ct));
     }
     if (lastActivityMessage.length())   addText("<br>Status: "); addText(lastActivityMessage);
 
@@ -147,7 +143,7 @@ ClientInfoForm::ref ClientInfoForm::createInfoForm( HWND parent, const std::stri
 
     vf->parentHWnd=parent;
     vf->title=utf8::utf8_wchar(jid);
-    vf->wt=WndTitleRef(new WndTitle(vf, icons::ICON_VCARD));
+    vf->wt=WndTitleRef(new WndTitle(vf, icons::ICON_SEARCH_INDEX));
 
     vf->init();
     

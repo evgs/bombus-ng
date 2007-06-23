@@ -25,6 +25,7 @@
 #include "DlgStatus.h"
 #include "DlgAddEditContact.h"
 #include "VcardForm.h"
+#include "ClientInfoForm.h"
 #include "ServiceDiscovery.h"
 #include "MucConfigForm.h"
 
@@ -449,7 +450,7 @@ HMENU RosterView::getContextMenu() {
         if (!mr) {
 
             AppendMenu(hmenu, MF_STRING, RosterView::VCARD,                    TEXT("VCard"));
-            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::CLIENTINFO,               TEXT("Client Info"));
+            AppendMenu(hmenu, MF_STRING, RosterView::CLIENTINFO,               TEXT("Client Info"));
             AppendMenu(hmenu, MF_STRING, RosterView::COMMANDS,                 TEXT("Commands"));
 
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
@@ -572,9 +573,16 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 WndRef vc=VcardForm::createVcardForm(tabs->getHWnd(), focusedContact->rosterJid, rc, false);
                 tabs->addWindow(vc);
                 tabs->switchByWndRef(vc);
+                break;
             }
         case RosterView::CLIENTINFO: 
-            break;
+            {
+                if (!rc->isLoggedIn()) break;
+                WndRef ci=ClientInfoForm::createInfoForm(tabs->getHWnd(), focusedContact->jid.getJid(), rc);
+                tabs->addWindow(ci);
+                tabs->switchByWndRef(ci);
+                break;
+            }
         case RosterView::COMMANDS:
             {
                 ServiceDiscovery::ref disco=ServiceDiscovery::createServiceDiscovery(

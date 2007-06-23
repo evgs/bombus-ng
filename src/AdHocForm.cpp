@@ -56,6 +56,8 @@ void GetAdHoc::doRequest(ResourceContextRef rc, const std::string &sid, const st
 
 ProcessResult GetAdHoc::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     AdHocForm::ref ahfRef=ahf.lock();
+    if (!ahfRef) return CANCEL;
+
 
     if (ahfRef)
         ahfRef->AdHocResultNotify(block);

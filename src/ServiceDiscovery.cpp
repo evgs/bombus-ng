@@ -263,20 +263,15 @@ void GetDisco::doRequest(ResourceContextRef rc) {
 }
 
 ProcessResult GetDisco::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-    //VcardForm::ref vfRef=vf.lock();
-
     ServiceDiscovery::ref sd=vf.lock();
+    if (!sd) return CANCEL;
 
     if (block->getAttribute("id")==idinfo) {
         if (block->getAttribute("type")=="result") {
-            if (sd) {
-                sd->infoReply=block->findChildNamespace("query", "http://jabber.org/protocol/disco#info");
-            }
+            sd->infoReply=block->findChildNamespace("query", "http://jabber.org/protocol/disco#info");
         } else {
             if (block->getAttribute("type")=="error") {
-                if (sd) {
-                    sd->infoReply=block->getChildByName("error");
-                }
+                sd->infoReply=block->getChildByName("error");
             }
         }
         SendMessage(sd->getHWnd(), WM_NOTIFY_BLOCKARRIVED, 0,0);
@@ -284,14 +279,10 @@ ProcessResult GetDisco::blockArrived(JabberDataBlockRef block, const ResourceCon
     }
     if (block->getAttribute("id")==iditems) {
         if (block->getAttribute("type")=="result") {
-            if (sd) {
-                sd->itemReply=block->findChildNamespace("query", "http://jabber.org/protocol/disco#items");
-            }
+            sd->itemReply=block->findChildNamespace("query", "http://jabber.org/protocol/disco#items");
         } else {
             if (block->getAttribute("type")=="error") {
-                if (sd) {
-                    sd->itemReply=block->getChildByName("error");
-                }
+                sd->itemReply=block->getChildByName("error");
             }
         }
         SendMessage(sd->getHWnd(), WM_NOTIFY_BLOCKARRIVED, 0,0);

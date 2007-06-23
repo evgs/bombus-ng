@@ -17,24 +17,28 @@ BOOL JabberStanzaDispatcher::dispatchDataBlock(JabberDataBlockRef block){
 	const std::string & blockTagName=block->getTagName();
 
 
-    for (JabberDataBlockListenersList::iterator i = listeners.begin();
-		 i!=listeners.end();
-		 i++) 
+    int i=0;
+    while (i<listeners.size()) 
 	{
-		const char * tag=i->get()->getTagName();
+        JabberDataBlockListener *p=listeners[i].get();
+        i++;
+
+		const char * tag=p->getTagName();
 		if (tag!=NULL) if ( blockTagName.compare(tag) ) continue;
 
-		const char * type=i->get()->getType();
+		const char * type=p->getType();
 		if (type!=NULL) if (blockType.compare(type)) continue;
 
-		const char * id=i->get()->getId();
+		const char * id=p->getId();
 		if (id!=NULL) if (blockId.compare(id)) continue;
 
-		ProcessResult result=i->get()->blockArrived(block, rc);
+		ProcessResult result=p->blockArrived(block, rc);
 
 		if (result==BLOCK_PROCESSED) return true;
 		
-		if (result==LAST_BLOCK_PROCESSED) { listeners.erase(i); return true; }
+		if (result==LAST_BLOCK_PROCESSED) { listeners.erase(listeners.begin()+i-1); return true; }
+
+        if (result==CANCEL) listeners.erase(listeners.begin()+i-1);
 
 		//if (result==BLOCK_REJECTED) continue;
 	}
@@ -47,11 +51,22 @@ void JabberStanzaDispatcher::addListener(JabberDataBlockListenerRef listener){
 }
 
 void JabberStanzaDispatcher::removeListener(const std::string& byId){
-	for (JabberDataBlockListenersList::iterator i = listeners.begin();
-		 i!=listeners.end();
-		 i++) 
-	{
-		const char * id=i->get()->getId();
-		if (id!=NULL) if (!byId.compare(byId)) listeners.erase(i);
+    int index=0;
+    while (index<listeners.size()) {
+		const char * id=listeners[index].get()->getId();
+        if (id!=NULL) if (!byId.compare(byId)) {
+            listeners.erase(listeners.begin()+index); 
+        } else index++;
 	}
+}
+
+void JabberStanzaDispatcher::removeListener(JabberDataBlockListener *ptr){
+    for (JabberDataBlockListenersList::iterator i = listeners.begin();
+        i!=listeners.end();
+        i++) 
+    {
+        if (i->get()==ptr) {
+            listeners.erase(i); return;
+        }
+    }
 }

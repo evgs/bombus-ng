@@ -1,11 +1,11 @@
 #pragma once
-#include <list>
+#include <vector>
 #include <boost/smart_ptr.hpp>
 
 #include "JabberDataBlock.h"
 #include "JabberDataBlockListener.h"
 
-typedef std::list<JabberDataBlockListenerRef> JabberDataBlockListenersList;
+typedef std::vector<JabberDataBlockListenerRef> JabberDataBlockListenersList;
 
 class JabberStanzaDispatcher {
 public:
@@ -15,7 +15,8 @@ public:
 	BOOL dispatchDataBlock(JabberDataBlockRef block);
 
 	void addListener(JabberDataBlockListenerRef listener);
-	void removeListener(const std::string& id);
+    void removeListener(const std::string& id);
+    void removeListener(JabberDataBlockListener *ptr);
 
 private:
 	JabberDataBlockListenersList listeners;

@@ -57,9 +57,10 @@ void GetMucConfig::doRequest( ResourceContextRef rc, JabberDataBlockRef childDat
 
 ProcessResult GetMucConfig::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     MucConfigForm::ref ahfRef=ahf.lock();
-    StringRef s=block->toXML();
-    if (ahfRef)
-        ahfRef->MucConfigResultNotify(block);
+    if (!ahfRef) return CANCEL;
+
+    //StringRef s=block->toXML();
+    ahfRef->MucConfigResultNotify(block);
 
     return LAST_BLOCK_PROCESSED;
 }

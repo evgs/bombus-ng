@@ -216,6 +216,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\ClientInfoForm.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\CompressedSocket.cpp"
 				>
 			</File>
@@ -224,11 +228,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\Contact.cpp"
+				RelativePath=".\contact.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\contact.cpp"
+				RelativePath="..\..\src\Contact.cpp"
 				>
 			</File>
 			<File
@@ -451,6 +455,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\ChatView.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\ClientInfoForm.h"
 				>
 			</File>
 			<File

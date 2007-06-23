@@ -320,6 +320,7 @@ MucRoom::MucRoom( const std::string &jid ) {
     offlineIcon=presence::OFFLINE;
 
     nUnread=0;
+    composing=false; acceptComposing=false;
 
     transpIndex=icons::ICON_GROUPCHAT_INDEX;
 

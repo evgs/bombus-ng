@@ -108,9 +108,9 @@ void VcardForm::onWmUserUpdate() {
 
 ProcessResult GetVcard::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     VcardForm::ref vfRef=vf.lock();
+    if (!vfRef) return CANCEL;
 
-    if (vfRef)
-        vfRef->vcardArrivedNotify(block);
+    vfRef->vcardArrivedNotify(block);
 
     return LAST_BLOCK_PROCESSED;
 }

@@ -56,9 +56,9 @@ void IqRegister::doRequest(ResourceContextRef rc, JabberDataBlockRef childData) 
 
 ProcessResult IqRegister::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     RegisterForm::ref regFRef=rf.lock();
+    if (!regFRef) return CANCEL;
 
-    if (regFRef)
-        regFRef->RegisterResultNotify(block);
+    regFRef->RegisterResultNotify(block);
 
     return LAST_BLOCK_PROCESSED;
 }

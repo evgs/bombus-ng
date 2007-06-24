@@ -54,7 +54,7 @@ void GetInfo::doRequest(ResourceContextRef rc) {
     rc->jabberStream->sendStanza(req);
 
     req.setAttribute("id", idTime=strtime::getRandom() );
-    qry->setAttribute("xmlns", "jabber:iq:last");
+    qry->setAttribute("xmlns", "jabber:iq:time");
     rc->jabberStream->sendStanza(req);
 }
 

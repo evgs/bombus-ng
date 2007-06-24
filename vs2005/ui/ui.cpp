@@ -39,6 +39,7 @@
 #include "XDataForm.h"
 #include "VcardForm.h"
 #include "ServiceDiscovery.h"
+#include "LastActivity.h"
 
 #include "Auth.h"
 
@@ -49,6 +50,7 @@
 #include "History.h"
 
 #include "utf8.hpp"
+
 
 #define MAX_LOADSTRING 100
 
@@ -608,34 +610,6 @@ ProcessResult Ping::blockArrived(JabberDataBlockRef block, const ResourceContext
     return BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////
-class LastActivity : public JabberDataBlockListener {
-public:
-    LastActivity() {}
-    ~LastActivity(){};
-    virtual const char * getType() const{ return "get"; }
-    virtual const char * getId() const{ return NULL; }
-    virtual const char * getTagName() const { return "iq"; }
-    virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
-};
-ProcessResult LastActivity::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-
-    JabberDataBlockRef query=block->findChildNamespace("query","jabber:iq:last");
-    if (!query) return BLOCK_REJECTED;
-
-    //Log::getInstance()->msg("Last Activity query: ", block->getAttribute("from").c_str());
-
-    JabberDataBlock result("iq");
-    result.setAttribute("to", block->getAttribute("from"));
-    result.setAttribute("type", "result");
-    result.setAttribute("id", block->getAttribute("id"));
-    result.addChild(query);
-    query->setAttribute("seconds","0"); //todo: replace this stub time
-    query->setText("This is stub time");//todo: remove stub message
-
-    rc->jabberStream->sendStanza(result);
-    return BLOCK_PROCESSED;
-}
-//////////////////////////////////////////////////////////////
 class EntityTime : public JabberDataBlockListener {
 public:
     EntityTime() {}
@@ -867,6 +841,7 @@ void JabberStreamEvents::loginSuccess(){
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new LastActivity() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new EntityTime() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new EntityCaps() ));
+    LastActivity::update();
 
     JabberDataBlock getRoster("iq");
     getRoster.setAttribute("type","get");

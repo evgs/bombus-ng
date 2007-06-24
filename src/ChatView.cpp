@@ -14,6 +14,8 @@
 #include "Smiles.h"
 #include "History.h"
 
+#include "LastActivity.h"
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern HWND	g_hWndMenuBar;		// menu bar handle
@@ -398,6 +400,8 @@ void ChatView::sendJabberMessage() {
     composing=false;
     //Reset form
     rc->jabberStream->sendStanza(*out);
+
+    LastActivity::update();
 
     buf[0]=0;
     SendMessage(editWnd, WM_SETTEXT, 1024, (LPARAM) buf);

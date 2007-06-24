@@ -132,7 +132,7 @@ void ClientInfoForm::onWmUserUpdate() {
     }
     if (lastActivityMessage.length())   addText("<br>Status: "); addText(lastActivityMessage);
 
-    if (clientTime.length()) addText("<br>Contact's time: "); addText(clientTime);
+    if (clientTime.length()) addText("<br><br><strong>Contact's time:</strong> "); addText(clientTime);
 
     endHtml();
 }

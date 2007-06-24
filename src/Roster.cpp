@@ -450,7 +450,7 @@ HMENU RosterView::getContextMenu() {
         if (!mr) {
 
             AppendMenu(hmenu, MF_STRING, RosterView::VCARD,                    TEXT("VCard"));
-            AppendMenu(hmenu, MF_STRING, RosterView::CLIENTINFO,               TEXT("Client Info"));
+            AppendMenu(hmenu, MF_STRING, RosterView::CLIENTINFO,               TEXT("Contact Info"));
             AppendMenu(hmenu, MF_STRING, RosterView::COMMANDS,                 TEXT("Commands"));
 
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
@@ -578,7 +578,9 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
         case RosterView::CLIENTINFO: 
             {
                 if (!rc->isLoggedIn()) break;
-                WndRef ci=ClientInfoForm::createInfoForm(tabs->getHWnd(), focusedContact->jid.getJid(), rc);
+                const std::string &jid=(focusedContact->status==PresenceIndex::OFFLINE)?
+                    focusedContact->rosterJid : focusedContact->jid.getJid();
+                WndRef ci=ClientInfoForm::createInfoForm(tabs->getHWnd(), jid, rc);
                 tabs->addWindow(ci);
                 tabs->switchByWndRef(ci);
                 break;

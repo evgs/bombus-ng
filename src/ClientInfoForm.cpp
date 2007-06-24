@@ -80,9 +80,9 @@ ProcessResult GetInfo::blockArrived(JabberDataBlockRef block, const ResourceCont
             vfRef->clientName=qry->getChildText("name");
             vfRef->clientVersion=qry->getChildText("version");
             vfRef->clientOS=qry->getChildText("os");
-        } else {
+        } /*else {
             vfRef->clientVersion="unavailable";
-        }
+        }*/
     }
 
     qry=block->findChildNamespace("query","jabber:iq:last");

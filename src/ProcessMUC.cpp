@@ -43,7 +43,7 @@ MucContact::Affiliation getAffiliationIndex(const std::string &role) {
 //////////////////////////////////////////////////////////////////////////
 ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 
-    JabberDataBlockRef xmuc=block->findChildNamespace("x", "http://jabber.org/protocol/muc");
+    JabberDataBlockRef xmuc=block->findChildNamespace("x", "http://jabber.org/protocol/muc#user");
     if (!xmuc) return BLOCK_REJECTED;
 
     const std::string &from=block->getAttribute("from");

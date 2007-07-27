@@ -67,6 +67,23 @@ namespace utf8 {
 
 				++iter;
 			}
+
+			else if(((*iter)&0x08) == 0) {
+				ret=((wchar_t)((*iter)&0x07)) << 18;
+				
+				if(++iter == end) throw utf8_error("utf-8 sequence incomplete");
+				ret|=((wchar_t)((*iter)&0x3F)) << 12;
+
+				if(++iter == end) throw utf8_error("utf-8 sequence incomplete");
+				ret|=((wchar_t)((*iter)&0x3F)) << 6;
+				
+				if(++iter == end) throw utf8_error("utf-8 sequence incomplete");
+				ret|=(*iter)&0x3F;
+
+				++iter;
+				ret='?'; // stub for U+10000..U+1FFFFF
+			}
+
 			else throw utf8_error("utf-8 not convertable to utf-16");
 
 			return ret;

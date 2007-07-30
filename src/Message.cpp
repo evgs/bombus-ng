@@ -58,7 +58,8 @@ int Message::getColor() const{
 }
 
 PackedTime Message::extractXDelay( JabberDataBlockRef stanza ) {
-    JabberDataBlockRef xdelay=stanza->findChildNamespace("x","jabber:x:delay");
+    JabberDataBlockRef xdelay=stanza->findChildNamespace("x","jabber:x:delay"); // DEPRECATED
+	if (!xdelay) xdelay=stanza->findChildNamespace("delay","urn:xmpp:delay");
     if (!xdelay) return strtime::getCurrentUtc();
     return strtime::PackIso8601(xdelay->getAttribute("stamp"));
 }

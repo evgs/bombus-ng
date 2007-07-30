@@ -1,4 +1,4 @@
-call vcvars32.bat
+call %VS80COMNTOOLS%vsvars32.bat
 call version.cmd
 vcbuild.exe /build vs2005\sockets\regex\regex.vcproj Release
 if ERRORLEVEL 1 goto :EOF

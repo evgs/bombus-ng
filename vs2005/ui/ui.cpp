@@ -654,22 +654,26 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     std::string body=block->getChildText("body");
     std::string subj=block->getChildText("subject");
 
-    JabberDataBlockRef xfwd=block->findChildNamespace("x","jabber:x:forward");
-    if (xfwd) {
-        std::string ofrom=xfwd->getChildText("from");
+    //JabberDataBlockRef xfwd=block->findChildNamespace("x","jabber:x:forward");
+    //if (xfwd) {
+	//  //old method
+    //  std::string ofrom=xfwd->getChildText("from");
+    //}
 
-        // xep-0033 Extended stanza addressing (used by psi)
-        JabberDataBlockRef addresses=xfwd->findChildNamespace("addresses", "http://jabber.org/protocol/address");
-        if (addresses) {
-            JabberDataBlockRefList::iterator i=addresses->getChilds()->begin();
-            while (i!=addresses->getChilds()->end()) {
-                JabberDataBlockRef addr=*(i++);
-                if (addr->getAttribute("type")=="ofrom") ofrom=addr->getAttribute("jid");
-            }
+	std::string ofrom;
+	std::string oto;
+    // xep-0033 Extended stanza addressing
+    JabberDataBlockRef addresses=block->findChildNamespace("addresses", "http://jabber.org/protocol/address");
+    if (addresses) {
+        JabberDataBlockRefList::iterator i=addresses->getChilds()->begin();
+        while (i!=addresses->getChilds()->end()) {
+            JabberDataBlockRef addr=*(i++);
+            if (addr->getAttribute("type")=="ofrom") ofrom=addr->getAttribute("jid");
+            if (addr->getAttribute("type")=="oto")   oto=addr->getAttribute("jid");
         }
-
-        if (ofrom.length()) from=ofrom;
     }
+
+    if (ofrom.length()) from=ofrom;
     //StringRef orig=block->toXML();
 
     std::string nick;
@@ -700,6 +704,9 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
         //delivery notifications
         if (x->getChildByName("delivered")) {
             if (xid.empty()) {
+				/*if (boost::dynamic_pointer_cast<MucContact>c) {
+					if (c->status==presence.OFFLINE) return;
+				}*/
                 JabberDataBlock delivered("message");
                 delivered.setAttribute("to", from);
                 JabberDataBlockRef x=delivered.addChildNS("x", "jabber:x:event");

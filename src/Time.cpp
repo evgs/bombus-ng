@@ -61,7 +61,20 @@ PackedTime strtime::PackIso8601(const std::string &time) {
         st.wHour=extractInt(time, 9, 11);
         st.wMinute=extractInt(time, 12, 14);
         st.wSecond=extractInt(time, 15, 17);
+    } 
+
+    // 0123456789abcdef0
+	// CCYY-MM-DDThh:mm:ss[.sss]TZD
+    if (time[10]=='T') {
+		if (time.length()<19) return t;
+        st.wYear=extractInt(time, 0, 4);
+        st.wMonth=extractInt(time, 5, 7);
+        st.wDay=extractInt(time, 8, 10);
+        st.wHour=extractInt(time, 11, 13);
+        st.wMinute=extractInt(time, 14, 16);
+        st.wSecond=extractInt(time, 17, 19);
     } //TODO CCYY-MM-DDThh:mm:ss[.sss]TZD
+
     SystemTimeToFileTime(&st, &t);
     return t;
 }

@@ -21,11 +21,10 @@ ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceC
     JabberDataBlockRef query=block->getChildByName("query");
     if (!query) return BLOCK_REJECTED;
     std::string xmlns=query->getAttribute("xmlns");
-    if (xmlns=="http://jabber.org/protocol/caps") { 
-        if (query->getAttribute("node").find("http://bombus-im.org/ng")<0) return BLOCK_REJECTED;
-    } else {
-        if (xmlns!="http://jabber.org/protocol/disco#info") return BLOCK_REJECTED;
-    }
+    if (xmlns!="http://jabber.org/protocol/disco#info") return BLOCK_REJECTED;
+    std::string node=query->getAttribute("node");
+    if (node.length()>0) 
+      if (node.find("http://bombus-im.org/ng")<0) return BLOCK_REJECTED;
 
     JabberDataBlock result ("iq");
     result.setAttribute("to", block->getAttribute("from"));
@@ -53,7 +52,7 @@ JabberDataBlockRef EntityCaps::presenceEntityCaps() {
     c->setAttribute("xmlns", "http://jabber.org/protocol/caps");
     c->setAttribute("node", "http://bombus-im.org/ng");
     c->setAttribute("ver", appVersion.c_str());
-    c->setAttribute("ext", appVersion.c_str());
+    //c->setAttribute("ext", appVersion.c_str());
 
     return c;
 }

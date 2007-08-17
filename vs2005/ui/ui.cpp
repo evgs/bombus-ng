@@ -621,23 +621,41 @@ public:
 };
 ProcessResult EntityTime::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 
-    JabberDataBlockRef query=block->findChildNamespace("query","jabber:iq:time"); //todo: urn:xmpp:time
-    if (!query) return BLOCK_REJECTED;
+	JabberDataBlockRef query=block->findChildNamespace("query","jabber:iq:time"); 
+	if (query) {
+		//Log::getInstance()->msg("Time query: ", block->getAttribute("from").c_str());
 
-    //Log::getInstance()->msg("Time query: ", block->getAttribute("from").c_str());
+		JabberDataBlock result("iq");
+		result.setAttribute("to", block->getAttribute("from"));
+		result.setAttribute("type", "result");
+		result.setAttribute("id", block->getAttribute("id"));
+		result.addChild(query);
+		PackedTime ct=strtime::getCurrentUtc();
+		query->addChild("utc",strtime::toIso8601(ct).c_str());
+		query->addChild("display",strtime::toLocalDateTime(ct).c_str());
+		query->addChild("tz",strtime::getLocalZoneOffset().c_str());
 
-    JabberDataBlock result("iq");
-    result.setAttribute("to", block->getAttribute("from"));
-    result.setAttribute("type", "result");
-    result.setAttribute("id", block->getAttribute("id"));
-    result.addChild(query);
-    PackedTime ct=strtime::getCurrentUtc();
-    query->addChild("utc",strtime::toIso8601(ct).c_str());
-    query->addChild("display",strtime::toLocalDateTime(ct).c_str());
-    query->addChild("tz",strtime::getLocalZoneOffset().c_str());
+		rc->jabberStream->sendStanza(result);
+		return BLOCK_PROCESSED;
+	}
 
-    rc->jabberStream->sendStanza(result);
-    return BLOCK_PROCESSED;
+	JabberDataBlockRef time=block->findChildNamespace("time","urn:xmpp:time"); 
+	if (time) {
+		//Log::getInstance()->msg("Time query: ", block->getAttribute("from").c_str());
+
+		JabberDataBlock result("iq");
+		result.setAttribute("to", block->getAttribute("from"));
+		result.setAttribute("type", "result");
+		result.setAttribute("id", block->getAttribute("id"));
+		result.addChild(time);
+		PackedTime ct=strtime::getCurrentUtc();
+		query->addChild("utc",strtime::toXep0080Time(ct).c_str());
+		query->addChild("tzo",strtime::getLocalZoneOffset().c_str());
+
+		rc->jabberStream->sendStanza(result);
+		return BLOCK_PROCESSED;
+	}
+	return BLOCK_REJECTED;
 }
 //////////////////////////////////////////////////////////////
 class MessageRecv : public JabberDataBlockListener {

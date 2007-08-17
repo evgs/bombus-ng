@@ -80,13 +80,23 @@ PackedTime strtime::PackIso8601(const std::string &time) {
 }
 
 std::string strtime::toIso8601(const PackedTime &utcTime) {
-    SYSTEMTIME st;
-    FileTimeToSystemTime(&utcTime, &st);
+	SYSTEMTIME st;
+	FileTimeToSystemTime(&utcTime, &st);
 
-    char timeBuf[18];
-    sprintf(timeBuf, "%04d%02d%02dT%02d:%02d:%02d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond );
+	char timeBuf[18];
+	sprintf(timeBuf, "%04d%02d%02dT%02d:%02d:%02d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond );
 
-    return std::string(timeBuf);
+	return std::string(timeBuf);
+}
+
+std::string strtime::toXep0080Time(const PackedTime &utcTime) {
+	SYSTEMTIME st;
+	FileTimeToSystemTime(&utcTime, &st);
+
+	char timeBuf[18];
+	sprintf(timeBuf, "%04d-%02d-%02dT%02d:%02d:%02dZ", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond );
+
+	return std::string(timeBuf);
 }
 
 

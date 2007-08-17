@@ -9,7 +9,7 @@ char *features[]={
     "jabber:iq:version", 
     "jabber:iq:last",   // last activity
     "jabber:iq:time",  //todo: replace with "urn:xmpp:time"
-    //"urn:xmpp:time", //todo
+    "urn:xmpp:time",
     "jabber:x:data", 
     "jabber:x:event",   // composing, delivered
     "http://jabber.org/protocol/disco#info",

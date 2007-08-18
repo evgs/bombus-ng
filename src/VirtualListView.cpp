@@ -348,7 +348,11 @@ ODRRef VirtualListView::moveCursorTo( int x, int y )
 
 bool VirtualListView::moveCursorEnd() {
     if (odrlist.get()==NULL) return false;
-    cursorPos=odrlist->back();
+    if (odrlist->empty()) {
+        cursorPos=ODRRef();
+    } else {
+        cursorPos=odrlist->back();
+    }
     cursorFit();
     return true;
 }

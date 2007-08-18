@@ -548,12 +548,13 @@ HMENU RosterView::getContextMenu() {
 }
 
 void RosterView::OnCommand( int cmdId, LONG lParam ) {
+    if (roster.expired()) return;
     ResourceContextRef rc=roster.lock()->rc;
+
     IconTextElement::ref focused = boost::dynamic_pointer_cast<IconTextElement>(cursorPos);
     if (focused) focused->onCommand(cmdId, rc);
 
     Contact::ref focusedContact = boost::dynamic_pointer_cast<Contact>(cursorPos);
-    if (roster.expired()) return;
 
     if (focusedContact) {
         switch (cmdId) {

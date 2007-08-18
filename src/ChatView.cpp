@@ -184,9 +184,9 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
             SetTextColor(hdc, p->contact->getColor());
             p->contact->draw(hdc, rc);
 
-            skin->drawElement(hdc, icons::ICON_CLOSE, p->width-2-skin->getElementWidth(), 0);
-
-            
+            int iconwidth= skin->getElementWidth();
+            skin->drawElement(hdc, icons::ICON_CLOSE, p->width-2-iconwidth, 0);
+            skin->drawElement(hdc, icons::ICON_TRASHCAN_INDEX, p->width-2-iconwidth*2, 0);
 
             /*SetBkMode(hdc, TRANSPARENT);
             LPCTSTR t=p->title.c_str();
@@ -277,8 +277,22 @@ LRESULT CALLBACK ChatView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPAR
     case WM_LBUTTONDOWN:
         SetFocus(hWnd);
         if ((GET_Y_LPARAM(lParam))>tabHeight) break;
-        if (GET_X_LPARAM(lParam) > p->width-2-skin->getElementWidth()) {
+        
+        if (GET_X_LPARAM(lParam) > (p->width)-2-(skin->getElementWidth()) ) {
             PostMessage(GetParent(hWnd), WM_COMMAND, TabsCtrl::CLOSETAB, 0);
+            break;
+        }
+        if (GET_X_LPARAM(lParam) > (p->width)-2-(skin->getElementWidth())*2) {
+            int result=MessageBox(
+                p->getHWnd(), 
+                L"Are You sure want to clear this chat session?", 
+                L"Clear chat", 
+                MB_YESNO | MB_ICONWARNING);
+            if (result==IDYES) {
+                p->contact->messageList->clear();
+                p->msgList->moveCursorEnd();
+            }
+            break;
         }
         break;
 

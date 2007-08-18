@@ -35,6 +35,10 @@ void IconTextElement::draw(HDC hdc, RECT &rt) const {
 int IconTextElement::getWidth() const { return width;}
 int IconTextElement::getHeight() const { return height; }
 
+void IconTextElement::createContextMenu( HMENU ) const { return; }
+
+void IconTextElement::onCommand( int cmdId, ResourceContextRef rc ) { return; }
+
 IconTextElementContainer::IconTextElementContainer(const std::wstring &wstr, int icon ) {
     this->iconIndex=icon;
     this->wstr=wstr;

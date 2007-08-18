@@ -421,6 +421,11 @@ HMENU RosterView::getContextMenu() {
 
     HMENU hmenu=CreatePopupMenu();
 
+    IconTextElement::ref focused = boost::dynamic_pointer_cast<IconTextElement>(cursorPos);
+    if (focused) {
+        focused->createContextMenu(hmenu);
+    }
+
     //////////////////////////////////////////////////////////////////////////
     // Group actions
     RosterGroup *rg = dynamic_cast<RosterGroup *>(cursorPos.get());
@@ -543,9 +548,12 @@ HMENU RosterView::getContextMenu() {
 }
 
 void RosterView::OnCommand( int cmdId, LONG lParam ) {
+    ResourceContextRef rc=roster.lock()->rc;
+    IconTextElement::ref focused = boost::dynamic_pointer_cast<IconTextElement>(cursorPos);
+    if (focused) focused->onCommand(cmdId, rc);
+
     Contact::ref focusedContact = boost::dynamic_pointer_cast<Contact>(cursorPos);
     if (roster.expired()) return;
-    ResourceContextRef rc=roster.lock()->rc;
 
     if (focusedContact) {
         switch (cmdId) {

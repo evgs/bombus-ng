@@ -3,6 +3,7 @@
 #include <boost/smart_ptr.hpp>
 #include "Log.h"
 #include "Presence.h"
+#include "jid.h"
 
 class JabberStream;
 class JabberStanzaDispatcher;
@@ -21,6 +22,7 @@ public:
     ResourceContext();
 
 	JabberAccountRef account;
+    Jid myJid;
 	JabberStreamRef jabberStream;
 	JabberStanzaDispatcherRef jabberStanzaDispatcherRT;
     JabberStanzaDispatcherRef jabberStanzaDispatcher2;

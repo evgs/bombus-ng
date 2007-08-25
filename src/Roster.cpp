@@ -217,6 +217,7 @@ Contact::ref Roster::getContactEntry(const std::string & from){
                 contact=bareJidMap[jid.getBareJid()];
                 contact=contact->clone();
                 contact->jid.setResource(jid.getResource());
+                contact->update();
                 contacts.push_back(contact);
                 needUpdateView=true;
             } else {

@@ -262,6 +262,9 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
             std::string res=resource->getText();
 
 			Log::getInstance()->msg("Resource: ", res.c_str());
+
+            rc->myJid.setJid(res);
+
 			//openung session
 			JabberDataBlock session("iq");
 			session.setAttribute("type", "set");

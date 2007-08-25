@@ -681,7 +681,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
 	std::string oto;
     // xep-0033 Extended stanza addressing
     JabberDataBlockRef addresses=block->findChildNamespace("addresses", "http://jabber.org/protocol/address");
-    if (addresses) {
+    if (addresses && rc->myJid.getBareJid() == Jid(from).getBareJid() ) {
         JabberDataBlockRefList::iterator i=addresses->getChilds()->begin();
         while (i!=addresses->getChilds()->end()) {
             JabberDataBlockRef addr=*(i++);
@@ -915,6 +915,7 @@ int prepareAccount(){
     //rc->account->password="l12sx95a";
 
     rc->account=JabberAccountRef(new JabberAccount(TEXT("defAccount.bin")));
+    rc->myJid.setJid( rc->account->getJid() );
 
     //rc->account->useSASL=true;
     //rc->account->useEncryption=true;

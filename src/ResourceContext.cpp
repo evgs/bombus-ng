@@ -20,7 +20,11 @@ char *statusVals []= {
 void ResourceContext::sendPresence(const char *to, presence::PresenceIndex status, const std::string &message, int priority) {
     if (!isLoggedIn()) return;
 
-    jabberStream->sendStanza(constructPresence(to, status, message, priority));
+    JabberDataBlockRef prs=constructPresence(to, status, message, priority);
+    jabberStream->sendStanza(prs);
+    if (to) return;
+    prs->setAttribute("from", myJid.getJid());
+    jabberStanzaDispatcherRT->dispatchDataBlock(prs);
 }
 
 JabberDataBlockRef presence::constructPresence(const char *to, presence::PresenceIndex status, const std::string &message, int priority) {

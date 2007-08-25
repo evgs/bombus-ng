@@ -119,6 +119,7 @@ public:
     const unsigned char * getDigestBits() const;
     
     const std::string getDigestHex() const;
+    const std::string getDigestBase64() const;
 
 
 };

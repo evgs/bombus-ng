@@ -1,4 +1,5 @@
 #include "crypto/MessageDigest.h"
+#include "base64.h"
 /*
 * @(#)MessageDigest.java	1.7 95/08/15
 *
@@ -142,4 +143,10 @@ const std::string MessageDigest::getDigestHex() const{
     }
 
     return result;
+}
+
+const std::string MessageDigest::getDigestBase64() const{
+    if (!digestValid) return std::string();
+
+    return base64::base64Encode(digestBits, digestBitsLen);
 }

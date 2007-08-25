@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
 
@@ -14,4 +15,8 @@ public:
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
     static JabberDataBlockRef presenceEntityCaps();
+
+private:
+    static const std::string & getCapsHash();
+    static std::string capsHash;
 };

@@ -2,20 +2,24 @@
 #include "JabberStream.h"
 
 #include <string>
+#include "crypto/SHA1.h"
 
 extern std::string appVersion;
 
+std::string EntityCaps::capsHash="";
+
 char *features[]={
-    "jabber:iq:version", 
-    "jabber:iq:last",   // last activity
-    "jabber:iq:time",  //todo: replace with "urn:xmpp:time"
-    "urn:xmpp:time",
-    "jabber:x:data", 
-    "jabber:x:event",   // composing, delivered
     "http://jabber.org/protocol/disco#info",
     "http://jabber.org/protocol/muc",
-    "http://www.xmpp.org/extensions/xep-0199.html#ns"
+    "http://www.xmpp.org/extensions/xep-0199.html#ns",
+    "jabber:iq:last",   // last activity
+    "jabber:iq:time",  //todo: replace with "urn:xmpp:time"
+    "jabber:iq:version", 
+    "jabber:x:data", 
+    "jabber:x:event",   // composing, delivered
+    "urn:xmpp:time"
 };
+#define featuresSize (sizeof(features)/sizeof(features[0]))
 
 ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
     JabberDataBlockRef query=block->getChildByName("query");
@@ -50,9 +54,34 @@ ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceC
 JabberDataBlockRef EntityCaps::presenceEntityCaps() {
     JabberDataBlockRef c=JabberDataBlockRef(new JabberDataBlock("c"));
     c->setAttribute("xmlns", "http://jabber.org/protocol/caps");
-    c->setAttribute("node", "http://bombus-im.org/ng");
-    c->setAttribute("ver", appVersion.c_str());
+    std::string node="http://bombus-im.org/ng#"; node+=appVersion.c_str();
+    c->setAttribute("node", node);
+
+    c->setAttribute("ver", getCapsHash());
+    c->setAttribute("hash", "sha-1");
+    //c->setAttribute("ver", appVersion.c_str());
     //c->setAttribute("ext", appVersion.c_str());
 
     return c;
+}
+
+typedef boost::shared_ptr<SHA1> SHA1Ref;
+
+const std::string & EntityCaps::getCapsHash() {
+    if (capsHash.length()) return capsHash;
+
+    SHA1Ref sha1=SHA1Ref(new SHA1());
+    sha1->init();
+
+    sha1->updateASCII("client/handheld");
+    sha1->updateASCII("<");
+
+    for (int i=0; i<featuresSize; i++) {
+        sha1->updateASCII(features[i]);
+        sha1->updateASCII("<");
+    }
+
+    sha1->finish();
+    capsHash=sha1->getDigestBase64();
+    return capsHash;
 }

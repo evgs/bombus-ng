@@ -212,15 +212,19 @@ unsigned long base64::base64Decode( void* dest, const void* src, unsigned long s
 }
 
 const std::string base64::base64Encode(const std::string &inbuf) {
-	int ilen=inbuf.length();
-	int olen=base64EncodeGetLength(ilen);
-	char *buf=new char[olen+1];
-	base64Encode(buf, inbuf.c_str(), ilen);
+    return base64Encode(inbuf.c_str(), inbuf.length() );
+}
 
-	buf[olen]=0;
+const std::string base64::base64Encode( const void* src, unsigned long size ) {
+    int olen=base64EncodeGetLength(size);
+    char *buf=new char[olen+1];
+
+    base64Encode(buf, src, size);
+
+    buf[olen]=0;
     std::string result(buf);
     delete buf;
-	return result;
+    return result;
 }
 
 const std::string base64::base64Decode(const std::string &inbuf) {

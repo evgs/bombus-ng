@@ -320,6 +320,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\MucBookmarks.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\MucConfigForm.cpp"
 				>
 			</File>
@@ -575,6 +579,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\MRU.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\MucBookmarks.h"
 				>
 			</File>
 			<File

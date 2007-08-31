@@ -10,12 +10,14 @@ class JabberStanzaDispatcher;
 class Connection;
 class JabberAccount;
 class Roster;
+class MucBookmarks;
 
 typedef boost::shared_ptr <JabberStanzaDispatcher> JabberStanzaDispatcherRef;
 typedef boost::shared_ptr <JabberStream> JabberStreamRef;
 typedef boost::shared_ptr <Connection> ConnectionRef;
 typedef boost::shared_ptr <JabberAccount> JabberAccountRef;
 typedef boost::shared_ptr <Roster> RosterRef;
+typedef boost::shared_ptr <MucBookmarks> MucBookmarksRef;
 
 class ResourceContext {
 public:
@@ -27,6 +29,7 @@ public:
 	JabberStanzaDispatcherRef jabberStanzaDispatcherRT;
     JabberStanzaDispatcherRef jabberStanzaDispatcher2;
     RosterRef roster;
+    MucBookmarksRef bookmarks;
 
     presence::PresenceIndex status;
     std::string presenceMessage;

@@ -29,6 +29,7 @@
 #include "Roster.h"
 
 #include "ProcessMUC.h"
+#include "MucBookmarks.h"
 
 #include "DlgAccount.h"
 #include "DlgStatus.h"
@@ -874,6 +875,7 @@ void JabberStreamEvents::loginSuccess(){
     getRoster.addChildNS("query", "jabber:iq:roster");
 
     rc->jabberStream->sendStanza(getRoster);
+    rc->bookmarks->doQueryBookmarks(rc);
 }
 
 void JabberStreamEvents::loginFailed(const char * errMsg){
@@ -934,6 +936,8 @@ int initJabber() {
     rc->roster->bindWindow(rosterWnd);
     rosterWnd->setIcon(icons::ICON_PROGRESS_INDEX);
     rosterWnd->roster=rc->roster;
+
+    rc->bookmarks=MucBookmarksRef(new MucBookmarks());
 
     rc->jabberStream=JabberStreamRef(new JabberStream(rc, JabberListenerRef(new JabberStreamEvents(rc))));
 

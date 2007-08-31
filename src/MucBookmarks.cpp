@@ -1,6 +1,7 @@
 #include "MucBookmarks.h"
 #include "JabberStream.h"
 #include "TimeFunc.h"
+#include "Log.h"
 
 ProcessResult MucBookmarks::blockArrived( JabberDataBlockRef block, const ResourceContextRef rc ) {
     std::string &type=block->getAttribute("type");
@@ -8,6 +9,7 @@ ProcessResult MucBookmarks::blockArrived( JabberDataBlockRef block, const Resour
         return LAST_BLOCK_PROCESSED;
     }
 
+    bookmarksAvailable=true;
     if (type=="result") {
         JabberDataBlockRef pvt=block->findChildNamespace("query","jabber:iq:private");
         if (!pvt) return LAST_BLOCK_PROCESSED;
@@ -35,6 +37,7 @@ ProcessResult MucBookmarks::blockArrived( JabberDataBlockRef block, const Resour
             }
         }
     }
+    Log::getInstance()->msg("Bookmarks received successfully");
     return LAST_BLOCK_PROCESSED;
 }
 
@@ -43,6 +46,7 @@ MucBookmarkItem * MucBookmarks::addNewBookmark() {
     return &bookmarks.back();
 }
 void MucBookmarks::doQueryBookmarks( ResourceContextRef rc ) {
+    bookmarksAvailable=false;
     id=strtime::getRandom();
     JabberDataBlock getBm("iq");
     getBm.setAttribute("type", "get");
@@ -52,3 +56,5 @@ void MucBookmarks::doQueryBookmarks( ResourceContextRef rc ) {
     rc->jabberStanzaDispatcherRT->addListener(rc->bookmarks);
     rc->jabberStream->sendStanza(getBm);
 }
+MucBookmarkItem * MucBookmarks::get( int i ) { return &bookmarks[i]; }
+int MucBookmarks::getBookmarkCount() const { return bookmarks.size(); }

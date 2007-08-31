@@ -140,7 +140,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 
             //DIGEST-MD5 mechanism
             if (mechanisms->hasChildByValue("DIGEST-MD5")) {
-                Log::getInstance()->msg("Init DIGEST-MD5");
+                Log::getInstance()->msg("DIGEST-MD5 authentication");
 
                 auth.setAttribute("mechanism", "DIGEST-MD5");
 
@@ -157,7 +157,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
                     return LAST_BLOCK_PROCESSED;
                 }
 
-				Log::getInstance()->msg("Sending PLAIN password");
+				Log::getInstance()->msg("PLAIN-password authentication");
 					
 				auth.setAttribute("mechanism", "PLAIN");
 

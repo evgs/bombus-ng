@@ -16,7 +16,7 @@ struct MucBookmarkItem {
 
 class MucBookmarks : public JabberDataBlockListener {
 public:
-    MucBookmarks(){};
+    MucBookmarks(){ bookmarksAvailable=false; };
     ~MucBookmarks(){};
 
     virtual const char * getType() const{ return NULL; /* result | error */}
@@ -25,13 +25,15 @@ public:
     virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 
     void doQueryBookmarks(ResourceContextRef rc);
-    void doStoreBookmarks(ResourceContextRef rc);
+    void doStoreBookmarks(ResourceContextRef rc) const;
 
     int getBookmarkCount() const;
     MucBookmarkItem * addNewBookmark();
     MucBookmarkItem * get(int i);
 
+    bool isBookmarksAvailable() const {return bookmarksAvailable;} ;
 private:
+    bool bookmarksAvailable;
     std::vector<MucBookmarkItem> bookmarks;
     std::string id;
 };

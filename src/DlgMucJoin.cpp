@@ -13,6 +13,7 @@
 #include "MRU.h"
 
 #include "ProcessMUC.h"
+#include "MucBookmarks.h"
 
 #include "..\vs2005\ui\resourceppc.h"
 
@@ -59,6 +60,21 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
             SendDlgItemMessage(hDlg, IDC_SPIN_HIST_SZ, UDM_SETRANGE32, 0, 20);
             SendDlgItemMessage(hDlg, IDC_SPIN_HIST_SZ, UDM_SETPOS, 0, 20 /*p->rc->priority*/);
 
+            if ( p->rc->bookmarks->isBookmarksAvailable() ) {
+                // enabling grayed items
+                EnableWindow(GetDlgItem(hDlg, IDC_C_BOOKMARK), TRUE);
+                //EnableWindow(GetDlgItem(hDlg, IDC_SAVE), TRUE);
+                //EnableWindow(GetDlgItem(hDlg, IDC_DELETE), TRUE);
+                //EnableWindow(GetDlgItem(hDlg, IDC_X_AUTOJOIN), TRUE);
+
+                // filling up combo box
+                for (int i=0; i< (p->rc->bookmarks->getBookmarkCount()); i++) {
+                    std::wstring bn=utf8::utf8_wchar(p->rc->bookmarks->get(i)->name);
+                    SendDlgItemMessage(hDlg, IDC_C_BOOKMARK, CB_ADDSTRING, 0, (LPARAM) bn.c_str());
+                }
+                SendDlgItemMessage(hDlg, IDC_C_BOOKMARK, CB_SETCURSEL, p->rc->status, 0);
+            }
+
             /*SetDlgItemText(hDlg, IDC_E_JID, dlgAccountParam->getBareJid());
             SetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
             SetDlgItemText(hDlg, IDC_E_RESOURCE, dlgAccountParam->getResource());
@@ -73,6 +89,16 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
 		return (INT_PTR)TRUE;
 
 	case WM_COMMAND:
+        if (HIWORD(wParam) == CBN_SELCHANGE) {
+            int bmi=SendDlgItemMessage(hDlg, IDC_C_BOOKMARK, CB_GETCURSEL, 0, 0);
+            if (bmi==CB_ERR) return TRUE;
+            MucBookmarkItem *bm=p->rc->bookmarks->get(bmi);
+            Jid roomJid(bm->jid);
+            SetDlgItemText(hDlg, IDC_E_ROOM, roomJid.getUserName());
+            SetDlgItemText(hDlg, IDC_E_SERVER, roomJid.getServer());
+            SetDlgItemText(hDlg, IDC_E_PASSWORD, bm->password);
+        }
+
 		if (LOWORD(wParam) == IDOK)
 		{
             std::string room;  GetDlgItemText(hDlg, IDC_E_ROOM, room); std::trim(room);

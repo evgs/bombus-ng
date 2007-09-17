@@ -155,7 +155,8 @@ void Contact::processPresence( JabberDataBlockRef block ) {
 
     if (nickname.empty()) {
         JabberDataBlockRef nick=block->findChildNamespace("nick","http://jabber.org/protocol/nick");
-        if (nick) nickname=nick->getText();
+        if (nick) 
+            nickname=nick->getText();
     }
 
     update();

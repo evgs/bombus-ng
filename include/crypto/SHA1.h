@@ -118,7 +118,7 @@ public:
     virtual void finish() ;
 
     /** Return a string that identifies this algorithm */
-    const char * getAlg() const { return "SHA1"; }
+    const char * getAlg() const { return "sha-1"; }
 
     
 };

@@ -8,20 +8,6 @@ extern std::string appVersion;
 
 std::string EntityCaps::capsHash="";
 
-char *features[]={
-    "http://jabber.org/protocol/disco#info",
-    "http://jabber.org/protocol/muc",
-    "http://www.xmpp.org/extensions/xep-0199.html#ns",
-    "jabber:iq:last",   // last activity
-    "jabber:iq:time",  //todo: replace with "urn:xmpp:time"
-    "jabber:iq:version", 
-    "jabber:x:data", 
-    "jabber:x:event",   // composing, delivered
-    "urn:xmpp:ping",    // xep-0199
-    "urn:xmpp:time"
-};
-#define featuresSize (sizeof(features)/sizeof(features[0]))
-
 ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc) {
     JabberDataBlockRef query=block->getChildByName("query");
     if (!query) return BLOCK_REJECTED;
@@ -42,9 +28,7 @@ ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceC
     identity->setAttribute("type","handheld");
     identity->setAttribute("name","Bombus-ng");
 
-    for (int i=0; i<sizeof(features)/sizeof(char *); i++) {
-        query->addChild("feature", NULL)->setAttribute("var", features[i]);
-    }
+    rc->myCaps->appendFeatures(query);
 
     rc->jabberStream->sendStanza(result);
 
@@ -52,37 +36,80 @@ ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceC
     
 }
 
-JabberDataBlockRef EntityCaps::presenceEntityCaps() {
+JabberDataBlockRef ClientCaps::presenceEntityCaps() {
     JabberDataBlockRef c=JabberDataBlockRef(new JabberDataBlock("c"));
     c->setAttribute("xmlns", "http://jabber.org/protocol/caps");
-    std::string node="http://bombus-im.org/ng#"; node+=appVersion.c_str();
     c->setAttribute("node", node);
 
     c->setAttribute("ver", getCapsHash());
-    c->setAttribute("hash", "sha-1");
+    c->setAttribute("hash", alg);
     //c->setAttribute("ver", appVersion.c_str());
     //c->setAttribute("ext", appVersion.c_str());
 
     return c;
 }
 
-typedef boost::shared_ptr<SHA1> SHA1Ref;
-
-const std::string & EntityCaps::getCapsHash() {
-    if (capsHash.length()) return capsHash;
-
-    SHA1Ref sha1=SHA1Ref(new SHA1());
-    sha1->init();
-
-    sha1->updateASCII("client/handheld");
-    sha1->updateASCII("<");
-
-    for (int i=0; i<featuresSize; i++) {
-        sha1->updateASCII(features[i]);
-        sha1->updateASCII("<");
+void ClientCaps::appendFeatures( JabberDataBlockRef result ) const {
+    for (size_t i=0; i<features.size(); i++) {
+        result->addChild("feature", NULL)->setAttribute("var", features[i]);
     }
 
-    sha1->finish();
-    capsHash=sha1->getDigestBase64();
+}
+typedef boost::shared_ptr<MessageDigest> MDRef;
+
+const std::string & ClientCaps::getCapsHash() {
+    if (capsHash.length()) return capsHash;
+
+    MDRef hashAlg=MDRef(new SHA1());
+    hashAlg->init();
+
+    hashAlg->updateASCII("client/handheld");
+    hashAlg->updateASCII("<");
+
+    for (size_t i=0; i<features.size(); i++) {
+        hashAlg->updateASCII(features[i]);
+        hashAlg->updateASCII("<");
+    }
+
+    hashAlg->finish();
+    capsHash=hashAlg->getDigestBase64();
     return capsHash;
+}
+
+void ClientCaps::addFeature( const std::string feature ) {
+    for (size_t i=0; i<features.size(); i++) {
+        if (features[i]==feature) return;
+    }
+    features.push_back(feature);
+    capsHash.clear();
+}
+void ClientCaps::removeFeature( const std::string feature ) {
+    for (size_t i=0; i<features.size(); i++) {
+        if (features[i]==feature) {
+            features.erase(features.begin()+i);
+            capsHash.clear();
+            return;
+        }
+    }
+}
+
+ClientCaps::ClientCaps() {
+    alg="sha-1";
+}
+
+MyCaps::MyCaps() {
+    node="http://bombus-im.org/ng#";
+    node+=appVersion.c_str();
+    alg="sha-1";
+
+    addFeature("http://jabber.org/protocol/disco#info");
+    addFeature("http://jabber.org/protocol/muc");
+    addFeature("http://www.xmpp.org/extensions/xep-0199.html#ns");
+    addFeature("jabber:iq:last");   // last activity
+    addFeature("jabber:iq:time");  //todo: replace with "urn:xmpp:time"
+    addFeature("jabber:iq:version");
+    addFeature("jabber:x:data");
+    addFeature("jabber:x:event");   // composing, delivered
+    addFeature("urn:xmpp:ping");    // xep-0199
+    addFeature("urn:xmpp:time");
 }

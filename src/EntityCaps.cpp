@@ -17,6 +17,7 @@ char *features[]={
     "jabber:iq:version", 
     "jabber:x:data", 
     "jabber:x:event",   // composing, delivered
+    "urn:xmpp:ping",    // xep-0199
     "urn:xmpp:time"
 };
 #define featuresSize (sizeof(features)/sizeof(features[0]))

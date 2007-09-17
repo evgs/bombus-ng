@@ -152,6 +152,12 @@ void Contact::processPresence( JabberDataBlockRef block ) {
 
     this->status=typeIndex;
     if (type2!=presence::NOCHANGE) this->offlineIcon=type2;
+
+    if (nickname.empty()) {
+        JabberDataBlockRef nick=block->findChildNamespace("nick","http://jabber.org/protocol/nick");
+        if (nick) nickname=nick->getText();
+    }
+
     update();
 
     std::string body=type;

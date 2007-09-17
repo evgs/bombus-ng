@@ -603,12 +603,12 @@ ProcessResult Ping::blockArrived(JabberDataBlockRef block, const ResourceContext
 
     Log::getInstance()->msg("Ping from ", block->getAttribute("from").c_str());
 
-    JabberDataBlock result("iq");
-    result.setAttribute("to", block->getAttribute("from"));
-    result.setAttribute("type", "result");
-    result.setAttribute("id", block->getAttribute("id"));
+    JabberDataBlock pong("iq");
+    pong.setAttribute("to", block->getAttribute("from"));
+    pong.setAttribute("type", "result");
+    pong.setAttribute("id", block->getAttribute("id"));
 
-    rc->jabberStream->sendStanza(result);
+    rc->jabberStream->sendStanza(pong);
     return BLOCK_PROCESSED;
 }
 //////////////////////////////////////////////////////////////

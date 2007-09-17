@@ -24,6 +24,7 @@
 #include "JabberListener.h"
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
+#include "HostFeatures.h"
 
 #include "EntityCaps.h"
 #include "Roster.h"
@@ -65,7 +66,7 @@ HCURSOR     cursorWait;
 TabsCtrlRef tabs;
 
 VirtualListView::ref odrLog;
-RosterView::ref rosterWnd;
+RosterListView::ref rosterWnd;
 ResourceContextRef rc;
 
 ImgListRef skin;
@@ -351,7 +352,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             tabs=TabsCtrlRef(new MainTabs(hWnd));
             //tabs->setParent(hWnd);
 
-            rosterWnd=RosterView::ref(new RosterView(tabs->getHWnd(), std::string("Roster")));
+            rosterWnd=RosterListView::ref(new RosterListView(tabs->getHWnd(), std::string("Roster")));
             tabs->addWindow(rosterWnd);
 
             { 
@@ -597,7 +598,7 @@ public:
 };
 ProcessResult Ping::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
 
-    JabberDataBlockRef ping=block->findChildNamespace("ping","http://www.xmpp.org/extensions/xep-0199.html#ns");
+    JabberDataBlockRef ping=block->findChildNamespace("ping","urn:xmpp:ping");
     if (!ping) return BLOCK_REJECTED;
 
     Log::getInstance()->msg("Ping from ", block->getAttribute("from").c_str());
@@ -857,6 +858,7 @@ void JabberStreamEvents::endConversation(const std::exception *ex){
 void JabberStreamEvents::loginSuccess(){
     Log::getInstance()->msg("Login ok");
 
+    HostFeatures::discoverFeatures(rc);
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new ProcessMuc(rc) ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new PresenceRecv() ));

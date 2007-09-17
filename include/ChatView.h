@@ -34,7 +34,7 @@ public:
 
     virtual bool showWindow(bool show);
 
-    void ChatView::redraw();
+    void redraw();
 
 protected:
     VirtualListView::ref msgList;

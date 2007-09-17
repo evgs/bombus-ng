@@ -260,6 +260,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\HostFeatures.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\HtmlView.cpp"
 				>
 			</File>
@@ -507,6 +511,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\History.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\HostFeatures.h"
 				>
 			</File>
 			<File

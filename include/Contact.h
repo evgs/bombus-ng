@@ -15,6 +15,13 @@
 
 class Contact : public IconTextElement {
 public:
+    enum SH{
+        DISABLED_STATE=-1,
+        DEFAULT=0,
+        ALLOW=1,
+        BLOCK=2
+    };
+
     typedef boost::shared_ptr<Contact> ref;
     Contact(const std::string &jid, const std::string &resource, const std::string &nickname);
     Contact(){}
@@ -33,6 +40,8 @@ public:
     int offlineIcon;
 
     ODRListRef messageList;
+
+    int enableServerHistory;
 
     bool composing;
     bool acceptComposing;

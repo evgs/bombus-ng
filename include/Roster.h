@@ -108,16 +108,38 @@ private:
 
 };
 
-
-class RosterView: public VirtualListView {
+class RosterView : public Wnd{
 public:
-    RosterView(HWND parent, const std::string & title);
+    //ChatView(HWND parent, const std::string & title);
+    RosterView(HWND parent);
     virtual ~RosterView();
+
+    static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+    typedef boost::shared_ptr<RosterView> ref;
+
+    virtual bool showWindow(bool show);
+
+    void redraw();
+
+protected:
+    VirtualListView::ref rosterListView;
+
+private:
+    static ATOM windowClass;
+    void calcEditHeight();
+    ATOM RegisterWindowClass();
+};
+
+class RosterListView: public VirtualListView {
+public:
+    RosterListView(HWND parent, const std::string & title);
+    virtual ~RosterListView();
 
     virtual void eventOk();
     boost::weak_ptr<Roster> roster;
 
-    typedef boost::shared_ptr<RosterView> ref;
+    typedef boost::shared_ptr<RosterListView> ref;
 
     virtual HMENU getContextMenu();
     virtual void OnCommand(int cmdId, LONG lParam);
@@ -138,7 +160,8 @@ public:
         MUCKICK, MUCBAN, 
         MUCVISITOR, MUCPARTICIPANT, MUCMODERATOR,
         MUCNONE, MUCMEMBER, MUCADMIN, MUCOWNER,
-        MUCCONFIG, MLOUTCASTS, MLMEMBERS, MLADMINS, MLOWNERS
+        MUCCONFIG, MLOUTCASTS, MLMEMBERS, MLADMINS, MLOWNERS,
+        SSH_DEFAULT, SSH_ENABLED, SSH_DISABLED
     };
 private:
 };

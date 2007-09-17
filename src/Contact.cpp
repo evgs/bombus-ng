@@ -27,6 +27,8 @@ Contact::Contact(const std::string &jid, const std::string &resource, const std:
     this->status=presence::OFFLINE;
     offlineIcon=presence::OFFLINE;
 
+    enableServerHistory=DISABLED_STATE;
+
     nUnread=0;
     sortKey=0;
 
@@ -44,6 +46,7 @@ Contact::ref Contact::clone() {
     c->subscr=subscr;
     c->group=group;
     c->offlineIcon=offlineIcon;
+    c->enableServerHistory=enableServerHistory;
     return c;
 }
 

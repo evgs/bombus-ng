@@ -21,7 +21,7 @@
 #include "stringutils.h"
 
 extern HINSTANCE	g_hInst;			// current instance
-extern RosterView::ref rosterWnd;
+extern RosterListView::ref rosterWnd;
 
 #define MRU_MUC_NICK L"MucJoinNick"
 

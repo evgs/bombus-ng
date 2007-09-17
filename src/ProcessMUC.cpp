@@ -6,7 +6,7 @@
 #include "ChatView.h"
 
 extern TabsCtrlRef tabs;
-extern RosterView::ref rosterWnd;
+extern RosterListView::ref rosterWnd;
 
 //////////////////////////////////////////////////////////////////////////
 MucContact::ref getMucContactEntry(const std::string &jid, ResourceContextRef rc) {
@@ -352,6 +352,7 @@ MucContact::MucContact( const std::string &jid )
 
     update();
     messageList=ODRListRef(new ODRList);
+    enableServerHistory=Contact::DISABLED_STATE;
 }
 
 void MucContact::update() {

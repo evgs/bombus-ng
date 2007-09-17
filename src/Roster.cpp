@@ -389,7 +389,7 @@ bool RosterGroup::compare( RosterGroup::ref left, RosterGroup::ref right ) {
 
 
 //////////////////////////////////////////////////////////////////////////
-RosterView::RosterView( HWND parent, const std::string & title ){
+RosterListView::RosterListView( HWND parent, const std::string & title ){
     parentHWnd=parent;
     init(); 
 
@@ -404,20 +404,20 @@ RosterView::RosterView( HWND parent, const std::string & title ){
     ////
 }
 
-RosterView::~RosterView() {}
+RosterListView::~RosterListView() {}
 
-void RosterView::eventOk() {
+void RosterListView::eventOk() {
     if (!cursorPos) return;
     RosterGroup *p = dynamic_cast<RosterGroup *>(cursorPos.get());
     if (p) {
     	p->setExpanded(!p->isExpanded());
         roster.lock()->makeViewList();
     } else {
-        OnCommand(RosterView::OPENCHAT, 0);
+        OnCommand(RosterListView::OPENCHAT, 0);
     }
 }
 
-HMENU RosterView::getContextMenu() {
+HMENU RosterListView::getContextMenu() {
     if (!cursorPos) return NULL;
 
     HMENU hmenu=CreatePopupMenu();
@@ -432,7 +432,7 @@ HMENU RosterView::getContextMenu() {
     RosterGroup *rg = dynamic_cast<RosterGroup *>(cursorPos.get());
     if (rg) {
         if (rg->type==RosterGroup::ROSTER)
-            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::RENAMEGRP,           TEXT("Rename"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::RENAMEGRP,           TEXT("Rename"));
 
     }
     
@@ -444,52 +444,52 @@ HMENU RosterView::getContextMenu() {
         MucRoom * mr= dynamic_cast<MucRoom *>(cursorPos.get());
 
         if (type==RosterGroup::TRANSPORTS) {
-            AppendMenu(hmenu, MF_STRING, RosterView::LOGON,                TEXT("Logon"));
-            AppendMenu(hmenu, MF_STRING, RosterView::LOGOFF,               TEXT("Logoff"));
-            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::RESOLVENICKNAMES,     TEXT("Resolve Nicknames"));
+            AppendMenu(hmenu, MF_STRING, RosterListView::LOGON,                TEXT("Logon"));
+            AppendMenu(hmenu, MF_STRING, RosterListView::LOGOFF,               TEXT("Logoff"));
+            AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::RESOLVENICKNAMES,     TEXT("Resolve Nicknames"));
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
         }
-        AppendMenu(hmenu, MF_STRING , RosterView::OPENCHAT,                TEXT("Open chat"));
+        AppendMenu(hmenu, MF_STRING , RosterListView::OPENCHAT,                TEXT("Open chat"));
 
         AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
         if (!mr) {
 
-            AppendMenu(hmenu, MF_STRING, RosterView::VCARD,                    TEXT("VCard"));
-            AppendMenu(hmenu, MF_STRING, RosterView::CLIENTINFO,               TEXT("Client Info"));
-            AppendMenu(hmenu, MF_STRING, RosterView::COMMANDS,                 TEXT("Commands"));
+            AppendMenu(hmenu, MF_STRING, RosterListView::VCARD,                    TEXT("VCard"));
+            AppendMenu(hmenu, MF_STRING, RosterListView::CLIENTINFO,               TEXT("Client Info"));
+            AppendMenu(hmenu, MF_STRING, RosterListView::COMMANDS,                 TEXT("Commands"));
 
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
             if (type==RosterGroup::ROSTER) {
-                AppendMenu(hmenu, MF_STRING, RosterView::EDITCONTACT,          TEXT("Edit contact"));
+                AppendMenu(hmenu, MF_STRING, RosterListView::EDITCONTACT,          TEXT("Edit contact"));
 
                 HMENU subscrMenu=CreatePopupMenu();
-                AppendMenu(subscrMenu, MF_STRING, RosterView::SUBSCRIBE, TEXT("Ask subscription"));
-                AppendMenu(subscrMenu, MF_STRING, RosterView::SUBSCRIBED, TEXT("Grant subscription"));
-                AppendMenu(subscrMenu, MF_STRING, RosterView::UNSUBSCRIBED, TEXT("Revoke subscription"));
+                AppendMenu(subscrMenu, MF_STRING, RosterListView::SUBSCRIBE, TEXT("Ask subscription"));
+                AppendMenu(subscrMenu, MF_STRING, RosterListView::SUBSCRIBED, TEXT("Grant subscription"));
+                AppendMenu(subscrMenu, MF_STRING, RosterListView::UNSUBSCRIBED, TEXT("Revoke subscription"));
 
                 AppendMenu(hmenu, MF_POPUP, (LPARAM)subscrMenu,               TEXT("Subscription"));
             }
 
             if (type==RosterGroup::NOT_IN_LIST)
-                AppendMenu(hmenu, MF_STRING, RosterView::ADDCONTACT,           TEXT("Add contact"));
+                AppendMenu(hmenu, MF_STRING, RosterListView::ADDCONTACT,           TEXT("Add contact"));
 
             if (type!=RosterGroup::MUC && type!=RosterGroup::SELF_CONTACT) {
-                AppendMenu(hmenu, MF_STRING, RosterView::DELETECONTACT,            TEXT("Delete"));
+                AppendMenu(hmenu, MF_STRING, RosterListView::DELETECONTACT,            TEXT("Delete"));
 
                 AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
 
-                AppendMenu(hmenu, MF_STRING, RosterView::SENDSTATUS,               TEXT("Send status"));
+                AppendMenu(hmenu, MF_STRING, RosterListView::SENDSTATUS,               TEXT("Send status"));
             }
             if (type!=RosterGroup::TRANSPORTS) {
-                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::SENDFILE,             TEXT("Send file"));
-                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::INVITE,               TEXT("Invite"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::SENDFILE,             TEXT("Send file"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::INVITE,               TEXT("Invite"));
             }
         }
 
         if (mr) {
-            AppendMenu(hmenu, MF_STRING, RosterView::SENDSTATUS,               TEXT("Send status"));
+            AppendMenu(hmenu, MF_STRING, RosterListView::SENDSTATUS,               TEXT("Send status"));
 
             MucGroup::ref roomGrp;
             roomGrp=boost::dynamic_pointer_cast<MucGroup> (roster.lock()->findGroup(mr->group));
@@ -497,14 +497,14 @@ HMENU RosterView::getContextMenu() {
             MucContact::Affiliation myAff=roomGrp->selfContact->affiliation;
             if (myAff==MucContact::OWNER || myAff==MucContact::ADMIN) {
                 AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MLOUTCASTS,           TEXT("Outcasts/Banned"));
-                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MLMEMBERS,            TEXT("Members"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MLOUTCASTS,           TEXT("Outcasts/Banned"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MLMEMBERS,            TEXT("Members"));
             }
             if (myAff==MucContact::OWNER) {
-                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MLADMINS,             TEXT("Admins"));
-                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MLOWNERS,             TEXT("Owners"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MLADMINS,             TEXT("Admins"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MLOWNERS,             TEXT("Owners"));
                 AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-                AppendMenu(hmenu, MF_STRING, RosterView::MUCCONFIG,               TEXT("Configure room"));
+                AppendMenu(hmenu, MF_STRING, RosterListView::MUCCONFIG,               TEXT("Configure room"));
             }
         }
 
@@ -523,23 +523,36 @@ HMENU RosterView::getContextMenu() {
 
             if (!canKick && !canBan) return hmenu;
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-            if (canKick) AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MUCKICK, L"Kick");
-            if (canBan)  AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterView::MUCBAN,  L"Ban");
+            if (canKick) AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MUCKICK, L"Kick");
+            if (canBan)  AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MUCBAN,  L"Ban");
 
             HMENU roleMenu=CreatePopupMenu();
-            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::VISITOR ? MF_CHECKED : 0), RosterView::MUCVISITOR, L"Visitor");
-            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::PARTICIPANT ? MF_CHECKED : 0), RosterView::MUCPARTICIPANT, L"Participant");
-            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::MODERATOR ? MF_CHECKED : 0), RosterView::UNSUBSCRIBED, L"Moderator");
+            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::VISITOR ? MF_CHECKED : 0), RosterListView::MUCVISITOR, L"Visitor");
+            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::PARTICIPANT ? MF_CHECKED : 0), RosterListView::MUCPARTICIPANT, L"Participant");
+            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::MODERATOR ? MF_CHECKED : 0), RosterListView::UNSUBSCRIBED, L"Moderator");
 
             if (myRole>=MucContact::MODERATOR) AppendMenu(hmenu, MF_POPUP, (LPARAM)roleMenu,               TEXT("Role"));
 
             HMENU afflMenu=CreatePopupMenu();
-            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::NONE ? MF_CHECKED : 0), RosterView::MUCNONE, L"None");
-            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::MEMBER ? MF_CHECKED : 0), RosterView::MUCMEMBER, L"Member");
-            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::ADMIN ? MF_CHECKED : 0), RosterView::MUCADMIN, L"Admin");
-            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::OWNER ? MF_CHECKED : 0), RosterView::MUCOWNER, L"Owner");
+            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::NONE ? MF_CHECKED : 0), RosterListView::MUCNONE, L"None");
+            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::MEMBER ? MF_CHECKED : 0), RosterListView::MUCMEMBER, L"Member");
+            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::ADMIN ? MF_CHECKED : 0), RosterListView::MUCADMIN, L"Admin");
+            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::OWNER ? MF_CHECKED : 0), RosterListView::MUCOWNER, L"Owner");
 
             if (myAff>=MucContact::ADMIN) AppendMenu(hmenu, MF_POPUP, (LPARAM)afflMenu,               TEXT("Affiliation"));
+
+        }
+
+        if (c->enableServerHistory!=Contact::DISABLED_STATE) {
+            HMENU sshMenu=CreatePopupMenu();
+            AppendMenu(sshMenu, MF_STRING | (c->enableServerHistory==Contact::DEFAULT ? MF_CHECKED : 0), 
+                RosterListView::SSH_DEFAULT, TEXT("Global state"));
+            AppendMenu(sshMenu, MF_STRING | (c->enableServerHistory==Contact::BLOCK ? MF_CHECKED : 0), 
+                RosterListView::SSH_DISABLED, TEXT("Disabled"));
+            AppendMenu(sshMenu, MF_STRING | (c->enableServerHistory==Contact::ALLOW ? MF_CHECKED : 0), 
+                RosterListView::SSH_ENABLED, TEXT("Enabled"));
+
+            AppendMenu(hmenu, MF_POPUP, (LPARAM)sshMenu,               TEXT("History"));
 
         }
 
@@ -548,7 +561,7 @@ HMENU RosterView::getContextMenu() {
     return hmenu;
 }
 
-void RosterView::OnCommand( int cmdId, LONG lParam ) {
+void RosterListView::OnCommand( int cmdId, LONG lParam ) {
     if (roster.expired()) return;
     ResourceContextRef rc=roster.lock()->rc;
 
@@ -559,25 +572,25 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
 
     if (focusedContact) {
         switch (cmdId) {
-        case RosterView::OPENCHAT: 
+        case RosterListView::OPENCHAT: 
             {
                 openChat(focusedContact);
                 break;
             }
 
-        case RosterView::LOGON: 
+        case RosterListView::LOGON: 
             //
-        case RosterView::LOGOFF: 
+        case RosterListView::LOGOFF: 
             rc->sendPresence(
                 focusedContact->jid.getJid().c_str(), 
-                (cmdId==RosterView::LOGON)? presence::ONLINE: presence::OFFLINE, 
+                (cmdId==RosterListView::LOGON)? presence::ONLINE: presence::OFFLINE, 
                 rc->presenceMessage, rc->priority );
             break;
 
-        case RosterView::RESOLVENICKNAMES:
+        case RosterListView::RESOLVENICKNAMES:
             break;
 
-        case RosterView::VCARD: 
+        case RosterListView::VCARD: 
             {
                 if (!rc->isLoggedIn()) break;
                 WndRef vc=VcardForm::createVcardForm(tabs->getHWnd(), focusedContact->rosterJid, rc, false);
@@ -585,7 +598,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 tabs->switchByWndRef(vc);
                 break;
             }
-        case RosterView::CLIENTINFO: 
+        case RosterListView::CLIENTINFO: 
             {
                 if (!rc->isLoggedIn()) break;
                 const std::string &jid=(focusedContact->status==presence::OFFLINE)?
@@ -595,7 +608,7 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 tabs->switchByWndRef(ci);
                 break;
             }
-        case RosterView::COMMANDS:
+        case RosterListView::COMMANDS:
             {
                 ServiceDiscovery::ref disco=ServiceDiscovery::createServiceDiscovery(
                     tabs->getHWnd(), 
@@ -608,23 +621,23 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
             }
             break;
             //case RosterView::SUBSCR: 
-        case RosterView::SUBSCRIBE:
-        case RosterView::SUBSCRIBED: 
-        case RosterView::UNSUBSCRIBED: 
+        case RosterListView::SUBSCRIBE:
+        case RosterListView::SUBSCRIBED: 
+        case RosterListView::UNSUBSCRIBED: 
             {
                 presence::PresenceIndex subscr=presence::PRESENCE_AUTH_ASK;
-                if (cmdId==RosterView::SUBSCRIBED) subscr=presence::PRESENCE_AUTH;
-                if (cmdId==RosterView::UNSUBSCRIBED) subscr=presence::PRESENCE_AUTH_REMOVE;
+                if (cmdId==RosterListView::SUBSCRIBED) subscr=presence::PRESENCE_AUTH;
+                if (cmdId==RosterListView::UNSUBSCRIBED) subscr=presence::PRESENCE_AUTH_REMOVE;
                 rc->sendPresence(focusedContact->rosterJid.c_str(),
                     subscr, std::string(), 0);
                 break;
             }
 
-        case RosterView::EDITCONTACT:
-        case RosterView::ADDCONTACT:
+        case RosterListView::EDITCONTACT:
+        case RosterListView::ADDCONTACT:
             DlgAddEditContact::createDialog(getHWnd(), rc, focusedContact); break;
 
-        case RosterView::DELETECONTACT:
+        case RosterListView::DELETECONTACT:
             {
                 std::wstring name=utf8::utf8_wchar(focusedContact->getFullName());
                 int result=MessageBox(getHWnd(), name.c_str(), TEXT("Delete contact ?"), MB_YESNO | MB_ICONWARNING);
@@ -633,14 +646,14 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
                 }
                 break;
             }
-        case RosterView::SENDSTATUS:
+        case RosterListView::SENDSTATUS:
             DlgStatus::createDialog(getHWnd(), rc, focusedContact); break;
 
-        case RosterView::SENDFILE: 
-        case RosterView::INVITE:
+        case RosterListView::SENDFILE: 
+        case RosterListView::INVITE:
             break;
 
-        case RosterView::MUCCONFIG:
+        case RosterListView::MUCCONFIG:
             {
                 MucConfigForm::ref mucconf=MucConfigForm::createMucConfigForm(
                     tabs->getHWnd(), 
@@ -660,17 +673,17 @@ void RosterView::OnCommand( int cmdId, LONG lParam ) {
         DlgAddEditContact::createDialog(getHWnd(), rc, Contact::ref());
     }
 }
-bool RosterView::showWindow( bool show ) {
+bool RosterListView::showWindow( bool show ) {
     Wnd::showWindow(show);
     if (show) SetFocus(getHWnd());
     return false;
 }
-void RosterView::setIcon( int iconIndex ) {
+void RosterListView::setIcon( int iconIndex ) {
     wt->setIcon(iconIndex);
     InvalidateRect(tabs->getHWnd(), NULL, false);
 }
 
-void RosterView::openChat(Contact::ref contact) {
+void RosterListView::openChat(Contact::ref contact) {
     WndRef chat=tabs->getWindowByODR(contact);
     if (!chat) {
         //Contact::ref r=roster.lock()->findContact(c->jid.getJid());
@@ -679,3 +692,180 @@ void RosterView::openChat(Contact::ref contact) {
     }
     tabs->switchByWndRef(chat);
 }
+
+
+#ifdef ENABLE_ROSTER_VIEW
+//////////////////////////////////////////////////////////////////////////
+ATOM RosterView::RegisterWindowClass() {
+    WNDCLASS wc;
+
+    wc.style         = CS_HREDRAW | CS_VREDRAW;
+    wc.lpfnWndProc   = ChatView::WndProc;
+    wc.cbClsExtra    = 0;
+    wc.cbWndExtra    = 0;
+    wc.hInstance     = g_hInst;
+    wc.hIcon         = NULL;
+    wc.hCursor       = 0;
+    wc.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
+    wc.lpszMenuName  = 0;
+    wc.lpszClassName = _T("BombusRV");
+
+    return RegisterClass(&wc);
+}
+
+//////////////////////////////////////////////////////////////////////////
+LRESULT CALLBACK RosterView::WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam ) {
+    PAINTSTRUCT ps;
+    HDC hdc;
+    RosterView *p=(RosterView *) GetWindowLong(hWnd, GWL_USERDATA);
+
+    switch (message) {
+    case WM_CREATE:
+        {
+            p=(RosterView *) (((CREATESTRUCT *)lParam)->lpCreateParams);
+            SetWindowLong(hWnd, GWL_USERDATA, (LONG) p );
+
+            p->rosterListView=VirtualListView::ref(new VirtualListView(hWnd, std::string("Roster")));
+            p->rosterListView->setParent(hWnd);
+            p->rosterListView->showWindow(true);
+            p->rosterListView->wrapList=true;
+            p->rosterListView->colorInterleaving=true;
+
+            //p->msgList->bindODRList(p->contact->messageList);
+            break;
+        }
+
+    case WM_PAINT:
+        hdc = BeginPaint(hWnd, &ps);
+
+        {
+            //p->contact->nUnread=0;
+            RECT rc = {0, 0, 200, tabHeight};
+            SetBkMode(hdc, TRANSPARENT);
+            SetTextColor(hdc, p->contact->getColor());
+            p->contact->draw(hdc, rc);
+
+            int iconwidth= skin->getElementWidth();
+            skin->drawElement(hdc, 0, /*icons::ICON_CLOSE*/, p->width-2-iconwidth, 0);
+            //skin->drawElement(hdc, icons::ICON_TRASHCAN_INDEX, p->width-2-iconwidth*2, 0);
+
+            /*SetBkMode(hdc, TRANSPARENT);
+            LPCTSTR t=p->title.c_str();
+            DrawText(hdc, t, -1, &rc, DT_CALCRECT | DT_LEFT | DT_TOP);
+            DrawText(hdc, t, -1, &rc, DT_LEFT | DT_TOP);*/
+        }
+
+        EndPaint(hWnd, &ps);
+        break;
+
+        //case WM_KILLFOCUS:
+        //    p->contact->nUnread=0;
+        //    break;
+
+    case WM_SIZE: 
+        { 
+            HDWP hdwp; 
+            RECT rc; 
+
+            int height=GET_Y_LPARAM(lParam);
+            p->width=GET_X_LPARAM(lParam);
+
+            int ySplit=height-p->editHeight;
+
+            p->calcEditHeight();
+
+            // Calculate the display rectangle, assuming the 
+            // tab control is the size of the client area. 
+            SetRect(&rc, 0, 0, 
+                GET_X_LPARAM(lParam), ySplit ); 
+
+            // Size the tab control to fit the client area. 
+            hdwp = BeginDeferWindowPos(2);
+
+            /*DeferWindowPos(hdwp, dropdownWnd, HWND_TOP, 0, 0, 
+            GET_X_LPARAM(lParam), 20, 
+            SWP_NOZORDER 
+            ); */
+
+
+            DeferWindowPos(hdwp, p->msgList->getHWnd(), HWND_TOP, 0, tabHeight, 
+                GET_X_LPARAM(lParam), ySplit-tabHeight, 
+                SWP_NOZORDER 
+                );
+            /*DeferWindowPos(hdwp, rosterWnd, HWND_TOP, 0, tabHeight, 
+            GET_X_LPARAM(lParam), height-tabHeight, 
+            SWP_NOZORDER 
+            );*/
+
+            DeferWindowPos(hdwp, p->editWnd, NULL, 0, ySplit+1, 
+                GET_X_LPARAM(lParam), height-ySplit-1, 
+                SWP_NOZORDER 
+                ); 
+
+            EndDeferWindowPos(hdwp); 
+
+            break; 
+        } 
+
+    case WM_COMMAND: 
+        {
+            if (wParam==IDS_SEND) {
+                p->sendJabberMessage();
+            }
+            if (wParam==IDC_COMPLETE) {
+                p->mucNickComplete();
+            }
+
+            if (wParam==IDC_COMPOSING) {
+                p->setComposingState(lParam!=0);
+            }
+            break;             
+        }
+        /*case WM_CTLCOLORSTATIC:
+        case WM_CTLCOLORLISTBOX:
+        case WM_CTLCOLOREDIT: 
+        {
+        //HGDIOBJ brush= GetStockObject(GRAY_BRUSH);
+        //HGDIOBJ pen= GetStockObject(WHITE_PEN);
+        SetBkColor(hdc, 0x808080);
+        SetTextColor(hdc, 0xffffff);
+        //SelectObject((HDC)wParam, brush);
+        //SelectObject((HDC)wParam, pen);
+        return (BOOL) GetStockObject(GRAY_BRUSH);
+        break;
+        }*/
+
+    case WM_LBUTTONDOWN:
+        SetFocus(hWnd);
+        if ((GET_Y_LPARAM(lParam))>tabHeight) break;
+
+        if (GET_X_LPARAM(lParam) > (p->width)-2-(skin->getElementWidth()) ) {
+            PostMessage(GetParent(hWnd), WM_COMMAND, TabsCtrl::CLOSETAB, 0);
+            break;
+        }
+        if (GET_X_LPARAM(lParam) > (p->width)-2-(skin->getElementWidth())*2) {
+            int result=MessageBox(
+                p->getHWnd(), 
+                L"Are You sure want to clear this chat session?", 
+                L"Clear chat", 
+                MB_YESNO | MB_ICONWARNING);
+            if (result==IDYES) {
+                p->contact->messageList->clear();
+                p->msgList->moveCursorEnd();
+            }
+            break;
+        }
+        break;
+
+    case WM_DESTROY:
+        //TODO: Destroy all child data associated eith this window
+
+        return 0;
+
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
+
+#endif

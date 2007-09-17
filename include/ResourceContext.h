@@ -5,6 +5,8 @@
 #include "Presence.h"
 #include "jid.h"
 
+#include "map"
+
 class JabberStream;
 class JabberStanzaDispatcher;
 class Connection;
@@ -30,6 +32,8 @@ public:
     JabberStanzaDispatcherRef jabberStanzaDispatcher2;
     RosterRef roster;
     MucBookmarksRef bookmarks;
+
+    std::map<std::string, bool> hostFeatures;
 
     presence::PresenceIndex status;
     std::string presenceMessage;

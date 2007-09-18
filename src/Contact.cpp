@@ -155,8 +155,10 @@ void Contact::processPresence( JabberDataBlockRef block ) {
 
     if (nickname.empty()) {
         JabberDataBlockRef nick=block->findChildNamespace("nick","http://jabber.org/protocol/nick");
-        if (nick) 
+        if (nick) {
             nickname=nick->getText();
+            std::trim(nickname);
+        }
     }
 
     update();

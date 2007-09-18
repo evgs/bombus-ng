@@ -23,13 +23,12 @@ class ClientCaps {
 public:
     ClientCaps();
     virtual ~ClientCaps(){};
-    ClientCaps(JabberDataBlockRef caps);
 
     JabberDataBlockRef presenceEntityCaps();
 
     const std::string & getCapsHash();
     
-    bool capsProbe(const std:: string) const;
+    bool probeFeature(const std:: string) const;
 
     void addFeature(const std::string feature);
     void removeFeature(const std::string feature);

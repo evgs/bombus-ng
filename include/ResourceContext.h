@@ -14,6 +14,7 @@ class JabberAccount;
 class Roster;
 class MucBookmarks;
 class MyCaps;
+class HostCaps;
 
 typedef boost::shared_ptr <JabberStanzaDispatcher> JabberStanzaDispatcherRef;
 typedef boost::shared_ptr <JabberStream> JabberStreamRef;
@@ -22,6 +23,7 @@ typedef boost::shared_ptr <JabberAccount> JabberAccountRef;
 typedef boost::shared_ptr <Roster> RosterRef;
 typedef boost::shared_ptr <MucBookmarks> MucBookmarksRef;
 typedef boost::shared_ptr <MyCaps> MyCapsRef;
+typedef boost::shared_ptr <HostCaps> HostCapsRef;
 
 class ResourceContext {
 public:
@@ -37,7 +39,7 @@ public:
 
     MyCapsRef myCaps;
 
-    std::map<std::string, bool> hostFeatures;
+    HostCapsRef hostFeatures;
 
     presence::PresenceIndex status;
     std::string presenceMessage;

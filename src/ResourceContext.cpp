@@ -2,6 +2,7 @@
 
 #include "ResourceContext.h"
 #include "EntityCaps.h"
+#include "HostFeatures.h"
 #include "JabberStream.h"
 
 #include <Presence.h>
@@ -11,6 +12,7 @@ ResourceContext::ResourceContext() {
     status=presence::OFFLINE;
     priority=0;
     myCaps=MyCapsRef(new MyCaps());
+    hostFeatures=HostCapsRef(new HostCaps());
 }
 
 char *statusVals []= { 

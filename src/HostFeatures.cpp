@@ -4,7 +4,7 @@
 #include "Log.h"
 
 ProcessResult HostFeatures::blockArrived( JabberDataBlockRef block, const ResourceContextRef rc ) {
-    rc->hostFeatures.clear();
+    rc->hostFeatures=HostCapsRef(new HostCaps());
 
     std::string &type=block->getAttribute("type");
     if (type=="error") {
@@ -23,8 +23,8 @@ ProcessResult HostFeatures::blockArrived( JabberDataBlockRef block, const Resour
             const std::string &tagName=item->getTagName();
 
             if (tagName=="feature") {
-                rc->hostFeatures[item->getAttribute("var")]=true;
-                Log::getInstance()->msg(item->getAttribute("var"));
+                rc->hostFeatures->addFeature(item->getAttribute("var"));
+                //Log::getInstance()->msg(item->getAttribute("var"));
             }
         }
     }

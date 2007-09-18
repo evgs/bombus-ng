@@ -4,14 +4,20 @@
 #include <vector>
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
+#include "boost/shared_ptr.hpp"
 
-struct MucBookmarkItem {
+class MucBookmarkItem {
+public:
     std::string name;
     std::string jid;
     std::string nick;
     std::string password;
     bool autoJoin;
     std::string url; //not used, for compatibility
+
+    typedef boost::shared_ptr<MucBookmarkItem> ref;
+
+    static bool compare(MucBookmarkItem::ref left, MucBookmarkItem::ref right);
 };
 
 class MucBookmarks : public JabberDataBlockListener {
@@ -28,12 +34,12 @@ public:
     void doStoreBookmarks(ResourceContextRef rc) const;
 
     int getBookmarkCount() const;
-    MucBookmarkItem * addNewBookmark();
-    MucBookmarkItem * get(int i);
+    MucBookmarkItem::ref addNewBookmark();
+    MucBookmarkItem::ref get(int i);
 
     bool isBookmarksAvailable() const {return bookmarksAvailable;} ;
 private:
     bool bookmarksAvailable;
-    std::vector<MucBookmarkItem> bookmarks;
+    std::vector<MucBookmarkItem::ref> bookmarks;
     std::string id;
 };

@@ -20,7 +20,7 @@ ProcessResult MucBookmarks::blockArrived( JabberDataBlockRef block, const Resour
             JabberDataBlockRef item=*(i++);
             const std::string &tagName=item->getTagName();
 
-            MucBookmarkItem *b=addNewBookmark();
+            MucBookmarkItem::ref b=addNewBookmark();
             b->name=item->getAttribute("name");
 
             if (tagName=="url") {
@@ -36,14 +36,15 @@ ProcessResult MucBookmarks::blockArrived( JabberDataBlockRef block, const Resour
                 b->autoJoin=(autoJoin=="1" || autoJoin=="true"); 
             }
         }
+        std::stable_sort(bookmarks.begin(), bookmarks.end(), MucBookmarkItem::compare);
     }
     Log::getInstance()->msg("Bookmarks received successfully");
     return LAST_BLOCK_PROCESSED;
 }
 
-MucBookmarkItem * MucBookmarks::addNewBookmark() {
-    bookmarks.push_back(MucBookmarkItem());
-    return &bookmarks.back();
+MucBookmarkItem::ref MucBookmarks::addNewBookmark() {
+    bookmarks.push_back(MucBookmarkItem::ref(new MucBookmarkItem()));
+    return bookmarks.back();
 }
 void MucBookmarks::doQueryBookmarks( ResourceContextRef rc ) {
     bookmarksAvailable=false;
@@ -56,5 +57,10 @@ void MucBookmarks::doQueryBookmarks( ResourceContextRef rc ) {
     rc->jabberStanzaDispatcherRT->addListener(rc->bookmarks);
     rc->jabberStream->sendStanza(getBm);
 }
-MucBookmarkItem * MucBookmarks::get( int i ) { return &bookmarks[i]; }
+MucBookmarkItem::ref MucBookmarks::get( int i ) { return bookmarks[i]; }
 int MucBookmarks::getBookmarkCount() const { return bookmarks.size(); }
+
+bool MucBookmarkItem::compare( MucBookmarkItem::ref l, MucBookmarkItem::ref r ) {
+    return (l->name.compare(r->name) < 0);
+
+}

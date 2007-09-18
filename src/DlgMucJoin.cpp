@@ -92,7 +92,7 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
         if (HIWORD(wParam) == CBN_SELCHANGE) {
             int bmi=SendDlgItemMessage(hDlg, IDC_C_BOOKMARK, CB_GETCURSEL, 0, 0);
             if (bmi==CB_ERR) return TRUE;
-            MucBookmarkItem *bm=p->rc->bookmarks->get(bmi);
+            MucBookmarkItem::ref bm=p->rc->bookmarks->get(bmi);
             Jid roomJid(bm->jid);
             SetDlgItemText(hDlg, IDC_E_ROOM, roomJid.getUserName());
             SetDlgItemText(hDlg, IDC_E_SERVER, roomJid.getServer());

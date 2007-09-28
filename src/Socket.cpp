@@ -10,6 +10,7 @@
 #include <Socket.h>
 #include <connmgr.h>
 #include <boost/assert.hpp>
+#include <boost/format.hpp>
 #include <memory.h>
 
 static int wsCount=0;
@@ -93,28 +94,23 @@ int Socket::write(const char * buf, int len) {
 }
 
 const std::string Socket::getStatistics(){
-	char *fmt="--- Socket ---\n"
-	"sent=%d\n"
-	"recv=%d\n";
 
-	char buf[256];
-
-	//sprintf_s(buf, 256, fmt, bytesSent, bytesRecvd);
-	sprintf(buf, fmt, bytesSent, bytesRecvd);
-
-	return std::string(buf);
+    return boost::str( boost::format (
+        "--- Socket ---\n"
+        "sent=%d\n"
+        "recv=%d\n")
+        % bytesSent % bytesRecvd 
+    );
 }
 
 const char * errorWSAText(int code);
 
 void Socket::throwSocketError() {
     int lastError=WSAGetLastError();
-    std::string err="Socket error: ";
-    err+=errorWSAText(lastError);
-    err+=" (";
-    err+=url;
-    err+=")";
-    throw std::exception(err.c_str());
+
+    boost::format err("Socket error: (%s)");
+    err % url;
+    throw std::exception(err.str().c_str());
 }
 
 long Socket::resolveUrl() {

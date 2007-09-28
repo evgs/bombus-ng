@@ -108,9 +108,7 @@ std::string strtime::toXep0080Time(const PackedTime &utcTime) {
 
 
 std::string strtime::getRandom() {
-    std::string ts;
-    strAppendInt(ts, getCurrentUtc().dwLowDateTime);
-    return ts;
+    return boost::str(boost::format("%d") % getCurrentUtc().dwLowDateTime);
 }
 
 std::string strtime::getLocalZoneOffset() {

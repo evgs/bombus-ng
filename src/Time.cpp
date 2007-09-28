@@ -1,6 +1,12 @@
 #include "TimeFunc.h"
 #include "stringutils.h"
 
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#pragma warning(disable : 4800)
+#include "boost/format.hpp"
+#pragma warning(pop)
+
 PackedTime strtime::getCurrentUtc(){
     PackedTime result;
     SYSTEMTIME st;
@@ -15,10 +21,10 @@ std::string strtime::toLocalDate(const PackedTime &utcTime) {
     FileTimeToLocalFileTime(&utcTime, &local);
     FileTimeToSystemTime(&local, &st);
 
-    char timeBuf[16];
-    sprintf(timeBuf, "%02d.%02d.%04d", st.wDay, st.wMonth, st.wYear);
+    boost::format fd("%02d.%02d.%04d");
+    fd % st.wDay % st.wMonth % st.wYear;
 
-    return std::string(timeBuf);
+    return fd.str();
 }
 
 std::string strtime::toLocalTime(const PackedTime &utcTime) {
@@ -27,10 +33,10 @@ std::string strtime::toLocalTime(const PackedTime &utcTime) {
     FileTimeToLocalFileTime(&utcTime, &local);
     FileTimeToSystemTime(&local, &st);
 
-    char timeBuf[16];
-    sprintf(timeBuf, "%02d:%02d:%02d", st.wHour, st.wMinute, st.wSecond);
+    boost::format tf("%02d:%02d:%02d");
+    tf % st.wHour % st.wMinute % st.wSecond;
 
-    return std::string(timeBuf);
+    return tf.str();
 }
 
 std::string strtime::toLocalDateTime(const PackedTime &utcTime) {
@@ -83,20 +89,21 @@ std::string strtime::toIso8601(const PackedTime &utcTime) {
 	SYSTEMTIME st;
 	FileTimeToSystemTime(&utcTime, &st);
 
-	char timeBuf[18];
-	sprintf(timeBuf, "%04d%02d%02dT%02d:%02d:%02d", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond );
-
-	return std::string(timeBuf);
+    boost::format fiso8601("%04d%02d%02dT%02d:%02d:%02d");
+	fiso8601 % st.wYear % st.wMonth % st.wDay 
+             % st.wHour % st.wMinute % st.wSecond;
+	return fiso8601.str();
 }
 
 std::string strtime::toXep0080Time(const PackedTime &utcTime) {
 	SYSTEMTIME st;
 	FileTimeToSystemTime(&utcTime, &st);
 
-	char timeBuf[21];
-	sprintf(timeBuf, "%04d-%02d-%02dT%02d:%02d:%02dZ", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond );
+    boost::format ftimeXep0080("%04d-%02d-%02dT%02d:%02d:%02dZ");
+	ftimeXep0080 % st.wYear % st.wMonth % st.wDay 
+                 % st.wHour % st.wMinute % st.wSecond ;
 
-	return std::string(timeBuf);
+    return ftimeXep0080.str();
 }
 
 
@@ -122,7 +129,9 @@ std::string strtime::getLocalZoneOffset() {
     if (bias<0) {
         sign='+'; bias=-bias;
     }
-    char timeBuf[7];
-    sprintf(timeBuf,"%c%02d:%02d",sign, bias/60, bias%60);
-    return std::string(timeBuf);
+
+    boost::format ltzo( "%c%02d:%02d" );
+    ltzo % sign % (bias/60) % (bias%60);
+
+    return ltzo.str();
 }

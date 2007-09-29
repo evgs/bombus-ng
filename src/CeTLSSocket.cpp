@@ -116,6 +116,8 @@ CeTLSSocket::CeTLSSocket(const std::string & url, const int port){
     ignoreSSLWarnings=false;
 
     initWinsocks();
+    networkUp();
+
     this->url=url;
 
     sock=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);

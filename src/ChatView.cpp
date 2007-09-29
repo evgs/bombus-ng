@@ -384,9 +384,17 @@ ATOM ChatView::windowClass=0;
 
 //////////////////////////////////////////////////////////////////////////
 void ChatView::sendJabberMessage() {
-    wchar_t buf[1024];
-    int len=SendMessage(editWnd, WM_GETTEXT, 1024, (LPARAM) buf);
+    int len=SendMessage(editWnd, WM_GETTEXTLENGTH, 0, 0);
     if (len==0) return;
+    len+=1; //null-terminating char
+
+    wchar_t *buf=new wchar_t[len+1];
+    int actualLen=SendMessage(editWnd, WM_GETTEXT, len, (LPARAM) buf);
+    if (len==0) { 
+        delete buf; 
+        return;
+    }
+
     std::string body=utf8::wchar_utf8(buf);
 
     Message::ref msg=Message::ref(new Message(body, rc->account->getNickname(), false, Message::SENT, strtime::getCurrentUtc() ));
@@ -418,7 +426,10 @@ void ChatView::sendJabberMessage() {
     LastActivity::update();
 
     buf[0]=0;
-    SendMessage(editWnd, WM_SETTEXT, 1024, (LPARAM) buf);
+    SendMessage(editWnd, WM_SETTEXT, 1, (LPARAM) buf);
+
+    delete buf;
+
 }
 
 void ChatView::calcEditHeight() {
@@ -511,6 +522,7 @@ void ChatView::mucNickComplete() {
 }
 
 void ChatView::setComposingState( bool composing ) {
+    if (!rc->isLoggedIn()) return;
     if (!contact->acceptComposing) return;
     if (composing==this->composing) return;
     this->composing=composing;
@@ -684,8 +696,13 @@ void MessageElement::render( HDC hdc, RECT &rt, bool measure ) const{
                 } else if (wordBegin) end=wordBegin;
         }
 
+        const wchar_t *lineEnd=end;
+        while (lineEnd>lineBegin) {
+            if (*(lineEnd-1)>0x0d) break;
+            lineEnd--;
+        }
 
-        if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, end-lineBegin, NULL);
+        if (!measure) ExtTextOut(hdc, xbegin, ypos, ETO_CLIPPED, &rt, lineBegin, lineEnd-lineBegin, NULL);
         if (inUrl) {
             int h=ypos+fmc.getHeight()-1;
             MoveToEx(hdc,xbegin, h, NULL);

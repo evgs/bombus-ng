@@ -31,6 +31,8 @@
 
 #include "utf8.hpp"
 
+#include "config.h"
+
 extern TabsCtrlRef tabs;
 
 char *NIL="Not-In-List";
@@ -248,11 +250,13 @@ void Roster::makeViewList() {
     
     ODRList *list=new ODRList(); //ÀÕÒÓÍÃ ¹1
 
+    bool showOfflines=Config::getInstance()->showOfflines;
+
     for (GroupList::const_iterator gi=groups.begin(); gi!=groups.end(); gi++) {
         RosterGroup::ref group=*gi;
         list->push_back(group);
 
-        int elemCount=0;
+        int elementsDisplayed=0;
 
         if (!group->isExpanded()) continue;
 
@@ -260,13 +264,17 @@ void Roster::makeViewList() {
 
         for (ContactList::const_iterator ci=contacts.begin(); ci!=contacts.end(); ci++) {
             Contact::ref contact=*ci;
-            if (group->equals(contact->group)) {
-                list->push_back(contact);
-                elemCount++;
-            }
+            if (!group->equals(contact->group)) continue;
+
+            // hide offline contacts without new messages.
+            // TODO: hide only inactive offlines
+            if (contact->status==presence::OFFLINE && contact->nUnread==0 && !showOfflines) continue;
+
+            elementsDisplayed++;
+            list->push_back(contact);
         }
         //removing group header if nothing to display
-        if (elemCount==0) { list->pop_back();  continue; } 
+        if (elementsDisplayed==0) { list->pop_back();  continue; } 
 
     }
 

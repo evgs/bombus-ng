@@ -5,25 +5,7 @@
 JabberAccount::JabberAccount(){
     init();
 }
-void JabberAccount::init(){
-    version=2;
-
-	password="";
-
-    //useSRV=true;
-	hostNameIp="";
-	port=5222;
-    setResource("bombus-ng");
-
-	plainTextPassword=false;
-	useSASL=true;
-	useEncryption=false;
-    ignoreSslWarnings=false;
-    legacySSL=false;
-	useCompression=false;
-	useProxy=false;
-	proxy="<none>";
-}
+void JabberAccount::init(){/*deprecated*/}
 
 JabberAccount::JabberAccount(const std::string &bareJid, const std::string &resource) {
     init();
@@ -33,45 +15,46 @@ JabberAccount::JabberAccount(const std::string &bareJid, const std::string &reso
 
 JabberAccount::JabberAccount( LPCTSTR filename ) {
     init();
-    Serialize s(filename, true);
-    serialize(s, true);
+    Serialize s(filename, Serialize::READ);
+    serialize(s);
 }
 
 JabberAccount::~JabberAccount(){}
 
 void JabberAccount::saveAccount( LPCTSTR fileName ) {
-    Serialize s(fileName, false);
-    serialize(s, false);
+    Serialize s(fileName, Serialize::WRITE);
+    serialize(s);
 }
 
-void JabberAccount::serialize( Serialize &s, bool read ) 
+void JabberAccount::serialize( Serialize &s ) 
 {
     //////////////////////////////////////////////////////////////////////////
     // Serialization
-    int version=this->version;
-    s.streamInt(version);
+    int version=2; //for write
+    s.streamInt(version, 2);
 
+    setResource("bombus-ng");
     std::string sjid=getJid();
     s.streamString(sjid);
+    setJid(sjid);
+
     s.streamScrambledString(password); 
 
     // host data
     s.streamString(hostNameIp);
-    s.streamInt(port);
+    s.streamInt(port, 5222);
 
     // login settings
-    s.streamBool(plainTextPassword);
-    s.streamBool(useSASL);
-    s.streamBool(useEncryption); //useEncryption=false;
-    s.streamBool(legacySSL);
-    s.streamBool(useCompression);
+    s.streamBool(plainTextPassword, false);
+    s.streamBool(useSASL, true);
+    s.streamBool(useEncryption, false); 
+    s.streamBool(legacySSL, false);
+    s.streamBool(useCompression, false);
 
-    if (version>=2) s.streamBool(ignoreSslWarnings);
+    if (version>=2) s.streamBool(ignoreSslWarnings, false); else ignoreSslWarnings=false;
 
     // proxy
-    s.streamBool(useProxy);
-    s.streamString(proxy);
-
-    setJid(sjid);
+    s.streamBool(useProxy, false);
+    s.streamString(proxy, "<none>");
 }
 

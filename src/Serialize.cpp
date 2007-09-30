@@ -25,23 +25,27 @@ void Serialize::streamData( void * data, int len ) {
     else WriteFile(file, data, len, &dwProcessed, NULL);
 }
 
-void Serialize::streamInt( int &data ) {
+void Serialize::streamInt( int &data, int defValue ) {
     int *pdata=&data;
+    if (read) data=defValue;
     streamData((LPVOID)(pdata), sizeof(int));
 }
 
-void Serialize::streamShort( short &data ) {
+void Serialize::streamShort( short &data, short defValue ) {
     short *pdata=&data;
+    if (read) data=defValue;
     streamData((LPVOID)(pdata), sizeof(short));
 }
 
-void Serialize::streamBool( bool &data ) {
+void Serialize::streamBool( bool &data, bool defValue ) {
     bool *pdata=&data;
+    if (read) data=defValue;
     streamData((LPVOID)(pdata), sizeof(bool));
 }
 
-void Serialize::streamString( std::string &data ) {
+void Serialize::streamString( std::string &data, const char *defValue ) {
     if (file == INVALID_HANDLE_VALUE) return;
+    if (read) if (defValue) data=defValue;
     short len;
     len=data.length();
     streamShort(len);

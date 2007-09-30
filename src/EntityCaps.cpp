@@ -3,6 +3,7 @@
 
 #include <string>
 #include "crypto/SHA1.h"
+#include "config.h"
 
 extern std::string appVersion;
 
@@ -109,7 +110,10 @@ MyCaps::MyCaps() {
     addFeature("jabber:iq:time");  //todo: replace with "urn:xmpp:time"
     addFeature("jabber:iq:version");
     addFeature("jabber:x:data");
+
+    if (Config::getInstance()->delivered)
     addFeature("jabber:x:event");   // composing, delivered
+
     addFeature("urn:xmpp:ping");    // xep-0199
     addFeature("urn:xmpp:time");
 }

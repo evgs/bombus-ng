@@ -1,5 +1,7 @@
 #include "Notify.h"
 
+#include "config.h"
+
 #include <nled.h>
 //#include <Pwinuser.h>
 extern "C" { 
@@ -38,10 +40,11 @@ DWORD WINAPI vibraThread(LPVOID param) {
 void Notify::PlayNotify() {
     if (Notify::vibraOn) return;
 
+    if (!(Config::getInstance()->vibra)) return;
+
     Notify::vibraOn=TRUE;
     HANDLE thread=CreateThread(NULL, 0, vibraThread, NULL, 0, NULL);
     SetThreadPriority(thread, THREAD_PRIORITY_IDLE);
-
 }
 
 BOOL Notify::vibraOn=FALSE;

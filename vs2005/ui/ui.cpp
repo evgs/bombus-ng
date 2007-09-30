@@ -53,6 +53,7 @@
 
 #include "utf8.hpp"
 
+#include "config.h"
 
 #define MAX_LOADSTRING 100
 
@@ -721,7 +722,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
     if (x) {
         std::string xid=x->getChildText("id");
         //delivery notifications
-        if (x->getChildByName("delivered")) {
+        if (x->getChildByName("delivered"))   if (Config::getInstance()->delivered) {
             if (xid.empty()) {
 				/*if (boost::dynamic_pointer_cast<MucContact>c) {
 					if (c->status==presence.OFFLINE) return;

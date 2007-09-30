@@ -29,13 +29,10 @@ public:
 
     void saveAccount(LPCTSTR fileName);
 
-    void serialize(Serialize &s, bool read);
+    void serialize(Serialize &s);
 
 private:
 	Jid jid;
-
-    int version;
-
 public:
 
 	std::string password;

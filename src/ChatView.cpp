@@ -16,6 +16,8 @@
 
 #include "LastActivity.h"
 
+#include "config.h"
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern HWND	g_hWndMenuBar;		// menu bar handle
@@ -522,6 +524,7 @@ void ChatView::mucNickComplete() {
 }
 
 void ChatView::setComposingState( bool composing ) {
+    if (!Config::getInstance()->composing) return;
     if (!rc->isLoggedIn()) return;
     if (!contact->acceptComposing) return;
     if (composing==this->composing) return;

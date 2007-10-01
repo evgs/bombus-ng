@@ -118,6 +118,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		}
 	}
     Shell_NotifyIcon(false, NULL);
+    Config::getInstance()->save();
 	return (int) msg.wParam;
 }
 

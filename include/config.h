@@ -7,7 +7,7 @@
 class Config
 {
 public:
-    ~Config();
+    ~Config(){};
 
     typedef boost::shared_ptr<Config> ref;
 
@@ -21,9 +21,10 @@ public:
 
     bool vibra;
 
-    void serialize(Serialize &s);
 
+    void save();
 private:
+    void serialize(Serialize &s);
     static Config::ref instance;
 
 	Config();

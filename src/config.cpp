@@ -16,10 +16,11 @@ Config::Config(void){
     serialize(s);
 }
 
-Config::~Config(void){
-    Serialize s(CONFIG_FILE, false);
+void Config::save() {
+    Serialize s(CONFIG_FILE, Serialize::WRITE);
     serialize(s);
 }
+
 
 void Config::serialize( Serialize &s ) {
 

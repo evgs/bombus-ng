@@ -108,8 +108,8 @@ const char * errorWSAText(int code);
 void Socket::throwSocketError() {
     int lastError=WSAGetLastError();
 
-    boost::format err("Socket error: (%s)");
-    err % url;
+    boost::format err("Socket error: %s (%s)");
+    err % errorWSAText(lastError) % url;
     throw std::exception(err.str().c_str());
 }
 

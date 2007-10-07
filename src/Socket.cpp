@@ -13,6 +13,8 @@
 #include <boost/format.hpp>
 #include <memory.h>
 
+#include "dnsquery.h"
+
 static int wsCount=0;
 
 
@@ -45,6 +47,10 @@ Socket::Socket(const std::string &url, const int port) {
     initWinsocks();
     networkUp();
     this->url=url;
+
+    /*dns::DNSQuery d;
+    d.setDnsHost(std::string("217.119.80.2"));
+    d.doQuery(std::string("_xmpp-client._tcp.")+url);*/
 
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock==INVALID_SOCKET) throwSocketError();

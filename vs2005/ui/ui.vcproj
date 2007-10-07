@@ -252,6 +252,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\dnsquery.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\EntityCaps.cpp"
 				>
 			</File>
@@ -507,6 +511,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\DlgUtils.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\dnsquery.h"
 				>
 			</File>
 			<File

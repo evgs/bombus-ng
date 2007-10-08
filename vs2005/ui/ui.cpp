@@ -55,6 +55,9 @@
 
 #include "config.h"
 
+#include "dnsquery.h"
+#include "boost/format.hpp"
+
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -889,16 +892,58 @@ void JabberStreamEvents::loginFailed(const char * errMsg){
 }
 
 bool JabberStreamEvents::connect(){
-    std::string host=(rc->account->hostNameIp.empty())?rc->account->getServer() : rc->account->hostNameIp;
 
-    Log::getInstance()->msg("Connect to ", host.c_str());
+    Socket::initWinsocks();
+
+    Log::getInstance()->msg("Raising up network");
+    Socket::networkUp();
+
+    std::string host;
+    int port=5222;
+
+    if (rc->account->useSRV) {
+        Log::getInstance()->msg("Searching SRV for ", rc->account->getServer().c_str() );
+
+        dns::DnsSrvQuery d;
+        int retries=3;
+        do { 
+            if (d.doQuery( "_xmpp-client._tcp."+rc->account->getServer())) {
+                if (d.getCount()>0) {
+                    dns::SRVAnswer::ref a=d.getResult(0);
+                    BOOST_ASSERT(a);
+
+                    host=a->target;
+                    port=a->port;
+
+                    Log::getInstance()->msg(boost::str(boost::format("Using %s:%d") % host.c_str() % port));
+                    break;
+                }
+            }
+        } while (retries--) ;
+    }
+
+    if (host.empty()) host=rc->account->hostNameIp;
+    if (host.empty()) host=rc->account->getServer();
+
+    if (rc->account->legacySSL) {
+        if (port==5222) port=5223;
+    }
+
+    Log::getInstance()->msg("Resolving ", host.c_str());
+
+    long ip=Socket::resolveUrl(host);
+
+    Log::getInstance()->msg(boost::str(boost::format("Connecting to %d.%d.%d.%d:%d") 
+        % (ip &0xff) % ((ip>>8) &0xff) % ((ip>>16) &0xff) % (ip>>24) % port));
+
     if (rc->account->useEncryption) {
-        ConnectionRef tlsCon=ConnectionRef( new CeTLSSocket(host, rc->account->port));
+        CeTLSSocket::ref tlsCon=CeTLSSocket::ref( new CeTLSSocket(ip, rc->account->port));
         rc->jabberStream->connection=tlsCon;
-        if (!rc->account->useSASL) ((CeTLSSocket*)(tlsCon.get()))->startTls(rc->account->ignoreSslWarnings);
+        if (!rc->account->useSASL) 
+            tlsCon->startTls(rc->account->getServer(), rc->account->ignoreSslWarnings);
     }
     else
-        rc->jabberStream->connection=ConnectionRef( new Socket(host, rc->account->port));
+        rc->jabberStream->connection=ConnectionRef( new Socket(ip, rc->account->port));
 
     /*if (rc->jabberStream->connection==NULL) {
         Log::getInstance()->msg("Failed to open connection");

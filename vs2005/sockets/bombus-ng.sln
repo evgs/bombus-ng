@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "zlib\zlib.vcproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regex", "regex\regex.vcproj", "{13914220-839D-4620-929B-C9161192CB38}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dnsquery", "dnsquery\dnsquery.vcproj", "{13D2523C-D62A-4581-B737-0876F972030D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -72,6 +74,16 @@ Global
 		{13914220-839D-4620-929B-C9161192CB38}.Release|Pocket PC 2003 (ARMV4).Build.0 = Release|Pocket PC 2003 (ARMV4)
 		{13914220-839D-4620-929B-C9161192CB38}.Release|Pocket PC 2003 (ARMV4).Deploy.0 = Release|Pocket PC 2003 (ARMV4)
 		{13914220-839D-4620-929B-C9161192CB38}.Release|Win32.ActiveCfg = Release|Pocket PC 2003 (ARMV4)
+		{13D2523C-D62A-4581-B737-0876F972030D}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Debug|Pocket PC 2003 (ARMV4).ActiveCfg = Debug|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Debug|Win32.Build.0 = Debug|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Release|Pocket PC 2003 (ARMV4).ActiveCfg = Release|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Release|Win32.ActiveCfg = Release|Win32
+		{13D2523C-D62A-4581-B737-0876F972030D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

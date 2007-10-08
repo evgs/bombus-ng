@@ -30,8 +30,8 @@ void JabberAccount::serialize( Serialize &s )
 {
     //////////////////////////////////////////////////////////////////////////
     // Serialization
-    int version=2; //for write
-    s.streamInt(version, 2);
+    int version=3; //for write
+    s.streamInt(version, 3);
 
     setResource("bombus-ng");
     std::string sjid=getJid();
@@ -41,6 +41,8 @@ void JabberAccount::serialize( Serialize &s )
     s.streamScrambledString(password); 
 
     // host data
+    if (version>=3) s.streamBool(useSRV, true); else useSRV=true;
+
     s.streamString(hostNameIp);
     s.streamInt(port, 5222);
 

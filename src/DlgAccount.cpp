@@ -59,6 +59,7 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             CheckDlgButton(hDlg, IDC_X_PLAIN, (dlgAccountParam->plainTextPassword)?BST_CHECKED:BST_UNCHECKED);
             CheckDlgButton(hDlg, IDC_X_SASL, (dlgAccountParam->useSASL)?BST_CHECKED:BST_UNCHECKED);
             CheckDlgButton(hDlg, IDC_X_ZLIB, (dlgAccountParam->useCompression)?BST_CHECKED:BST_UNCHECKED);
+            CheckDlgButton(hDlg, IDC_X_NSRV, (!dlgAccountParam->useSRV)?BST_CHECKED:BST_UNCHECKED);
 		}
 		return (INT_PTR)TRUE;
 
@@ -80,6 +81,7 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             dlgAccountParam->plainTextPassword=IsDlgButtonChecked(hDlg, IDC_X_PLAIN)==BST_CHECKED;
             dlgAccountParam->useSASL=IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_CHECKED;
             dlgAccountParam->useCompression=IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED;
+            dlgAccountParam->useSRV=!IsDlgButtonChecked(hDlg, IDC_X_NSRV);
 
             dlgAccountParam->saveAccount(TEXT("defAccount.bin"));
 
@@ -87,16 +89,13 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 			return TRUE;
 		}
 
-        /*if (HIWORD(wParam)==BN_CLICKED) {
-            if (LOWORD(wParam)==IDC_X_SASL) { 
-                if (IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_UNCHECKED) 
-                    CheckDlgButton(hDlg, IDC_X_ZLIB, BST_UNCHECKED);
+        if (HIWORD(wParam)==BN_CLICKED) {
+            if (LOWORD(wParam)==IDC_X_NSRV) { 
+                int state=IsDlgButtonChecked(hDlg, IDC_X_NSRV);
+                EnableWindow(GetDlgItem(hDlg, IDC_E_HOSTIP), state==BST_CHECKED);
+                EnableWindow(GetDlgItem(hDlg, IDC_E_PORT), state==BST_CHECKED);
             };
-            if (LOWORD(wParam)==IDC_X_ZLIB) { 
-                if (IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED) 
-                    CheckDlgButton(hDlg, IDC_X_SASL, BST_CHECKED);
-            };
-        }*/
+        }
 
 		if (LOWORD(wParam) == IDCANCEL)
 		{

@@ -5,7 +5,7 @@
 class Socket : public Connection 
 {
 public:
-	Socket(const std::string & url, const int port);
+	Socket(const long ip, const int port);
 	virtual ~Socket(void);
 
 	virtual int read(char * buf, int len);
@@ -18,18 +18,19 @@ public:
 
     SOCKET getSocket(){ return sock; }
 
+    //todo: move to another namespace
     static void networkUp();
+    //todo: move to another namespace
+    static void initWinsocks();
+    //todo: move to another namespace
+    static long resolveUrl(const std::string &url);
 
 protected:
     Socket(){};
-    std::string url;
     SOCKET sock;
 
-    long resolveUrl();
 
-    static void initWinsocks();
-
-    void throwSocketError();
+    static void throwSocketError();
 
     long bytesSent;
     long bytesRecvd;

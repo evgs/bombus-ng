@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <Winsock2.h>
+#include <boost/shared_ptr.hpp>
 
 #pragma comment(lib,"Iphlpapi.lib")
 
@@ -48,7 +49,19 @@ namespace dns {
         Qtype_ALL   =255 //
     };
 
-    class DNSQuery {
+    class SRVAnswer {
+    public:
+        std::string service;    // _service._proto.name
+        int ttl;                // TimeToLive
+        short priority;
+        short weight;
+        short port;
+        std::string target;
+
+        typedef boost::shared_ptr<SRVAnswer> ref;
+    };
+
+    class DnsSrvQuery {
     private:
         std::string DNSHost;
         char *Buffer;
@@ -56,15 +69,15 @@ namespace dns {
 
         SOCKET sock;
 
-        std::vector<std::string> results;
+        std::vector<SRVAnswer::ref> results;
 
 
         static const std::string getSystemDnsServer();
-        int CompressName(const std::string & name, char *out);
+        int PrepDnsName(const std::string & name, char *out);
 
     public:
-        DNSQuery();
-        ~DNSQuery();
+        DnsSrvQuery();
+        ~DnsSrvQuery();
 
         const std::string & getDnsHost() const { return DNSHost; }
 
@@ -72,9 +85,9 @@ namespace dns {
 
         int getCount() const { return results.size(); }
 
-        void doQuery(const std::string &hostname);
+        bool doQuery(const std::string &hostname);
 
-        const std::string & getResult(int index) const { return results[index]; } //todo: operator[]
+        SRVAnswer::ref getResult(int index) const { return results[index]; } //todo: operator[]
 
     };
 

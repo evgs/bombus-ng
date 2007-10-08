@@ -13,8 +13,6 @@
 #include <boost/format.hpp>
 #include <memory.h>
 
-#include "dnsquery.h"
-
 static int wsCount=0;
 
 
@@ -42,22 +40,15 @@ void Socket::initWinsocks(){
     wsCount++;
 }
 
-Socket::Socket(const std::string &url, const int port) {
+Socket::Socket(const long addr, const int port) {
     bytesSent=bytesRecvd=0;
-    initWinsocks();
-    networkUp();
-    this->url=url;
-
-    /*dns::DNSQuery d;
-    d.setDnsHost(std::string("217.119.80.2"));
-    d.doQuery(std::string("_xmpp-client._tcp.")+url);*/
 
 	sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock==INVALID_SOCKET) throwSocketError();
 
 	struct sockaddr_in name;
 	name.sin_family=AF_INET;
-	name.sin_addr.S_un.S_addr=resolveUrl();
+	name.sin_addr.S_un.S_addr=addr;
 	name.sin_port= htons(port); // internet byte order
 
     //bool keepAlive=true;
@@ -114,12 +105,12 @@ const char * errorWSAText(int code);
 void Socket::throwSocketError() {
     int lastError=WSAGetLastError();
 
-    boost::format err("Socket error: %s (%s)");
-    err % errorWSAText(lastError) % url;
+    boost::format err("Socket error: %s");
+    err % errorWSAText(lastError);// % url;
     throw std::exception(err.str().c_str());
 }
 
-long Socket::resolveUrl() {
+long Socket::resolveUrl(const std::string &url) {
     long inaddr=inet_addr(url.c_str());
     if (inaddr!=INADDR_NONE) return inaddr;
 
@@ -145,7 +136,8 @@ void Socket::networkUp() {
 
     HANDLE hconn;
     DWORD status;
-    ConnMgrEstablishConnectionSync(&rq, &hconn, 60000, &status);
+    if (ConnMgrEstablishConnectionSync(&rq, &hconn, 60000, &status) != S_OK)
+        throw std::exception("Error: Network is down");
 }
 
 

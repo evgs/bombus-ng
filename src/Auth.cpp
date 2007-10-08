@@ -219,11 +219,11 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
     if (block->getTagName()=="proceed") {
         Log::getInstance()->msg("Starting TLS connection");
 #ifndef NOSTARTTLS
-        //starting tls layer socket
-        /*ConnectionRef tlssocket=ConnectionRef(new TLSSocket(rc->connection));
-        rc->connection=tlssocket;**/
-        ((CeTLSSocket *)(rc->jabberStream->connection.get()))->startTls(rc->account->ignoreSslWarnings);
-        //rc->jabberStream->parser->bindStream(tlssocket);
+
+        CeTLSSocket::ref tlsSocket=boost::dynamic_pointer_cast<CeTLSSocket>(rc->jabberStream->connection);
+        if (!tlsSocket) throw std::exception("unexpected non-tls-socket");
+        tlsSocket->startTls(rc->account->getServer(), rc->account->ignoreSslWarnings);
+
         rc->jabberStream->sendXmppBeginHeader();
         return LAST_BLOCK_PROCESSED;
 #endif

@@ -83,7 +83,7 @@ int CeTLSSocket::SslValidate (
     if (dwFlags & SSL_CERT_FLAG_ISSUER_UNKNOWN) {
         //TODO: ask for accept/decline certificate
 
-        std::wstring url=utf8::utf8_wchar(s->url);
+        //std::wstring url=utf8::utf8_wchar(s->url);
 
         if (!gSslCrackCertificate || !gSslFreeCertificate) return SSL_ERR_CERT_UNKNOWN;
 
@@ -111,14 +111,9 @@ int CeTLSSocket::SslValidate (
 };
 
 
-CeTLSSocket::CeTLSSocket(const std::string & url, const int port){
+CeTLSSocket::CeTLSSocket(const long addr, const int port){
     bytesSent=bytesRecvd=0;
     ignoreSSLWarnings=false;
-
-    initWinsocks();
-    networkUp();
-
-    this->url=url;
 
     sock=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (sock==INVALID_SOCKET) throwSocketError();
@@ -142,7 +137,7 @@ CeTLSSocket::CeTLSSocket(const std::string & url, const int port){
 
     struct sockaddr_in name;
     name.sin_family=AF_INET;
-    name.sin_addr.S_un.S_addr=resolveUrl();
+    name.sin_addr.S_un.S_addr=addr;
     name.sin_port= htons(port); // internet byte order
 
     int result=connect(sock, (sockaddr*)(&name), sizeof(name));
@@ -155,7 +150,7 @@ CeTLSSocket::~CeTLSSocket(){
     FreeSSL();
 }
 
-bool CeTLSSocket::startTls(bool ignoreSSLWarnings){
+bool CeTLSSocket::startTls(const std::string &url, bool ignoreSSLWarnings){
     this->ignoreSSLWarnings=ignoreSSLWarnings;
     int result=LoadSSL();
     BOOST_ASSERT(result==S_OK);

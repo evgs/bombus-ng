@@ -43,6 +43,8 @@
 #define IDC_E_PORT                      1011
 #define IDC_X_SSL_WARNINGS              1012
 #define IDC_AREV                        1013
+#define IDC_X_SSL_WARNINGS2             1013
+#define IDC_X_NSRV                      1013
 #define IDC_AVERSION                    1014
 #define IDC_E_PRIORITY                  1015
 #define IDC_AVERSION2                   1015

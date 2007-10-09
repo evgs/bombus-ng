@@ -920,9 +920,11 @@ bool JabberStreamEvents::connect(){
                 }
             }
         } while (retries--) ;
+    } else {
+        host=rc->account->hostNameIp;
+        port=rc->account->port;
     }
 
-    if (host.empty()) host=rc->account->hostNameIp;
     if (host.empty()) host=rc->account->getServer();
 
     if (rc->account->legacySSL) {

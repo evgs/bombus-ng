@@ -937,13 +937,13 @@ bool JabberStreamEvents::connect(){
         % (ip &0xff) % ((ip>>8) &0xff) % ((ip>>16) &0xff) % (ip>>24) % port));
 
     if (rc->account->useEncryption) {
-        CeTLSSocket::ref tlsCon=CeTLSSocket::ref( new CeTLSSocket(ip, rc->account->port));
+        CeTLSSocket::ref tlsCon=CeTLSSocket::ref( new CeTLSSocket(ip, port));
         rc->jabberStream->connection=tlsCon;
         if (!rc->account->useSASL) 
             tlsCon->startTls(rc->account->getServer(), rc->account->ignoreSslWarnings);
     }
     else
-        rc->jabberStream->connection=ConnectionRef( new Socket(ip, rc->account->port));
+        rc->jabberStream->connection=ConnectionRef( new Socket(ip, port));
 
     /*if (rc->jabberStream->connection==NULL) {
         Log::getInstance()->msg("Failed to open connection");

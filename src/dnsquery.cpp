@@ -105,6 +105,11 @@ struct  R_DATA
     unsigned int   ttl;
     unsigned short data_len;
 };
+struct SRV_DATA {
+    unsigned short priority;
+    unsigned short weight;
+    unsigned short port;    
+}
 #pragma pack(pop)
 
 
@@ -265,9 +270,12 @@ bool DnsSrvQuery::doQuery(const std::string &hostname){
             SRVAnswer::ref srv(new SRVAnswer());
             srv->service=name;
             srv->ttl=ttl;
-            srv->priority=((*(reader++))<<8) + *(reader++);
-            srv->weight=((*(reader++))<<8) + *(reader++);
-            srv->port=((*(reader++))<<8) + *(reader++);
+
+            SRV_DATA sd*=(SRV_DATA *)reader;
+            srv->priority=ntohs(sd->priority);
+            srv->weight=ntohs(sd->weight);
+            srv->port=ntohs(sd->port);
+            reader+=sizeof(SRV_DATA);
 
             srv->target=ReadName((unsigned char *)reader, (unsigned char *)buf,&scount);
             reader+=scount;

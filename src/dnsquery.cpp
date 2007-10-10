@@ -109,7 +109,7 @@ struct SRV_DATA {
     unsigned short priority;
     unsigned short weight;
     unsigned short port;    
-}
+};
 #pragma pack(pop)
 
 

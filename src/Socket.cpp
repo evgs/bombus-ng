@@ -136,8 +136,9 @@ void Socket::networkUp() {
 
     HANDLE hconn;
     DWORD status;
-    if (ConnMgrEstablishConnectionSync(&rq, &hconn, 60000, &status) != S_OK)
-        throw std::exception("Error: Network is down");
+    if (ConnMgrEstablishConnectionSync(&rq, &hconn, 60000, &status) != S_OK) {
+        throw std::exception(boost::str(boost::format("Network is down (%d)") % status).c_str());
+    }
 }
 
 

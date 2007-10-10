@@ -271,7 +271,7 @@ bool DnsSrvQuery::doQuery(const std::string &hostname){
             srv->service=name;
             srv->ttl=ttl;
 
-            SRV_DATA sd*=(SRV_DATA *)reader;
+            SRV_DATA *sd=(SRV_DATA *)reader;
             srv->priority=ntohs(sd->priority);
             srv->weight=ntohs(sd->weight);
             srv->port=ntohs(sd->port);

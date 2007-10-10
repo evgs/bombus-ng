@@ -935,7 +935,7 @@ bool JabberStreamEvents::connect(){
 
     long ip=Socket::resolveUrl(host);
 
-    Log::getInstance()->msg(boost::str(boost::format("Connecting to %d.%d.%d.%d:%d") 
+    Log::getInstance()->msg(boost::str(boost::format("Connecting to %u.%u.%u.%u:%u") 
         % (ip &0xff) % ((ip>>8) &0xff) % ((ip>>16) &0xff) % (ip>>24) % port));
 
     if (rc->account->useEncryption) {

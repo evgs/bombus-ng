@@ -36,6 +36,12 @@ void AddComboString(HWND hDlg, int itemId, const std::string &data) {
     SendDlgItemMessage(hDlg, itemId, CB_ADDSTRING, 0, (LPARAM) utf8::utf8_wchar(data).c_str());
 }
 
+void DlgAccountItemStates(HWND hDlg) {
+    int state=IsDlgButtonChecked(hDlg, IDC_X_NSRV);
+    EnableWindow(GetDlgItem(hDlg, IDC_E_HOSTIP), state==BST_CHECKED);
+    EnableWindow(GetDlgItem(hDlg, IDC_E_PORT), state==BST_CHECKED);
+}
+
 INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -60,6 +66,9 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             CheckDlgButton(hDlg, IDC_X_SASL, (dlgAccountParam->useSASL)?BST_CHECKED:BST_UNCHECKED);
             CheckDlgButton(hDlg, IDC_X_ZLIB, (dlgAccountParam->useCompression)?BST_CHECKED:BST_UNCHECKED);
             CheckDlgButton(hDlg, IDC_X_NSRV, (!dlgAccountParam->useSRV)?BST_CHECKED:BST_UNCHECKED);
+
+            //finally
+            DlgAccountItemStates(hDlg);
 		}
 		return (INT_PTR)TRUE;
 
@@ -90,11 +99,8 @@ INT_PTR CALLBACK DlgAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 		}
 
         if (HIWORD(wParam)==BN_CLICKED) {
-            if (LOWORD(wParam)==IDC_X_NSRV) { 
-                int state=IsDlgButtonChecked(hDlg, IDC_X_NSRV);
-                EnableWindow(GetDlgItem(hDlg, IDC_E_HOSTIP), state==BST_CHECKED);
-                EnableWindow(GetDlgItem(hDlg, IDC_E_PORT), state==BST_CHECKED);
-            };
+            if (LOWORD(wParam)==IDC_X_NSRV) 
+                DlgAccountItemStates(hDlg);
         }
 
 		if (LOWORD(wParam) == IDCANCEL)

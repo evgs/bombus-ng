@@ -41,15 +41,6 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
 			shidi.hDlg = hDlg;
 			SHInitDialog(&shidi);
 
-            /*std::string room="bombus";
-            std::string server="conference.jabber.ru";
-            std::string pass="";*/
-            //std::string nick; //="evgs";
-
-            /*for (int i=0; i<6; i++)
-                SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_ADDSTRING, 0, (LPARAM) statusNames[i]);
-            SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_SETCURSEL, p->rc->status, 0);*/
-
             SetDlgItemText(hDlg, IDC_E_ROOM, p->jid.getUserName());
             SetDlgItemText(hDlg, IDC_E_SERVER, p->jid.getServer());
             SetDlgItemText(hDlg, IDC_E_PASSWORD, p->pass);
@@ -125,7 +116,9 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
                 p->rc->status, 
                 p->rc->presenceMessage, 
                 p->rc->priority); 
-            joinPresence->addChildNS("x", "http://jabber.org/protocol/muc");
+            JabberDataBlockRef xMuc=joinPresence->addChildNS("x", "http://jabber.org/protocol/muc");
+            if (!pass.empty()) xMuc->addChild("password",pass.c_str());
+
             if (p->rc->isLoggedIn())
                 p->rc->jabberStream->sendStanza(joinPresence);
 

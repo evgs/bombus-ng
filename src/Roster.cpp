@@ -497,7 +497,12 @@ HMENU RosterListView::getContextMenu() {
         }
 
         if (mr) {
-            AppendMenu(hmenu, MF_STRING, RosterListView::SENDSTATUS,               TEXT("Send status"));
+            if (mr->status!=presence::OFFLINE) {
+                AppendMenu(hmenu, MF_STRING, RosterListView::SENDSTATUS,               TEXT("Send status"));
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MUC_LEAVE,   TEXT("Leave room"));
+            }
+            else 
+                AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MUC_REENTER,  TEXT("Reenter room"));
 
             MucGroup::ref roomGrp;
             roomGrp=boost::dynamic_pointer_cast<MucGroup> (roster.lock()->findGroup(mr->group));
@@ -523,31 +528,38 @@ HMENU RosterListView::getContextMenu() {
             MucContact::Role myRole=roomGrp->selfContact->role;
             MucContact::Affiliation myAff=roomGrp->selfContact->affiliation;
 
-            bool canKick = (myRole==MucContact::MODERATOR && mc->role !=MucContact::MODERATOR);
+            bool online=mc->status!=presence::OFFLINE;
+
+            bool canKick = (myRole==MucContact::MODERATOR && mc->role !=MucContact::MODERATOR && online);
             bool canBan = 
                 myAff==MucContact::OWNER || 
                 (myAff==MucContact::ADMIN 
                 && (mc->affiliation==MucContact::PARTICIPANT || mc->affiliation==MucContact::MEMBER));
 
+
             if (!canKick && !canBan) return hmenu;
             AppendMenu(hmenu, MF_SEPARATOR , 0, NULL);
-            if (canKick) AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MUCKICK, L"Kick");
-            if (canBan)  AppendMenu(hmenu, MF_STRING | MF_GRAYED, RosterListView::MUCBAN,  L"Ban");
+            if (canKick) AppendMenu(hmenu, MF_STRING, RosterListView::MUCKICK, L"Kick");
+            if (canBan)  AppendMenu(hmenu, MF_STRING, RosterListView::MUCBAN,  L"Ban");
 
-            HMENU roleMenu=CreatePopupMenu();
-            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::VISITOR ? MF_CHECKED : 0), RosterListView::MUCVISITOR, L"Visitor");
-            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::PARTICIPANT ? MF_CHECKED : 0), RosterListView::MUCPARTICIPANT, L"Participant");
-            AppendMenu(roleMenu, MF_STRING | MF_GRAYED| (mc->role==MucContact::MODERATOR ? MF_CHECKED : 0), RosterListView::UNSUBSCRIBED, L"Moderator");
+            if (online && myRole>=MucContact::MODERATOR) {
+                HMENU roleMenu=CreatePopupMenu();
+                AppendMenu(roleMenu, MF_STRING | (mc->role==MucContact::VISITOR ? MF_CHECKED : 0), RosterListView::MUCVISITOR, L"Visitor");
+                AppendMenu(roleMenu, MF_STRING | (mc->role==MucContact::PARTICIPANT ? MF_CHECKED : 0), RosterListView::MUCPARTICIPANT, L"Participant");
+                AppendMenu(roleMenu, MF_STRING | (mc->role==MucContact::MODERATOR ? MF_CHECKED : 0), RosterListView::MUCMODERATOR, L"Moderator");
 
-            if (myRole>=MucContact::MODERATOR) AppendMenu(hmenu, MF_POPUP, (LPARAM)roleMenu,               TEXT("Role"));
+                AppendMenu(hmenu, MF_POPUP, (LPARAM)roleMenu,               TEXT("Role"));
+            }
 
-            HMENU afflMenu=CreatePopupMenu();
-            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::NONE ? MF_CHECKED : 0), RosterListView::MUCNONE, L"None");
-            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::MEMBER ? MF_CHECKED : 0), RosterListView::MUCMEMBER, L"Member");
-            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::ADMIN ? MF_CHECKED : 0), RosterListView::MUCADMIN, L"Admin");
-            AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::OWNER ? MF_CHECKED : 0), RosterListView::MUCOWNER, L"Owner");
+            if (myAff>=MucContact::ADMIN) {
+                HMENU afflMenu=CreatePopupMenu();
+                AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::NONE ? MF_CHECKED : 0), RosterListView::MUCNONE, L"None");
+                AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::MEMBER ? MF_CHECKED : 0), RosterListView::MUCMEMBER, L"Member");
+                AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::ADMIN ? MF_CHECKED : 0), RosterListView::MUCADMIN, L"Admin");
+                AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::OWNER ? MF_CHECKED : 0), RosterListView::MUCOWNER, L"Owner");
 
-            if (myAff>=MucContact::ADMIN) AppendMenu(hmenu, MF_POPUP, (LPARAM)afflMenu,               TEXT("Affiliation"));
+                AppendMenu(hmenu, MF_POPUP, (LPARAM)afflMenu,               TEXT("Affiliation"));
+            }
 
         }
 
@@ -671,6 +683,38 @@ void RosterListView::OnCommand( int cmdId, LONG lParam ) {
                 tabs->switchByWndRef(mucconf);
                 break;
             }
+
+        case RosterListView::MUCVISITOR:
+        case RosterListView::MUCPARTICIPANT:
+        case RosterListView::MUCMODERATOR:
+        case RosterListView::MUCKICK: 
+            {
+                MucContact::Role role=MucContact::VISITOR;
+                if (cmdId==MUCMODERATOR) role=MucContact::MODERATOR;
+                if (cmdId==MUCPARTICIPANT) role=MucContact::PARTICIPANT;
+                if (cmdId==MUCKICK) {
+                    std::wstring name=utf8::utf8_wchar(focusedContact->getFullName());
+                    int result=MessageBox(getHWnd(), name.c_str(), TEXT("Kick this dude ?"), MB_YESNO | MB_ICONWARNING);
+                    if (result==IDNO) break;
+                    role=MucContact::NONE_ROLE;
+                }
+
+                MucContact::ref mc=boost::dynamic_pointer_cast<MucContact>(focusedContact);
+                if (mc) mc->changeRole(rc, role);
+                break;
+            }
+
+        case RosterListView::MUCBAN: 
+            {
+                std::wstring name=utf8::utf8_wchar(focusedContact->getFullName());
+                int result=MessageBox(getHWnd(), name.c_str(), TEXT("Sure to BAN???"), MB_YESNO | MB_ICONWARNING);
+                if (result==IDYES) {
+                    MucContact::ref mc=boost::dynamic_pointer_cast<MucContact>(focusedContact);
+                    if (mc) mc->changeAffiliation(rc, MucContact::OUTCAST);
+                }
+                break;
+            }
+
             //case RosterView::RENAMEGRP:
         default:
             break;

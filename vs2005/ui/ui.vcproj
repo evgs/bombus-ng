@@ -44,6 +44,7 @@
 				Optimization="0"
 				AdditionalIncludeDirectories="\libs\boost;..\..\zlib\include;..\..\include"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;BOOST_REGEX_USE_C_LOCALE;BOOST_NO_STD_LOCALE;_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
+				StringPooling="true"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
 				RuntimeTypeInfo="true"
@@ -127,8 +128,10 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="2"
+				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="\libs\boost;..\..\zlib\include;..\..\include"
 				PreprocessorDefinitions="BOOST_ALL_NO_LIB;BOOST_USE_WINDOWS_H;BOOST_REGEX_USE_C_LOCALE;BOOST_NO_STD_LOCALE;_WIN32_WCE=$(CEVER);UNDER_CE;$(PLATFORMDEFINES);WINCE;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE;POCKETPC2003_UI_MODEL"
+				StringPooling="true"
 				RuntimeLibrary="0"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
@@ -161,6 +164,7 @@
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				OptimizeForWindows98="1"
+				LinkTimeCodeGeneration="1"
 			/>
 			<Tool
 				Name="VCALinkTool"

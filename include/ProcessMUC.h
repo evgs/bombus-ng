@@ -33,6 +33,11 @@ public:
 
     typedef boost::shared_ptr<MucContact> ref;
 
+    void changeRole(ResourceContextRef rc, Role newRole);
+    void changeAffiliation(ResourceContextRef rc, Affiliation newAffiliation);
+
+protected:
+    void changeMucItem(ResourceContextRef rc, JabberDataBlockRef item);
 };
 
 class MucRoom : public Contact {

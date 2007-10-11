@@ -936,7 +936,7 @@ bool JabberStreamEvents::connect(){
     long ip=Socket::resolveUrl(host);
 
     Log::getInstance()->msg(boost::str(boost::format("Connecting to %u.%u.%u.%u:%u") 
-        % (ip &0xff) % ((ip>>8) &0xff) % ((ip>>16) &0xff) % (ip>>24) % port));
+        % (ip &0xff) % ((ip>>8) &0xff) % ((ip>>16) &0xff) % ((ip>>24)&0xff) % port));
 
     if (rc->account->useEncryption) {
         CeTLSSocket::ref tlsCon=CeTLSSocket::ref( new CeTLSSocket(ip, port));

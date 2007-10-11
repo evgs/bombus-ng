@@ -5,6 +5,8 @@
 #include "TabCtrl.h"
 #include "ChatView.h"
 
+#include "JabberStream.h"
+
 extern TabsCtrlRef tabs;
 extern RosterListView::ref rosterWnd;
 
@@ -358,4 +360,41 @@ MucContact::MucContact( const std::string &jid )
 void MucContact::update() {
     wjid=utf8::utf8_wchar( jid.getResource() );
     init();
+}
+
+void MucContact::changeRole( ResourceContextRef rc, Role newRole ) {
+    BOOST_ASSERT(newRole<=MODERATOR);
+
+    JabberDataBlockRef item=JabberDataBlockRef(new JabberDataBlock("item"));
+    item->setAttribute("nick",jid.getResource());
+    item->setAttribute("role",roleName[newRole]);
+    //todo:    
+    //  if (!reason.empty) item->addChild("reason", reason);
+
+    changeMucItem(rc, item);
+}
+
+void MucContact::changeAffiliation( ResourceContextRef rc, Affiliation newAffiliation ) {
+    BOOST_ASSERT(newAffiliation<=OWNER);
+
+    JabberDataBlockRef item=JabberDataBlockRef(new JabberDataBlock("item"));
+    Jid rj(realJid);
+    item->setAttribute("jid",rj.getBareJid());
+    item->setAttribute("affiliation",affiliationName[newAffiliation-OUTCAST]);
+    //todo:    
+    //  if (!reason.empty) item->addChild("reason", reason);
+
+    changeMucItem(rc, item);
+}
+
+void MucContact::changeMucItem(ResourceContextRef rc, JabberDataBlockRef item) {
+
+    JabberDataBlock iq("iq");
+    iq.setAttribute("type","set");
+    iq.setAttribute("id","muc-a");
+    iq.setAttribute("to",jid.getBareJid());
+
+    iq.addChildNS("query","http://jabber.org/protocol/muc#admin")
+        ->addChild(item);
+    rc->jabberStream->sendStanza(iq);
 }

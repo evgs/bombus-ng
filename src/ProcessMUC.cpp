@@ -7,8 +7,12 @@
 
 #include "JabberStream.h"
 
+#include "Image.h"
+
 extern TabsCtrlRef tabs;
 extern RosterListView::ref rosterWnd;
+extern ImgListRef skin;
+
 
 //////////////////////////////////////////////////////////////////////////
 MucContact::ref getMucContactEntry(const std::string &jid, ResourceContextRef rc) {
@@ -109,9 +113,17 @@ ProcessResult ProcessMuc::blockArrived(JabberDataBlockRef block, const ResourceC
 
         //setSortKey(nick);
 
-        if (role==MucContact::MODERATOR) {
+        switch (role) {
+        case MucContact::MODERATOR:
             c->transpIndex=icons::ICON_MODERATOR_INDEX;
-        } else {
+            break;
+        case MucContact::VISITOR:
+            {
+                Skin * il= dynamic_cast<Skin *>(skin.get());
+                c->transpIndex=(il)? il->getBaseIndex("visitors") : 0;
+                break;
+            }
+        default:
             c->transpIndex=0;
         }
 

@@ -115,18 +115,16 @@ JabberDataBlockRef XmppError::construct() const {
     error->setAttribute("type", type);
 
     error->addChildNS(textCondition.c_str(), "urn:ietf:params:xml:ns:xmpp-stanzas");
-    if (!text.empty()) error->addChildNS("text", "urn:ietf:params:xml:ns:xmpp-streams")->setText(text);
+    if (!text.empty()) error->addChildNS("text", "urn:ietf:params:xml:ns:xmpp-stanzas")->setText(text);
 
     return error;
 }
 
 XmppError::ref XmppError::findInStanza(JabberDataBlockRef stanza) {
-    return decodeError(stanza->getChildByName("error"));
+    return decodeStreamError(stanza->getChildByName("error"));
 }
 
-XmppError::ref XmppError::decodeError(JabberDataBlockRef error) {
-    if (error->getTagName()!="error") return XmppError::ref();
-
+XmppError::ref XmppError::decodeError(JabberDataBlockRef error, const char *ns) {
     int errCond=NONE;
     std::string text;
 
@@ -135,7 +133,7 @@ XmppError::ref XmppError::decodeError(JabberDataBlockRef error) {
 
         JabberDataBlockRef child=*(i++);
 
-        if (child->getAttribute("xmlns")!="urn:ietf:params:xml:ns:xmpp-stanzas") continue;
+        if (child->getAttribute("xmlns")!=ns) continue;
         std::string tag=child->getTagName();
         if (tag=="text")                    text=child->getText();
         if (tag=="bad-request")             errCond=BAD_REQUEST;
@@ -196,4 +194,13 @@ XmppError::ref XmppError::decodeError(JabberDataBlockRef error) {
     if (type=="wait") xe->errorType=TYPE_WAIT;
 
     return xe;
+}
+
+XmppError::ref XmppError::decodeStreamError( JabberDataBlockRef error ) {
+    if (error->getTagName()!="stream:error") return XmppError::ref();
+    return decodeError(error, "urn:ietf:params:xml:ns:xmpp-streams");
+}
+XmppError::ref XmppError::decodeStanzaError( JabberDataBlockRef error ) {
+    if (error->getTagName()!="error") return XmppError::ref();
+    return decodeError(error, "urn:ietf:params:xml:ns:xmpp-stanzas");
 }

@@ -47,7 +47,8 @@ public:
 
     static XmppError::ref findInStanza(JabberDataBlockRef stanza);
 
-    static XmppError::ref decodeError(JabberDataBlockRef error);
+    static XmppError::ref decodeStreamError(JabberDataBlockRef error);
+    static XmppError::ref decodeStanzaError(JabberDataBlockRef error);
     
     const std::string & getText() const { return text; };
     const std::string & getName() const { return textCondition; /*TODO: remove stub*/}
@@ -63,4 +64,5 @@ private:
 
     std::string textCondition;
     std::string text;
+    static XmppError::ref decodeError(JabberDataBlockRef error, const char *ns);
 };

@@ -71,7 +71,7 @@ bool JabberStream::tagEnd(const std::string & tagname) {
             
             stanza->setTagName("error"); //todo: fix this hack - required by decodeError
 
-            XmppError::ref xe=XmppError::decodeError(stanza);
+            XmppError::ref xe=XmppError::decodeStreamError(stanza);
             std::string err("Stream error: ");
             err+=xe->toString();
             throw std::exception(err.c_str());

@@ -2,6 +2,7 @@
 
 #include "JabberAccount.h"
 #include "JabberStream.h"
+#include "XmppError.h"
 //#include <boost/thread.hpp>
 //#include <boost/bind.hpp>
 #include <stack>
@@ -64,6 +65,16 @@ bool JabberStream::tagEnd(const std::string & tagname) {
         
         if (stanza->getTagName()!=tagname) {
             throw std::exception("XML: Tag mismatch");
+        }
+
+        if (tagname=="stream:error") {
+            
+            stanza->setTagName("error"); //todo: fix this hack - required by decodeError
+
+            XmppError::ref xe=XmppError::decodeError(stanza);
+            std::string err("Stream error: ");
+            err+=xe->toString();
+            throw std::exception(err.c_str());
         }
 
 		JabberStanzaDispatcher * dispatcher= rc->jabberStanzaDispatcherRT.get();

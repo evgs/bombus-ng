@@ -56,7 +56,7 @@ JabberDataBlockRef JabberDataBlock::addChild(const char *_tagName, const char *_
 	return child;
 }
 
-JabberDataBlockRef JabberDataBlock::addChildNS( const char *_tagName, const char *xmlns ) {
+JabberDataBlockRef JabberDataBlock::addChildNS(const char *_tagName, const char *xmlns ) {
     JabberDataBlockRef child=addChild(_tagName, NULL);
     child->setAttribute("xmlns", xmlns);
     return child;

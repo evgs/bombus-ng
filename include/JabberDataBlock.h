@@ -28,6 +28,7 @@ private:
 
 public:
 	const std::string& getTagName() const{ return tagName; }
+    void setTagName (const char *tagName) { this->tagName=tagName; }
 
 	bool hasAttribute(const std::string & byName);
     std::string getAttribute(const std::string & byName);

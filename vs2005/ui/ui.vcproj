@@ -444,6 +444,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\XmppError.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\sockets\zlib\pocket pc 2003 (armv4)\debug\zlib.lib"
 				>
 			</File>
@@ -723,6 +727,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\XMLParser.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\XmppError.h"
 				>
 			</File>
 		</Filter>

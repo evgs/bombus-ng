@@ -11,6 +11,7 @@
 #include <utf8.hpp>
 
 #include <algorithm>
+#include <boost/format.hpp>
 
 #include "Image.h"
 #include "JabberAccount.h"
@@ -530,7 +531,7 @@ HMENU RosterListView::getContextMenu() {
 
             bool online=mc->status!=presence::OFFLINE;
 
-            bool canKick = (myRole==MucContact::MODERATOR && mc->role !=MucContact::MODERATOR && online);
+            bool canKick = (myRole==MucContact::MODERATOR && mc->affiliation <MucContact::ADMIN && online);
             bool canBan = 
                 myAff==MucContact::OWNER || 
                 (myAff==MucContact::ADMIN 
@@ -542,7 +543,7 @@ HMENU RosterListView::getContextMenu() {
             if (canKick) AppendMenu(hmenu, MF_STRING, RosterListView::MUCKICK, L"Kick");
             if (canBan)  AppendMenu(hmenu, MF_STRING, RosterListView::MUCBAN,  L"Ban");
 
-            if (online && myRole>=MucContact::MODERATOR) {
+            if (canKick) {
                 HMENU roleMenu=CreatePopupMenu();
                 AppendMenu(roleMenu, MF_STRING | (mc->role==MucContact::VISITOR ? MF_CHECKED : 0), RosterListView::MUCVISITOR, L"Visitor");
                 AppendMenu(roleMenu, MF_STRING | (mc->role==MucContact::PARTICIPANT ? MF_CHECKED : 0), RosterListView::MUCPARTICIPANT, L"Participant");
@@ -553,12 +554,23 @@ HMENU RosterListView::getContextMenu() {
 
             if (myAff>=MucContact::ADMIN) {
                 HMENU afflMenu=CreatePopupMenu();
-                AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::NONE ? MF_CHECKED : 0), RosterListView::MUCNONE, L"None");
-                AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::MEMBER ? MF_CHECKED : 0), RosterListView::MUCMEMBER, L"Member");
-                AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::ADMIN ? MF_CHECKED : 0), RosterListView::MUCADMIN, L"Admin");
-                AppendMenu(afflMenu, MF_STRING | MF_GRAYED| (mc->affiliation==MucContact::OWNER ? MF_CHECKED : 0), RosterListView::MUCOWNER, L"Owner");
+                bool hasItems=false;
+                if (myAff==MucContact::OWNER || myAff>=mc->affiliation) {
+                    AppendMenu(afflMenu, MF_STRING | (mc->affiliation==MucContact::NONE ? MF_CHECKED : 0), RosterListView::MUCNONE, L"None");
+                    AppendMenu(afflMenu, MF_STRING | (mc->affiliation==MucContact::MEMBER ? MF_CHECKED : 0), RosterListView::MUCMEMBER, L"Member");
+                    hasItems=true;
+                }
+                if (myAff==MucContact::OWNER) {
+                    AppendMenu(afflMenu, MF_STRING | (mc->affiliation==MucContact::ADMIN ? MF_CHECKED : 0), RosterListView::MUCADMIN, L"Admin");
+                    AppendMenu(afflMenu, MF_STRING | (mc->affiliation==MucContact::OWNER ? MF_CHECKED : 0), RosterListView::MUCOWNER, L"Owner");
+                    //hasItems=true; // rudimentary here
+                }
 
-                AppendMenu(hmenu, MF_POPUP, (LPARAM)afflMenu,               TEXT("Affiliation"));
+                //finally
+                if (hasItems)
+                    AppendMenu(hmenu, MF_POPUP, (LPARAM)afflMenu,               TEXT("Affiliation"));
+                else 
+                    DestroyMenu(afflMenu);
             }
 
         }
@@ -704,14 +716,48 @@ void RosterListView::OnCommand( int cmdId, LONG lParam ) {
                 break;
             }
 
+        case RosterListView::MUCNONE:
+        case RosterListView::MUCMEMBER:
+        case RosterListView::MUCADMIN:
+        case RosterListView::MUCOWNER:
         case RosterListView::MUCBAN: 
             {
-                std::wstring name=utf8::utf8_wchar(focusedContact->getFullName());
-                int result=MessageBox(getHWnd(), name.c_str(), TEXT("Sure to BAN???"), MB_YESNO | MB_ICONWARNING);
-                if (result==IDYES) {
-                    MucContact::ref mc=boost::dynamic_pointer_cast<MucContact>(focusedContact);
-                    if (mc) mc->changeAffiliation(rc, MucContact::OUTCAST);
+                // because of security reasons here may be up to 2 questions:
+                // - modifying ownership
+                // - banning an occupant
+                MucContact::Affiliation newAffiliation=MucContact::OUTCAST;
+                if (cmdId==MUCNONE) newAffiliation=MucContact::NONE;
+                if (cmdId==MUCMEMBER) newAffiliation=MucContact::MEMBER;
+                if (cmdId==MUCADMIN) newAffiliation=MucContact::ADMIN;
+                if (cmdId==MUCOWNER) newAffiliation=MucContact::OWNER;
+
+                MucContact::ref mc=boost::dynamic_pointer_cast<MucContact>(focusedContact);
+                if (!mc) break;
+                if (newAffiliation==mc->affiliation) break;
+
+                if (mc->affiliation==MucContact::OWNER || newAffiliation==MucContact::OWNER) {
+                    char *fmt="Are you sure want to revoke owner's priveleges from %s?";
+                    if (newAffiliation==MucContact::OWNER) fmt=
+                        "Are you sure want to grant owner's priveleges to %s?\n"
+                        "WARNING!!! Owner's priveleges are maximal priveleges in conference!";
+
+                    std::wstring msg=utf8::utf8_wchar(boost::str(boost::format(fmt) % focusedContact->getFullName()));
+                    int result=MessageBox(
+                        getHWnd(), 
+                        msg.c_str(), 
+                        TEXT("Modifying ownership"), 
+                        MB_YESNO | MB_ICONWARNING);
+                    if (result==IDNO) break;
                 }
+
+                std::wstring name=utf8::utf8_wchar(focusedContact->getFullName());
+
+                if (newAffiliation==MucContact::OUTCAST) {
+                    int result=MessageBox(getHWnd(), name.c_str(), TEXT("Sure to BAN???"), MB_YESNO | MB_ICONWARNING);
+                    if (result==IDNO) break;
+                }
+
+                mc->changeAffiliation(rc, newAffiliation);
                 break;
             }
 

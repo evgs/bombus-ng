@@ -15,6 +15,7 @@ JabberAccount::JabberAccount(const std::string &bareJid, const std::string &reso
 
 JabberAccount::JabberAccount( LPCTSTR filename ) {
     init();
+    setResource("bombus-ng");
     Serialize s(filename, Serialize::READ);
     serialize(s);
 }
@@ -33,7 +34,6 @@ void JabberAccount::serialize( Serialize &s )
     int version=3; //for write
     s.streamInt(version, 3);
 
-    setResource("bombus-ng");
     std::string sjid=getJid();
     s.streamString(sjid);
     setJid(sjid);

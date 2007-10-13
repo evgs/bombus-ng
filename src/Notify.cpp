@@ -3,11 +3,15 @@
 #include "config.h"
 
 #include <nled.h>
+
 //#include <Pwinuser.h>
 extern "C" { 
     BOOL WINAPI NLedGetDeviceInfo( UINT nInfoId, void *pOutput ); 
     BOOL WINAPI NLedSetDevice( UINT nDeviceId, void *pInput ); 
 };
+
+void doSmartPhoneVibra();
+
 
 #ifdef _WIN32_WCE
 DWORD vibraThread(LPVOID param) {
@@ -23,7 +27,7 @@ DWORD WINAPI vibraThread(LPVOID param) {
     nsi.MetaCycleOn=2;
     nsi.MetaCycleOff=2;
 
-    nsi.OffOnBlink=2;
+    nsi.OffOnBlink=1;
 
     NLedSetDevice(NLED_SETTINGS_INFO_ID, &nsi);
     Sleep(400);
@@ -38,6 +42,8 @@ DWORD WINAPI vibraThread(LPVOID param) {
 }
 
 void Notify::PlayNotify() {
+    //doSmartPhoneVibra();
+    
     if (Notify::vibraOn) return;
 
     if (!(Config::getInstance()->vibra)) return;
@@ -48,3 +54,24 @@ void Notify::PlayNotify() {
 }
 
 BOOL Notify::vibraOn=FALSE;
+
+
+typedef struct
+{
+    WORD wDuration;
+    BYTE bAmplitude;  
+    BYTE bFrequency;
+} VIBRATENOTE; 
+
+void doSmartPhoneVibra() {
+    HINSTANCE hInst = LoadLibrary(_T("aygshell.dll"));
+    if (hInst) {
+        HRESULT (*Vibrate)(DWORD cvn, const VIBRATENOTE * rgvn, BOOL fRepeat, DWORD dwTimeout);
+        (FARPROC&)Vibrate = GetProcAddress(hInst, _T("Vibrate"));
+        if (Vibrate) {
+            HRESULT retval=Vibrate(0, NULL, true, 2000);
+            retval++;
+        }
+        FreeLibrary(hInst);
+    }
+}

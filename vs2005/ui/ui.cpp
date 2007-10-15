@@ -272,9 +272,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     DlgAbout(g_hInst, hWnd);
 				    break;
                 }
-				case IDM_JABBER_ACCOUNT:
-					DialogAccount(g_hInst, hWnd, rc->account);
-					break;
+                case IDM_JABBER_ACCOUNT:
+                    DialogAccount(g_hInst, hWnd, rc->account);
+                    break;
+                case IDM_JABBER_ACCOUNT2:
+                    DialogAccountMP(g_hInst, hWnd, rc->account);
+                    break;
                 case IDM_EXIT:
                     SendMessage (hWnd, WM_CLOSE, 0, 0);				
                     break;

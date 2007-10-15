@@ -122,3 +122,124 @@ void DialogAccount(HINSTANCE g_hInst, HWND parent, JabberAccountRef accnt) {
     DialogBox(g_hInst, (LPCTSTR)IDD_ACCNT, parent, DlgAccount);
 }
 
+//////////////////////////////////////////////////////////////////////////////////
+
+INT_PTR CALLBACK DlgAccountP1(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+
+void DialogAccountMP(HINSTANCE g_hInst, HWND parent, JabberAccountRef accnt) {
+    dlgAccountParam=accnt;
+
+    PROPSHEETPAGE pages[2];
+    pages[0].dwSize=sizeof(PROPSHEETPAGE);
+    pages[1].dwSize=sizeof(PROPSHEETPAGE);
+
+    pages[0].hInstance=g_hInst;
+    pages[1].hInstance=g_hInst;
+
+    pages[0].dwFlags=PSP_DEFAULT;
+    pages[1].dwFlags=PSP_DEFAULT;
+
+    pages[0].pszTemplate=(LPCTSTR)IDD_ACCNT1;
+    pages[1].pszTemplate=(LPCTSTR)IDD_ACCNT2;
+
+    pages[0].pszTitle=L"Account";
+    pages[1].pszTitle=L"Connection";
+
+    pages[0].pfnDlgProc=DlgAccountP1;
+    pages[1].pfnDlgProc=DlgAccountP1;
+
+    pages[0].lParam=0;
+    pages[1].lParam=1;
+
+    PROPSHEETHEADER psh;
+    psh.dwSize=sizeof(PROPSHEETHEADER);
+    psh.dwFlags=PSH_PROPSHEETPAGE ;
+    psh.hwndParent=parent;
+    psh.hInstance=g_hInst;
+    psh.pszCaption=L"Account";
+    psh.nPages=2;
+    psh.nStartPage=0;
+    psh.ppsp=pages;
+
+
+    PropertySheet(&psh);
+
+    dlgAccountParam->saveAccount(TEXT("defAccount.bin"));
+}
+
+
+
+INT_PTR CALLBACK DlgAccountP1(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        {
+            // Create a Done button and size it.  
+            SHINITDLGINFO shidi;
+            shidi.dwMask = SHIDIM_FLAGS;
+            shidi.dwFlags = SHIDIF_SIPDOWN | SHIDIF_SIZEDLGFULLSCREEN | SHIDIF_EMPTYMENU;
+            shidi.hDlg = hDlg;
+            //SHInitDialog(&shidi);
+
+            if (lParam==0) {
+                SetDlgItemText(hDlg, IDC_E_JID, dlgAccountParam->getBareJid());
+                SetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
+                SetDlgItemText(hDlg, IDC_E_RESOURCE, dlgAccountParam->getResource());
+            } else {
+                SetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);
+                SetDlgItemInt(hDlg, IDC_E_PORT, dlgAccountParam->port, false);
+                CheckDlgButton(hDlg, IDC_X_SSL, (dlgAccountParam->useEncryption)?BST_CHECKED:BST_UNCHECKED);
+                CheckDlgButton(hDlg, IDC_X_SSL_WARNINGS, (dlgAccountParam->ignoreSslWarnings)?BST_CHECKED:BST_UNCHECKED);
+                CheckDlgButton(hDlg, IDC_X_PLAIN, (dlgAccountParam->plainTextPassword)?BST_CHECKED:BST_UNCHECKED);
+                CheckDlgButton(hDlg, IDC_X_SASL, (dlgAccountParam->useSASL)?BST_CHECKED:BST_UNCHECKED);
+                CheckDlgButton(hDlg, IDC_X_ZLIB, (dlgAccountParam->useCompression)?BST_CHECKED:BST_UNCHECKED);
+                CheckDlgButton(hDlg, IDC_X_NSRV, (!dlgAccountParam->useSRV)?BST_CHECKED:BST_UNCHECKED);
+                DlgAccountItemStates(hDlg);
+            }
+
+            //finally
+        }
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK)
+        {
+            if (lParam==0) {
+                std::string myjid=GetDlgItemText(hDlg, IDC_E_JID);
+                std::trim(myjid);
+                if (!verifyJid(hDlg, myjid)) return TRUE;
+                dlgAccountParam->setBareJid(myjid);
+                GetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
+                dlgAccountParam->setResource(GetDlgItemText(hDlg, IDC_E_RESOURCE));
+            } else {
+                GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp); std::trim(dlgAccountParam->hostNameIp);
+
+                dlgAccountParam->port=GetDlgItemInt(hDlg, IDC_E_PORT, NULL, false);
+
+                dlgAccountParam->useEncryption=IsDlgButtonChecked(hDlg, IDC_X_SSL)==BST_CHECKED;
+                dlgAccountParam->ignoreSslWarnings=IsDlgButtonChecked(hDlg, IDC_X_SSL_WARNINGS)==BST_CHECKED;
+                dlgAccountParam->plainTextPassword=IsDlgButtonChecked(hDlg, IDC_X_PLAIN)==BST_CHECKED;
+                dlgAccountParam->useSASL=IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_CHECKED;
+                dlgAccountParam->useCompression=IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED;
+                dlgAccountParam->useSRV=!IsDlgButtonChecked(hDlg, IDC_X_NSRV);
+            }
+            return TRUE;
+        }
+
+        if (HIWORD(wParam)==BN_CLICKED) {
+            if (lParam==1) if (LOWORD(wParam)==IDC_X_NSRV) 
+                DlgAccountItemStates(hDlg);
+        }
+
+        if (LOWORD(wParam) == IDCANCEL) {
+            return TRUE;
+        }
+        break;
+
+    case WM_CLOSE:
+        EndDialog(hDlg, message);
+        return TRUE;
+    }
+    return (INT_PTR)FALSE;
+}

@@ -535,7 +535,7 @@ HMENU RosterListView::getContextMenu() {
             bool canBan = 
                 myAff==MucContact::OWNER || 
                 (myAff==MucContact::ADMIN 
-                && (mc->affiliation==MucContact::PARTICIPANT || mc->affiliation==MucContact::MEMBER));
+                && (mc->affiliation==MucContact::NONE || mc->affiliation==MucContact::MEMBER));
 
 
             if (!canKick && !canBan) return hmenu;

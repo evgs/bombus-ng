@@ -32,6 +32,7 @@
 #define IDC_STATIC_2                    202
 #define IDC_STATIC_3                    203
 #define IDC_STATIC_4                    204
+#define IDC_STATIC_5                    206
 #define IDC_E_JID                       1003
 #define IDC_E_PASSWORD                  1004
 #define IDC_X_SSL                       1005
@@ -43,7 +44,6 @@
 #define IDC_E_PORT                      1011
 #define IDC_X_SSL_WARNINGS              1012
 #define IDC_AREV                        1013
-#define IDC_X_SSL_WARNINGS2             1013
 #define IDC_X_NSRV                      1013
 #define IDC_AVERSION                    1014
 #define IDC_E_PRIORITY                  1015

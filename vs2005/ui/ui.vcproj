@@ -240,6 +240,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\DlgAbout.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\DlgAccount.cpp"
 				>
 			</File>
@@ -499,6 +503,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\Contact.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\DlgAbout.h"
 				>
 			</File>
 			<File

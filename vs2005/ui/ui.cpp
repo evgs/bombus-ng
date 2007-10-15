@@ -32,6 +32,7 @@
 #include "ProcessMUC.h"
 #include "MucBookmarks.h"
 
+#include "DlgAbout.h"
 #include "DlgAccount.h"
 #include "DlgStatus.h"
 #include "DlgMucJoin.h"
@@ -92,7 +93,6 @@ void Shell_NotifyIcon(bool show, HWND hwnd);
 ATOM			MyRegisterClass(HINSTANCE, LPTSTR);
 BOOL			InitInstance(HINSTANCE, int);
 LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK	About(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI WinMain(HINSTANCE hInstance,
                    HINSTANCE hPrevInstance,
@@ -269,7 +269,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId) {
                 case IDM_HELP_ABOUT: {
-					DialogBox(g_hInst, (LPCTSTR)IDD_ABOUTBOX, hWnd, About);
+                    DlgAbout(g_hInst, hWnd);
 				    break;
                 }
 				case IDM_JABBER_ACCOUNT:
@@ -463,55 +463,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-        case WM_INITDIALOG:
-            {
-                // Create a Done button and size it.  
-                SHINITDLGINFO shidi;
-                shidi.dwMask = SHIDIM_FLAGS;
-                shidi.dwFlags = SHIDIF_DONEBUTTON | SHIDIF_SIPDOWN | SHIDIF_SIZEDLGFULLSCREEN | SHIDIF_EMPTYMENU;
-                shidi.hDlg = hDlg;
-                SHInitDialog(&shidi);
-
-                wchar_t buf[256];
-                LoadString(g_hInst, IDS_VERSION, buf, 256);
-                SetDlgItemText(hDlg, IDC_AVERSION, buf);
-
-
-                SetDlgItemText(hDlg, IDC_AHW, sysinfo::getOsVersion().c_str());
-                //SetDlgItemText(hDlg, IDC_AVERSION, MAKEINTRESOURCE(IDS_VERSION));
-            }
-            return (INT_PTR)TRUE;
-
-        case WM_COMMAND:
-            if (LOWORD(wParam) == IDOK)
-            {
-                EndDialog(hDlg, LOWORD(wParam));
-                return TRUE;
-            }
-            break;
-
-        case WM_CLOSE:
-            EndDialog(hDlg, message);
-            return TRUE;
-
-/*#ifdef _DEVICE_RESOLUTION_AWARE
-        case WM_SIZE:
-            {
-		DRA::RelayoutDialog(
-			g_hInst, 
-			hDlg, 
-			DRA::GetDisplayMode() != DRA::Portrait ? MAKEINTRESOURCE(IDD_ABOUTBOX_WIDE) : MAKEINTRESOURCE(IDD_ABOUTBOX));
-            }
-            break;
-#endif*/
-    }
-    return (INT_PTR)FALSE;
-}
 
 //////////////////////////////////////////////////////////////////////////
 /*class MTForwarder: public JabberDataBlockListener {
@@ -575,7 +526,7 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
 
     Log::getInstance()->msg("version request ", block->getAttribute("from").c_str());
 
-    std::string version=utf8::wchar_utf8(sysinfo::getOsVersion());
+    std::string version=sysinfo::getOsVersion();
 
 
     JabberDataBlock result("iq");

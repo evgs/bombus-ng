@@ -22,29 +22,6 @@ Log::Log(){}
 
 Log::~Log(){}
 
-wchar_t buf[256];
-
-const wchar_t * charToWchar(const char * src, const char *src2 = NULL) {
-    wchar_t *b=buf;
-
-    int i;
-    for (i=0; i<255; i++) {
-        if (*src ==0 ) break;
-        *(b++)=*(src++);
-    }
-
-    //*(b++)=0x20;
-    if (src2!=0)
-        for (; i<255; i++) {
-            if (*src2 ==0 ) break;
-            *(b++)=*(src2++);
-        }
-        *b=0;
-
-        return buf;
-}
-
-
 void Log::addLog(const wchar_t * msg) {
     //ListBox_AddString( logWnd->getListBoxHWnd(), msg);
     //ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), -1));
@@ -53,15 +30,18 @@ void Log::addLog(const wchar_t * msg) {
 }
 
 void Log::msg(const std::string &message){
-    addLog(charToWchar(message.c_str()));
+    addLog(utf8::utf8_wchar(message).c_str());
 }
 
 void Log::msg(const char * message){
-    addLog(charToWchar(message));
+    msg(std::string(message));
 }
 
 void Log::msg(const char * message, const char *message2){
-    addLog(charToWchar(message, message2));
+    std::string buf(message);
+    buf+=" ";
+    buf+=message2;
+    msg(buf);
 }
 
 Log::ref instance;

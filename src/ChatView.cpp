@@ -18,6 +18,8 @@
 
 #include "config.h"
 
+#include "stringutils.h"
+
 extern HINSTANCE			g_hInst;
 extern int tabHeight;
 extern HWND	g_hWndMenuBar;		// menu bar handle
@@ -392,12 +394,11 @@ void ChatView::sendJabberMessage() {
 
     wchar_t *buf=new wchar_t[len+1];
     int actualLen=SendMessage(editWnd, WM_GETTEXT, len, (LPARAM) buf);
-    if (len==0) { 
-        delete buf; 
-        return;
-    }
-
     std::string body=utf8::wchar_utf8(buf);
+    delete[] buf; 
+
+    std::trimTail(body);
+    if (body.length()==0) return;
 
     Message::ref msg=Message::ref(new Message(body, rc->account->getNickname(), false, Message::SENT, strtime::getCurrentUtc() ));
     bool muc=boost::dynamic_pointer_cast<MucRoom>(contact);
@@ -427,11 +428,7 @@ void ChatView::sendJabberMessage() {
 
     LastActivity::update();
 
-    buf[0]=0;
-    SendMessage(editWnd, WM_SETTEXT, 1, (LPARAM) buf);
-
-    delete buf;
-
+    SendMessage(editWnd, WM_SETTEXT, 1, (LPARAM) L"");
 }
 
 void ChatView::calcEditHeight() {

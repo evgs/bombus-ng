@@ -12,7 +12,6 @@
 #define IDS_EXIT                        103
 #define IDS_HELP                        104
 #define IDD_ABOUTBOX                    105
-#define IDD_ACCNT                       106
 #define IDS_SEND                        107
 #define IDD_STATUS                      107
 #define IDS_VERSION                     108
@@ -40,6 +39,7 @@
 #define IDC_X_PLAIN                     1008
 #define IDC_E_HOSTIP                    1009
 #define IDC_E_RESOURCE                  1010
+#define IDC_X_ZLIB2                     1010
 #define IDC_E_PORT                      1011
 #define IDC_X_SSL_WARNINGS              1012
 #define IDC_AREV                        1013
@@ -96,7 +96,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32801
-#define _APS_NEXT_CONTROL_VALUE         1040
+#define _APS_NEXT_CONTROL_VALUE         1041
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

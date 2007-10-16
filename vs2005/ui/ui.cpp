@@ -1,8 +1,6 @@
 // ui.cpp : Defines the entry point for the application.
 //
 
-//#define JIVESOFTWARE
-
 //#include "stdafx.h"
 
 #include "ui.h"
@@ -273,9 +271,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				    break;
                 }
                 case IDM_JABBER_ACCOUNT:
-                    DialogAccount(g_hInst, hWnd, rc->account);
-                    break;
-                case IDM_JABBER_ACCOUNT2:
                     DialogAccountMP(g_hInst, hWnd, rc->account);
                     break;
                 case IDM_EXIT:

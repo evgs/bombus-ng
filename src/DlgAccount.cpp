@@ -123,6 +123,29 @@ void DialogAccount(HINSTANCE g_hInst, HWND parent, JabberAccountRef accnt) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
+int CALLBACK PropSheetCallback(HWND hwndDlg, UINT message, LPARAM lParam) {
+    switch(message) {
+        case PSCB_INITIALIZED:
+            {
+                HWND hwndChild = GetWindow(hwndDlg, GW_CHILD);
+                while (hwndChild) {
+                    TCHAR szTemp[32];
+                    GetClassName(hwndChild, szTemp, 32);
+                    if (_tcscmp(szTemp, _T("SysTabControl32"))==0)
+                        break;
+                    hwndChild = GetWindow(hwndChild, GW_HWNDNEXT);
+                }
+                if (hwndChild) {
+                    DWORD dwStyle = GetWindowLong(hwndChild, GWL_STYLE) | TCS_BOTTOM;
+                    ::SetWindowLong(hwndChild, GWL_STYLE, dwStyle);
+                }
+                break;
+            }
+        case PSCB_GETVERSION:
+            return COMCTL32_VERSION;
+    }
+    return 0;
+}
 
 INT_PTR CALLBACK DlgAccountP1(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -153,14 +176,14 @@ void DialogAccountMP(HINSTANCE g_hInst, HWND parent, JabberAccountRef accnt) {
 
     PROPSHEETHEADER psh;
     psh.dwSize=sizeof(PROPSHEETHEADER);
-    psh.dwFlags=PSH_PROPSHEETPAGE ;
+    psh.dwFlags=PSH_MAXIMIZE | PSH_PROPSHEETPAGE | PSH_USECALLBACK;
     psh.hwndParent=parent;
     psh.hInstance=g_hInst;
     psh.pszCaption=L"Account";
     psh.nPages=2;
     psh.nStartPage=0;
     psh.ppsp=pages;
-
+	psh.pfnCallback = PropSheetCallback;
 
     PropertySheet(&psh);
 

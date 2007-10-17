@@ -624,8 +624,9 @@ public:
 };
 ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
     std::string from=block->getAttribute("from");
-    std::string body=block->getChildText("body");
-    std::string subj=block->getChildText("subject");
+    const std::string & id=block->getAttribute("id");
+    const std::string & body=block->getChildText("body");
+    const std::string & subj=block->getChildText("subject");
 
     //JabberDataBlockRef xfwd=block->findChildNamespace("x","jabber:x:forward");
     //if (xfwd) {
@@ -670,7 +671,41 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
         nick=c->getName();
     }
 
-    //processing jabber:x:event
+    //xep-085
+    if (block->findChildNamespace("active", "http://jabber.org/protocol/chatstates")) {
+        c->composing=false;
+        c->acceptComposing=true;
+    }
+    if (block->findChildNamespace("paused", "http://jabber.org/protocol/chatstates")) {
+        c->composing=false;
+        c->acceptComposing=true;
+    }
+    if (block->findChildNamespace("composing", "http://jabber.org/protocol/chatstates")) {
+        c->composing=true;
+        c->acceptComposing=true;
+    }
+    //end xep-0085
+
+    //xep-0184
+    if (Config::getInstance()->delivered) {
+        if (block->findChildNamespace("request","urn:xmpp:receipts")) {
+            // reply
+            JabberDataBlock delivered("message");
+            delivered.setAttribute("to", from);
+            delivered.setAttribute("id",id);
+            JabberDataBlockRef x=delivered.addChildNS("x", "jabber:x:event");
+            x->addChild("id", block->getAttribute("id").c_str() );
+            x->addChild("delivered", NULL);
+            rc->jabberStream->sendStanza(delivered);
+        }
+
+        if (block->findChildNamespace("received","urn:xmpp:receipts")) {
+            c->messageDelivered(id);
+        }
+    }
+    //end of xep-0184
+
+    //processing jabber:x:event - deprecated xep-0022
     JabberDataBlockRef x=block->findChildNamespace("x","jabber:x:event");
     if (x) {
         std::string xid=x->getChildText("id");
@@ -702,6 +737,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
             //todo: repaint
         }
     }
+    // end of xep-0022
 
     Message::ref msg;
 

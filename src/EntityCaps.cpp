@@ -2,6 +2,8 @@
 #include "JabberStream.h"
 
 #include <string>
+#include <functional>
+#include <algorithm>
 #include "crypto/SHA1.h"
 #include "config.h"
 
@@ -61,6 +63,9 @@ typedef boost::shared_ptr<MessageDigest> MDRef;
 const std::string & ClientCaps::getCapsHash() {
     if (capsHash.length()) return capsHash;
 
+    //sorting
+    std::stable_sort(features.begin(), features.end(), std::less<std::string>() );
+
     MDRef hashAlg=MDRef(new SHA1());
     hashAlg->init();
 
@@ -112,7 +117,12 @@ MyCaps::MyCaps() {
     addFeature("jabber:x:data");
 
     if (Config::getInstance()->delivered)
-    addFeature("jabber:x:event");   // composing, delivered
+        addFeature("urn:xmpp:receipts");    //xep-0184
+
+    if (Config::getInstance()->composing)
+        addFeature("http://jabber.org/protocol/chatstates");
+
+    //addFeature("jabber:x:event");   // xep-0022; deprecated
 
     addFeature("urn:xmpp:ping");    // xep-0199
     addFeature("urn:xmpp:time");

@@ -526,6 +526,8 @@ HMENU RosterListView::getContextMenu() {
         if (mc) {
             MucGroup::ref roomGrp;
             roomGrp=boost::dynamic_pointer_cast<MucGroup> (roster.lock()->findGroup(mc->group));
+            BOOST_ASSERT(roomGrp);
+
             MucContact::Role myRole=roomGrp->selfContact->role;
             MucContact::Affiliation myAff=roomGrp->selfContact->affiliation;
 

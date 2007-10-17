@@ -417,10 +417,18 @@ void ChatView::sendJabberMessage() {
     JabberDataBlockRef out=msg->constructStanza(to);
     if (muc) out->setAttribute("type","groupchat"); 
     else {
+        /* xep-0022; deprecated; will be re-enabled with entity caps
         JabberDataBlockRef x=out->addChildNS("x", "jabber:x:event");
-        //x->addChild("id", block->getAttribute("id").c_str() );
-        x->addChild("delivered", NULL);
+        x->addChild("delivered", NULL); 
         x->addChild("composing", NULL);
+        */
+
+        if (Config::getInstance()->composing)
+            out->addChildNS("active","http://jabber.org/protocol/chatstates");
+
+        if (Config::getInstance()->delivered)
+            //if (! contact->jid.getResource().empty() ) 
+            out->addChildNS("request","urn:xmpp:receipts");
     }
     composing=false;
     //Reset form
@@ -523,16 +531,24 @@ void ChatView::mucNickComplete() {
 void ChatView::setComposingState( bool composing ) {
     if (!Config::getInstance()->composing) return;
     if (!rc->isLoggedIn()) return;
+
     if (!contact->acceptComposing) return;
     if (composing==this->composing) return;
+
     this->composing=composing;
 
     std::string to=contact->jid.getJid();
     JabberDataBlockRef out=JabberDataBlockRef(new JabberDataBlock("message", NULL)); 
     out->setAttribute("to", to);
+    out->addChildNS(
+        (composing)? "composing" : "paused",
+        "http://jabber.org/protocol/chatstates");
+
+    /* xep-0022 deprecated; will be re-enabled with entity caps
     JabberDataBlockRef x=out->addChildNS("x", "jabber:x:event");
     x->addChild("id", NULL);
     if (composing) x->addChild("composing", NULL);
+    */
     rc->jabberStream->sendStanza(*out);
 }
 //////////////////////////////////////////////////////////////////////////

@@ -153,7 +153,7 @@ void Contact::processPresence( JabberDataBlockRef block ) {
     this->status=typeIndex;
     if (type2!=presence::NOCHANGE) this->offlineIcon=type2;
 
-    if (nickname.empty()) {
+    if (nickname.empty() && status<=presence::DND) {
         JabberDataBlockRef nick=block->findChildNamespace("nick","http://jabber.org/protocol/nick");
         if (nick) {
             nickname=nick->getText();

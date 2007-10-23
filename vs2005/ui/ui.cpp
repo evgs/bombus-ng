@@ -32,6 +32,7 @@
 
 #include "DlgAbout.h"
 #include "DlgAccount.h"
+#include "DlgConfig.h"
 #include "DlgStatus.h"
 #include "DlgMucJoin.h"
 #include "VirtualListView.h"
@@ -270,6 +271,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     DlgAbout(g_hInst, hWnd);
 				    break;
                 }
+
+                case ID_JABBER_OPTIONS:
+                    DialogConfigMP(g_hInst, hWnd);
+                    rc->myCaps=MyCapsRef(new MyCaps());
+                    if (!rc->isLoggedIn()) break;
+                    rc->roster->makeViewList();
+                    break;
+
                 case IDM_JABBER_ACCOUNT:
                     DialogAccountMP(g_hInst, hWnd, rc->account);
                     break;
@@ -747,12 +756,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
 
         msg=Message::ref(new Message(body, nick, mucMessage, Message::INCOMING, Message::extractXDelay(block) ));
 
-        std::wstring soundName(appRootPath);
-        soundName+=TEXT("sounds\\message.wav");
-
         Notify::PlayNotify();
-
-        PlaySound(soundName.c_str(), NULL, SND_ASYNC | /*SND_NOWAIT |*/SND_FILENAME);
     }
 
     ChatView *cv = dynamic_cast<ChatView *>(tabs->getWindowByODR(c).get());

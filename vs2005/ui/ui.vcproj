@@ -252,11 +252,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\DlgConfig.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\DlgMucJoin.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\DlgStatus.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\DlgUtils.cpp"
 				>
 			</File>
 			<File
@@ -515,6 +523,10 @@
 			</File>
 			<File
 				RelativePath="..\..\include\DlgAddEditContact.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\DlgConfig.h"
 				>
 			</File>
 			<File

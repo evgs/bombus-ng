@@ -47,7 +47,7 @@ BEGIN
             MENUITEM "Stream Info",                 IDM_JABBER_STREAMINFO
         END
         MENUITEM SEPARATOR
-        MENUITEM "Options",                     ID_JABBER_OPTIONS, GRAYED
+        MENUITEM "Options",                     ID_JABBER_OPTIONS
         MENUITEM SEPARATOR
         MENUITEM "About",                       IDM_HELP_ABOUT
         MENUITEM "Exit",                        IDM_EXIT
@@ -228,6 +228,37 @@ BEGIN
     CONTROL         "Send ""Keep-Alive"" packets",IDC_X_ZLIB2,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_DISABLED | WS_TABSTOP,11,85,100,10
 END
 
+IDD_OPTIONS1 DIALOG  0, 0, 156, 129
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+EXSTYLE 0x80000000L
+CAPTION "Roster"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "Enable groups",IDC_X_GROUPS,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_DISABLED | WS_TABSTOP,11,17,61,10
+    CONTROL         "Show offline contacts",IDC_X_OFFLINES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,7,85,10
+END
+
+IDD_OPTIONS2 DIALOG  0, 0, 156, 129
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+EXSTYLE 0x80000000L
+CAPTION "Messages"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "Delivery notifications",IDC_X_DELIVERY,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,11,17,83,10
+    CONTROL         "Composing events",IDC_X_COMPOSING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,7,75,10
+    CONTROL         "Local chat history",IDC_X_HISTORY,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,11,28,72,10
+END
+
+IDD_OPTIONS3 DIALOG  0, 0, 156, 129
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+EXSTYLE 0x80000000L
+CAPTION "Sounds"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "Sounds",IDC_X_SOUNDS,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,11,17,39,10
+    CONTROL         "Enable vibra on smartphones",IDC_X_VIBRA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,7,109,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -294,6 +325,30 @@ BEGIN
     END
 
     IDD_ACCNT2, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 152
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 122
+    END
+
+    IDD_OPTIONS1, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 152
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 122
+    END
+
+    IDD_OPTIONS2, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 152
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 122
+    END
+
+    IDD_OPTIONS3, DIALOG
     BEGIN
         LEFTMARGIN, 4
         RIGHTMARGIN, 152

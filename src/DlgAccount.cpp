@@ -17,25 +17,6 @@
 
 static JabberAccountRef dlgAccountParam;
 
-
-void GetDlgItemText(HWND hDlg, int itemId, std::string &dest) {
-    wchar_t buf[1024];
-    ::GetDlgItemText(hDlg, itemId, buf, sizeof(buf));
-    dest=utf8::wchar_utf8(buf);
-}
-std::string GetDlgItemText(HWND hDlg, int itemId) {
-    wchar_t buf[1024];
-    ::GetDlgItemText(hDlg, itemId, buf, sizeof(buf));
-    return utf8::wchar_utf8(buf);
-}
-
-void SetDlgItemText(HWND hDlg, int itemId, const std::string &data) {
-    ::SetDlgItemText(hDlg, itemId, utf8::utf8_wchar(data).c_str());
-}
-void AddComboString(HWND hDlg, int itemId, const std::string &data) {
-    SendDlgItemMessage(hDlg, itemId, CB_ADDSTRING, 0, (LPARAM) utf8::utf8_wchar(data).c_str());
-}
-
 void DlgAccountItemStates(HWND hDlg) {
     int state=IsDlgButtonChecked(hDlg, IDC_X_NSRV);
     EnableWindow(GetDlgItem(hDlg, IDC_E_HOSTIP), state==BST_CHECKED);
@@ -43,30 +24,6 @@ void DlgAccountItemStates(HWND hDlg) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////
-int CALLBACK PropSheetCallback(HWND hwndDlg, UINT message, LPARAM lParam) {
-    switch(message) {
-        case PSCB_INITIALIZED:
-            {
-                HWND hwndChild = GetWindow(hwndDlg, GW_CHILD);
-                while (hwndChild) {
-                    TCHAR szTemp[32];
-                    GetClassName(hwndChild, szTemp, 32);
-                    if (_tcscmp(szTemp, _T("SysTabControl32"))==0)
-                        break;
-                    hwndChild = GetWindow(hwndChild, GW_HWNDNEXT);
-                }
-                if (hwndChild) {
-                    DWORD dwStyle = GetWindowLong(hwndChild, GWL_STYLE) | TCS_BOTTOM;
-                    ::SetWindowLong(hwndChild, GWL_STYLE, dwStyle);
-                }
-                break;
-            }
-        case PSCB_GETVERSION:
-            return COMCTL32_VERSION;
-    }
-    return 0;
-}
-
 INT_PTR CALLBACK DlgProcAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam, int npage);
 INT_PTR CALLBACK DlgProcAccountP1(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     return DlgProcAccount(hDlg, message, wParam, lParam, 0);
@@ -132,12 +89,12 @@ INT_PTR CALLBACK DlgProcAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
             } else {
                 SetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);
                 SetDlgItemInt(hDlg, IDC_E_PORT, dlgAccountParam->port, false);
-                CheckDlgButton(hDlg, IDC_X_SSL, (dlgAccountParam->useEncryption)?BST_CHECKED:BST_UNCHECKED);
-                CheckDlgButton(hDlg, IDC_X_SSL_WARNINGS, (dlgAccountParam->ignoreSslWarnings)?BST_CHECKED:BST_UNCHECKED);
-                CheckDlgButton(hDlg, IDC_X_PLAIN, (dlgAccountParam->plainTextPassword)?BST_CHECKED:BST_UNCHECKED);
-                CheckDlgButton(hDlg, IDC_X_SASL, (!dlgAccountParam->useSASL)?BST_CHECKED:BST_UNCHECKED);
-                CheckDlgButton(hDlg, IDC_X_ZLIB, (dlgAccountParam->useCompression)?BST_CHECKED:BST_UNCHECKED);
-                CheckDlgButton(hDlg, IDC_X_NSRV, (!dlgAccountParam->useSRV)?BST_CHECKED:BST_UNCHECKED);
+                SetDlgCheckBox(hDlg, IDC_X_SSL, dlgAccountParam->useEncryption);
+                SetDlgCheckBox(hDlg, IDC_X_SSL_WARNINGS, dlgAccountParam->ignoreSslWarnings);
+                SetDlgCheckBox(hDlg, IDC_X_PLAIN, dlgAccountParam->plainTextPassword);
+                SetDlgCheckBox(hDlg, IDC_X_SASL, !dlgAccountParam->useSASL);
+                SetDlgCheckBox(hDlg, IDC_X_ZLIB, dlgAccountParam->useCompression);
+                SetDlgCheckBox(hDlg, IDC_X_NSRV, !dlgAccountParam->useSRV);
                 DlgAccountItemStates(hDlg);
             }
 
@@ -160,13 +117,12 @@ INT_PTR CALLBACK DlgProcAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
                 } else {
                     GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp); std::trim(dlgAccountParam->hostNameIp);
 
-                    dlgAccountParam->port=GetDlgItemInt(hDlg, IDC_E_PORT, NULL, false);
+                    GetDlgCheckBox(hDlg, IDC_X_SSL, dlgAccountParam->useEncryption);
+                    GetDlgCheckBox(hDlg, IDC_X_SSL_WARNINGS, dlgAccountParam->ignoreSslWarnings);
+                    GetDlgCheckBox(hDlg, IDC_X_PLAIN, dlgAccountParam->plainTextPassword);
+                    GetDlgCheckBox(hDlg, IDC_X_ZLIB, dlgAccountParam->useCompression);
 
-                    dlgAccountParam->useEncryption=IsDlgButtonChecked(hDlg, IDC_X_SSL)==BST_CHECKED;
-                    dlgAccountParam->ignoreSslWarnings=IsDlgButtonChecked(hDlg, IDC_X_SSL_WARNINGS)==BST_CHECKED;
-                    dlgAccountParam->plainTextPassword=IsDlgButtonChecked(hDlg, IDC_X_PLAIN)==BST_CHECKED;
                     dlgAccountParam->useSASL=!IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_CHECKED;
-                    dlgAccountParam->useCompression=IsDlgButtonChecked(hDlg, IDC_X_ZLIB)==BST_CHECKED;
                     dlgAccountParam->useSRV=!IsDlgButtonChecked(hDlg, IDC_X_NSRV);
                 }
 

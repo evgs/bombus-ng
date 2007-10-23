@@ -16,7 +16,11 @@ Config::Config(void){
     serialize(s);
 }
 
+extern std::wstring appRootPath;
 void Config::save() {
+    std::wstring configPath=appRootPath+L"config";
+    CreateDirectory(configPath.c_str(), NULL);
+
     Serialize s(CONFIG_FILE, Serialize::WRITE);
     serialize(s);
 }
@@ -40,5 +44,8 @@ void Config::serialize( Serialize &s ) {
 
     //signalling
     s.streamBool(vibra, true);
+    s.streamBool(sounds, true);
+
+    s.streamBool(showGroups, true);
 }
 

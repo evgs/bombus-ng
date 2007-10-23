@@ -14,12 +14,14 @@ public:
     static Config::ref getInstance();
 
     bool showOfflines;
+    bool showGroups;
 
     bool composing;
     bool delivered;
     bool history;
 
     bool vibra;
+    bool sounds;
 
 
     void save();

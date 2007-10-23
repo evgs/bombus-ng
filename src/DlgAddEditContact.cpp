@@ -179,18 +179,3 @@ void DlgAddEditContact::createDialog( HWND parent, ResourceContextRef rc, Contac
         (p->edit)? (LPCTSTR)IDD_EDIT_CONTACT : (LPCTSTR)IDD_ADD_CONTACT ,
         parent, dialogProc, (LPARAM)p);
 }
-
-bool verifyJid( HWND hwnd, const std::string &jid ) {
-    Jid j(jid);
-
-    if (!j.isValid()) {
-        MessageBox(hwnd, L"Please enter valid JID, like user@jabber.ru", L"Invalid Jabber ID", MB_OK | MB_ICONEXCLAMATION);
-        return false;
-    }
-
-    if (!j.getResource().empty()) {
-        MessageBox(hwnd, L"JID should not contain resource.\nExample: user@jabber.ru,\nbut not user@jabber.ru/resource", L"Bare Jabber ID wanted", MB_OK | MB_ICONEXCLAMATION);
-        return false;
-    }
-    return true;
-}

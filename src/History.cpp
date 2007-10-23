@@ -1,5 +1,6 @@
 #include "History.h"
 #include "utf8.hpp"
+#include "config.h"
 
 #include <stdio.h>
 
@@ -9,7 +10,7 @@ History::ref History::getInstance() {
 }
 
 void History::appendHistory( Contact::ref c, Message::ref msg ) {
-    if (!writeHistory) return;
+    if (!Config::getInstance()->history) return;
     std::wstring filePath=historyPath;
     filePath+='\\';
     //todo: normalize filename
@@ -18,6 +19,8 @@ void History::appendHistory( Contact::ref c, Message::ref msg ) {
 
     FILE *f=_wfopen(filePath.c_str(), L"a");
     if (f==NULL) return;
+
+
     std::string t=strtime::toLocalDateTime(msg->time);
 
     fprintf(f, "[%s] (%s)%s\n", t.c_str(), msg->fromName.c_str(), msg->getMessageText().c_str());
@@ -28,12 +31,13 @@ extern std::wstring appRootPath;
 
 History::History() {
     historyPath=appRootPath+L"history";
-    //CreateDirectory(historyPath.c_str(), NULL);
-    DWORD attrs=GetFileAttributes(historyPath.c_str());
+    CreateDirectory(historyPath.c_str(), NULL);
+
+    /*DWORD attrs=GetFileAttributes(historyPath.c_str());
     if (attrs==0xFFFFFFFF) {
         writeHistory=false;
     } else {
         writeHistory=(attrs & FILE_ATTRIBUTE_DIRECTORY)!=0;
-    }
+    }*/
 }
 History::ref History::instance=History::ref();

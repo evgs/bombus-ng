@@ -71,8 +71,9 @@
 #define IDC_X_AUTOJOIN                  1037
 #define IDC_X_GROUPS                    1041
 #define IDC_X_OFFLINES                  1042
-#define IDC_X_GROUPS2                   1043
 #define IDC_X_HISTORY                   1043
+#define IDC_X_OFFLINES2                 1043
+#define IDC_X_PRESENCESORT              1043
 #define IDC_X_DELIVERY                  1044
 #define IDC_X_COMPOSING                 1045
 #define IDC_X_SOUNDS                    1046

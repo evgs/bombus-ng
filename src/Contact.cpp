@@ -81,7 +81,7 @@ const std::string Contact::getName() const{
     return nickname;
 }
 //////////////////////////////////////////////////////////////////////////
-bool Contact::compare( Contact::ref left, Contact::ref right ) {
+bool Contact::compareKST( Contact::ref left, Contact::ref right ) {
     Contact *l=left.get();
     Contact *r=right.get();
     if (l->sortKey < r->sortKey) return true;
@@ -90,6 +90,15 @@ bool Contact::compare( Contact::ref left, Contact::ref right ) {
     if (l->status > r->status) return false;
     return (_wcsicmp(left->getText(), right->getText()) < 0);
 }
+//////////////////////////////////////////////////////////////////////////
+bool Contact::compareKT( Contact::ref left, Contact::ref right ) {
+    Contact *l=left.get();
+    Contact *r=right.get();
+    if (l->sortKey < r->sortKey) return true;
+    if (l->sortKey > r->sortKey) return false;
+    return (_wcsicmp(left->getText(), right->getText()) < 0);
+}
+
 void Contact::update() {
     std::string s=(nickname.empty())? jid.getBareJid():nickname;
     std::string resource=jid.getResource();

@@ -15,6 +15,7 @@ public:
 
     bool showOfflines;
     bool showGroups;
+    bool sortByStatus;
 
     bool composing;
     bool delivered;

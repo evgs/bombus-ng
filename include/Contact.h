@@ -50,7 +50,8 @@ public:
 
     int nUnread;
 
-    static bool compare(Contact::ref left, Contact::ref right);
+    static bool compareKST(Contact::ref left, Contact::ref right);
+    static bool compareKT(Contact::ref left, Contact::ref right);
 
     const std::string getFullName() const;
     const std::string getName() const;

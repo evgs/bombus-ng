@@ -89,6 +89,7 @@ INT_PTR CALLBACK DlgProcConfig(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
             if (npage==0) {
                 SetDlgCheckBox(hDlg, IDC_X_OFFLINES, cfg->showOfflines);
                 SetDlgCheckBox(hDlg, IDC_X_GROUPS, cfg->showGroups);
+                SetDlgCheckBox(hDlg, IDC_X_PRESENCESORT, cfg->sortByStatus);
             }
             if (npage==1) {
                 SetDlgCheckBox(hDlg, IDC_X_COMPOSING, cfg->composing);
@@ -113,6 +114,7 @@ INT_PTR CALLBACK DlgProcConfig(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
                 if (npage==0) {
                     GetDlgCheckBox(hDlg, IDC_X_OFFLINES, cfg->showOfflines);
                     GetDlgCheckBox(hDlg, IDC_X_GROUPS, cfg->showGroups);
+                    GetDlgCheckBox(hDlg, IDC_X_PRESENCESORT, cfg->sortByStatus);
                 }
                 if (npage==1) {
                     GetDlgCheckBox(hDlg, IDC_X_COMPOSING, cfg->composing);

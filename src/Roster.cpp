@@ -244,7 +244,10 @@ Contact::ref Roster::getContactEntry(const std::string & from){
 //////////////////////////////////////////////////////////////////////////
 void Roster::makeViewList() {
 
-    std::stable_sort(contacts.begin(), contacts.end(), Contact::compare);
+    std::stable_sort(
+        contacts.begin(), 
+        contacts.end(), 
+        (Config::getInstance()->sortByStatus) ? Contact::compareKST : Contact::compareKT );
 
     //ODRSet::ref odrlist=ODRSet::ref(new ODRList());
     //ODRList *list=(ODRList *)(odrlist.get());

@@ -4,6 +4,7 @@
 #include <aygshell.h>
 #include "../vs2005/ui/ui.h"
 
+#include "Sysinfo.h"
 #include "wmuser.h"
 #include "ResourceContext.h"
 #include "JabberStream.h"
@@ -324,7 +325,7 @@ ChatView::ChatView( HWND parent, Contact::ref contact )
     //TEXTMETRIC txm;
     //GetTextMetrics(NULL, &txm); //TODO - hdc must not be NULL
     //editHeight=txm.tmHeight*4;
-    editHeight=60;
+    editHeight=(sysinfo::screenIsVGA())? 50*2 : 50;
 
     this->contact=contact;
 

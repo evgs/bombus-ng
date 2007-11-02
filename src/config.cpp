@@ -47,5 +47,6 @@ void Config::serialize( Serialize &s ) {
     s.streamBool(sounds, true);
 
     s.streamBool(showGroups, true);
+    s.streamBool(sortByStatus, true);
 }
 

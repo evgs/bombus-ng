@@ -884,8 +884,10 @@ bool JabberStreamEvents::connect(){
 
     Socket::initWinsocks();
 
-    Log::getInstance()->msg("Raising up network");
-    Socket::networkUp();
+    if (rc->account->networkUp) {
+        Log::getInstance()->msg("Raising up network");
+        Socket::networkUp();
+    }
 
     std::string host;
     int port=5222;

@@ -58,5 +58,8 @@ void JabberAccount::serialize( Serialize &s )
     // proxy
     s.streamBool(useProxy, false);
     s.streamString(proxy, "<none>");
+
+    // network
+    s.streamBool(networkUp, true);
 }
 

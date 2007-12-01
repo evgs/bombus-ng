@@ -50,6 +50,8 @@ public:
 	bool useProxy;
 	std::string proxy;
 
+    bool networkUp;
+
 private:
     void init();
 };

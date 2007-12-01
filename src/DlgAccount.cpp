@@ -31,28 +31,37 @@ INT_PTR CALLBACK DlgProcAccountP1(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 INT_PTR CALLBACK DlgProcAccountP2(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     return DlgProcAccount(hDlg, message, wParam, lParam, 1);
 }
+INT_PTR CALLBACK DlgProcAccountP3(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+    return DlgProcAccount(hDlg, message, wParam, lParam, 2);
+}
 
 void DialogAccountMP(HINSTANCE g_hInst, HWND parent, JabberAccountRef accnt) {
     dlgAccountParam=accnt;
 
-    PROPSHEETPAGE pages[2];
+    PROPSHEETPAGE pages[3];
     pages[0].dwSize=sizeof(PROPSHEETPAGE);
     pages[1].dwSize=sizeof(PROPSHEETPAGE);
+    pages[2].dwSize=sizeof(PROPSHEETPAGE);
 
     pages[0].hInstance=g_hInst;
     pages[1].hInstance=g_hInst;
+    pages[2].hInstance=g_hInst;
 
     pages[0].dwFlags=PSP_DEFAULT;
     pages[1].dwFlags=PSP_DEFAULT;
+    pages[2].dwFlags=PSP_DEFAULT;
 
     pages[0].pszTemplate=(LPCTSTR)IDD_ACCNT1;
     pages[1].pszTemplate=(LPCTSTR)IDD_ACCNT2;
+    pages[2].pszTemplate=(LPCTSTR)IDD_ACCNT3;
 
     pages[0].pfnDlgProc=DlgProcAccountP1;
     pages[1].pfnDlgProc=DlgProcAccountP2;
+    pages[2].pfnDlgProc=DlgProcAccountP3;
 
     pages[0].lParam=0;
     pages[1].lParam=1;
+    pages[2].lParam=2;
 
     PROPSHEETHEADER psh;
     psh.dwSize=sizeof(PROPSHEETHEADER);
@@ -60,7 +69,7 @@ void DialogAccountMP(HINSTANCE g_hInst, HWND parent, JabberAccountRef accnt) {
     psh.hwndParent=parent;
     psh.hInstance=g_hInst;
     psh.pszCaption=L"Account";
-    psh.nPages=2;
+    psh.nPages=3;
     psh.nStartPage=0;
     psh.ppsp=pages;
 	psh.pfnCallback = PropSheetCallback;
@@ -86,7 +95,8 @@ INT_PTR CALLBACK DlgProcAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
                 SetDlgItemText(hDlg, IDC_E_JID, dlgAccountParam->getBareJid());
                 SetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
                 SetDlgItemText(hDlg, IDC_E_RESOURCE, dlgAccountParam->getResource());
-            } else {
+            } 
+            if (npage==1) {
                 SetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp);
                 SetDlgItemInt(hDlg, IDC_E_PORT, dlgAccountParam->port, false);
                 SetDlgCheckBox(hDlg, IDC_X_SSL, dlgAccountParam->useEncryption);
@@ -97,6 +107,9 @@ INT_PTR CALLBACK DlgProcAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
                 SetDlgCheckBox(hDlg, IDC_X_NSRV, !dlgAccountParam->useSRV);
                 DlgAccountItemStates(hDlg);
             }
+            if (npage==2) {
+                SetDlgCheckBox(hDlg, IDC_X_DIALUP, dlgAccountParam->networkUp);
+            } 
 
             //finally
         }
@@ -114,7 +127,8 @@ INT_PTR CALLBACK DlgProcAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
                     dlgAccountParam->setBareJid(myjid);
                     GetDlgItemText(hDlg, IDC_E_PASSWORD, dlgAccountParam->password);
                     dlgAccountParam->setResource(GetDlgItemText(hDlg, IDC_E_RESOURCE));
-                } else {
+                } 
+                if (npage==1) {
                     GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp); std::trim(dlgAccountParam->hostNameIp);
 
                     GetDlgCheckBox(hDlg, IDC_X_SSL, dlgAccountParam->useEncryption);
@@ -124,6 +138,9 @@ INT_PTR CALLBACK DlgProcAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 
                     dlgAccountParam->useSASL=!IsDlgButtonChecked(hDlg, IDC_X_SASL)==BST_CHECKED;
                     dlgAccountParam->useSRV=!IsDlgButtonChecked(hDlg, IDC_X_NSRV);
+                }
+                if (npage==2) {
+                    GetDlgCheckBox(hDlg, IDC_X_DIALUP, dlgAccountParam->networkUp);
                 }
 
                 return TRUE;

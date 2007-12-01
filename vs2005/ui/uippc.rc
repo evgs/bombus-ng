@@ -260,6 +260,15 @@ BEGIN
     CONTROL         "Enable vibra on smartphones",IDC_X_VIBRA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,7,109,10
 END
 
+IDD_ACCNT3 DIALOG  0, 0, 156, 129
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+EXSTYLE 0x80000000L
+CAPTION "Network"
+FONT 8, "MS Shell Dlg"
+BEGIN
+    CONTROL         "Raise network up",IDC_X_DIALUP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,7,71,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -350,6 +359,14 @@ BEGIN
     END
 
     IDD_OPTIONS3, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 152
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 122
+    END
+
+    IDD_ACCNT3, DIALOG
     BEGIN
         LEFTMARGIN, 4
         RIGHTMARGIN, 152

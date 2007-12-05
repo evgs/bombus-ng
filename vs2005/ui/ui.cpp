@@ -702,9 +702,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
             JabberDataBlock delivered("message");
             delivered.setAttribute("to", from);
             delivered.setAttribute("id",id);
-            JabberDataBlockRef x=delivered.addChildNS("x", "jabber:x:event");
-            x->addChild("id", block->getAttribute("id").c_str() );
-            x->addChild("delivered", NULL);
+            delivered.addChildNS("received","urn:xmpp:receipts");
             rc->jabberStream->sendStanza(delivered);
         }
 

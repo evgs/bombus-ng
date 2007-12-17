@@ -12,7 +12,7 @@
 #include "wmuser.h"
 #include "Notify.h"
 
-#include "Log.h"
+#include "LogPanel.h"
 #include "Socket.h"
 #include "CETLSSocket.h"
 #include <string>
@@ -159,6 +159,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance, LPTSTR szWindowClass)
 //        In this function, we save the instance handle in a global variable and
 //        create and display the main program window.
 //
+const std::string responseMd5Digest( const std::string &user, const std::string &pass, const std::string &realm, const std::string &digestUri, const std::string &nonce, const std::string cnonce);
+
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
     HWND hWnd;
@@ -370,7 +372,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             { 
                 odrLog = VirtualListView::ref(new VirtualListView(tabs->getHWnd(), std::string("Log")));
                 tabs->addWindow(odrLog);
-                Log::getInstance()->bindLV(odrLog); 
+                LogPanel::bindLV(odrLog); 
+                Log::getInstance()->msg(responseMd5Digest("juliet", "passwd", "example.com", "xmpp/example.com", "OA6MG9tEQGm2hh", "OA6MHXh6VqTrRk"));
             }
 
             /*#ifdef DEBUG
@@ -916,7 +919,7 @@ bool JabberStreamEvents::connect(){
 
     if (host.empty()) host=rc->account->getServer();
 
-    if (rc->account->legacySSL) {
+    if (rc->account->legacySSL && rc->account->useEncryption) {
         if (port==5222) port=5223;
     }
 

@@ -1,7 +1,7 @@
 //#include "stdafx.h"
+#include "JabberStream.h"
 
 #include "JabberAccount.h"
-#include "JabberStream.h"
 #include "XmppError.h"
 //#include <boost/thread.hpp>
 //#include <boost/bind.hpp>

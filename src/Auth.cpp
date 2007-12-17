@@ -1,8 +1,8 @@
 //#include "stdafx.h"
 
+#include "JabberStream.h"
 #include "Auth.h"
 #include "JabberAccount.h"
-#include "JabberStream.h"
 #include "ResourceContext.h"
 #include "CompressedSocket.h"
 #include "CETLSSocket.h"
@@ -208,7 +208,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
                 std::string("xmpp/")+rc->account->getServer(),
                 nonce,
                 cnonce ));
-            //System.out.println(resp.toString());
+            Log::getInstance()->msg(base64::base64Decode(resp.getText()));
         }
         // first stream - step 3. sending second empty response due to second challenge
         //if (challenge.startsWith("rspauth")) {}

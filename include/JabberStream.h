@@ -1,12 +1,12 @@
 #pragma once
 
+#include "Socket.h"
 #include <boost/smart_ptr.hpp>
 #include <map>
 #include <stack>
 
 #include "basetypes.h"
 #include "ResourceContext.h"
-#include "Socket.h"
 #include "JabberDataBlock.h"
 #include "JabberListener.h"
 #include "JabberStanzaDispatcher.h"

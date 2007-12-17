@@ -8,7 +8,11 @@
  */
 
 #include <Socket.h>
+
+#ifdef WINCE
 #include <connmgr.h>
+#endif
+
 #include <boost/assert.hpp>
 #include <boost/format.hpp>
 #include <memory.h>
@@ -125,6 +129,7 @@ void Socket::close() {
 }
 
 void Socket::networkUp() {
+#ifdef WINCE
     CONNMGR_CONNECTIONINFO rq;
     memset(&rq, 0, sizeof(rq));
     rq.cbSize=sizeof(rq);
@@ -139,6 +144,7 @@ void Socket::networkUp() {
     if (ConnMgrEstablishConnectionSync(&rq, &hconn, 60000, &status) != S_OK) {
         throw std::exception(boost::str(boost::format("Network is down (%d)") % status).c_str());
     }
+#endif
 }
 
 

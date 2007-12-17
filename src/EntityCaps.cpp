@@ -1,5 +1,6 @@
-#include "EntityCaps.h"
 #include "JabberStream.h"
+
+#include "EntityCaps.h"
 
 #include <string>
 #include <functional>

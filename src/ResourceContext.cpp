@@ -1,9 +1,9 @@
 //#include "stdafx.h"
+#include "JabberStream.h"
 
 #include "ResourceContext.h"
 #include "EntityCaps.h"
 #include "HostFeatures.h"
-#include "JabberStream.h"
 
 #include <Presence.h>
 #include <stdlib.h>

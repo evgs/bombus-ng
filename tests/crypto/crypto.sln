@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "crypto", "crypto.vcproj", "{63385666-CD11-4E6E-9578-85694AB5D97C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{63385666-CD11-4E6E-9578-85694AB5D97C}.Debug.ActiveCfg = Debug|Win32
+		{63385666-CD11-4E6E-9578-85694AB5D97C}.Debug.Build.0 = Debug|Win32
+		{63385666-CD11-4E6E-9578-85694AB5D97C}.Release.ActiveCfg = Release|Win32
+		{63385666-CD11-4E6E-9578-85694AB5D97C}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

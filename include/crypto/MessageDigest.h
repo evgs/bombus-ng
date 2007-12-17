@@ -100,7 +100,7 @@ public:
     /**
      * Add specific bytes to the digest.
      */
-    void updateArray(const unsigned char* input, int len, int offset=0);
+    virtual void updateArray(const unsigned char* input, int len, int offset=0);
 
     /**
      * Add the bytes in the String 'input' to the current digest.

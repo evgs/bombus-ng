@@ -2,6 +2,7 @@
 #include <commctrl.h>
 #include <windowsx.h>
 #include <aygshell.h>
+#include <sipapi.h>
 #include "../vs2005/ui/ui.h"
 
 #include "Sysinfo.h"
@@ -127,7 +128,11 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
         }
         PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPOSING, true);
         break;
+    case WM_SETFOCUS:
+        if (Config::getInstance()->raiseSIP) SipShowIM(SIPF_ON);
+        break;
     case WM_KILLFOCUS:
+        if (Config::getInstance()->raiseSIP) SipShowIM(SIPF_OFF);
         PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPOSING, false);
         break;
     } 

@@ -373,7 +373,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 odrLog = VirtualListView::ref(new VirtualListView(tabs->getHWnd(), std::string("Log")));
                 tabs->addWindow(odrLog);
                 LogPanel::bindLV(odrLog); 
-                Log::getInstance()->msg(responseMd5Digest("juliet", "passwd", "example.com", "xmpp/example.com", "OA6MG9tEQGm2hh", "OA6MHXh6VqTrRk"));
             }
 
             /*#ifdef DEBUG

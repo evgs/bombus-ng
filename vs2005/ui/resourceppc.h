@@ -77,8 +77,10 @@
 #define IDC_X_DELIVERY                  1044
 #define IDC_X_COMPOSING                 1045
 #define IDC_X_SOUNDS                    1046
+#define IDC_X_SIP                       1046
 #define IDC_X_VIBRA                     1047
 #define IDC_X_DIALUP                    1048
+#define IDC_SIP1                        1049
 #define IDM_JABBER                      32775
 #define IDM_JABBER_STREAMINFO           32777
 #define IDM_WINDOWS_ROSTER              32782
@@ -109,7 +111,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32801
-#define _APS_NEXT_CONTROL_VALUE         1049
+#define _APS_NEXT_CONTROL_VALUE         1050
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

@@ -48,5 +48,8 @@ void Config::serialize( Serialize &s ) {
 
     s.streamBool(showGroups, true);
     s.streamBool(sortByStatus, true);
+
+    //SIP control
+    s.streamBool(raiseSIP, false);
 }
 

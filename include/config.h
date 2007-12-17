@@ -24,6 +24,8 @@ public:
     bool vibra;
     bool sounds;
 
+    bool raiseSIP;
+
 
     void save();
 private:

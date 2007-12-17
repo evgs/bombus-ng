@@ -193,10 +193,10 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
         
         JabberDataBlock resp("response");
         resp.setAttribute("xmlns", "urn:ietf:params:xml:ns:xmpp-sasl");
-        int nonceIndex=challenge.find("nonce=");
+        size_t nonceIndex=challenge.find("nonce=");
         // first stream - step 2. generating DIGEST-MD5 response due to challenge
 
-        if (nonceIndex>=0) {
+        if (nonceIndex!=std::string::npos) {
             nonceIndex+=7; //length("nonce=\"");
             std::string nonce=challenge.substr(nonceIndex, challenge.find('\"', nonceIndex)-nonceIndex);
             std::string cnonce("123456789abcd");
@@ -208,7 +208,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
                 std::string("xmpp/")+rc->account->getServer(),
                 nonce,
                 cnonce ));
-            Log::getInstance()->msg(base64::base64Decode(resp.getText()));
+            //Log::getInstance()->msg(base64::base64Decode(resp.getText()));
         }
         // first stream - step 3. sending second empty response due to second challenge
         //if (challenge.startsWith("rspauth")) {}

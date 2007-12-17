@@ -95,6 +95,7 @@ INT_PTR CALLBACK DlgProcConfig(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
                 SetDlgCheckBox(hDlg, IDC_X_COMPOSING, cfg->composing);
                 SetDlgCheckBox(hDlg, IDC_X_DELIVERY, cfg->delivered);
                 SetDlgCheckBox(hDlg, IDC_X_HISTORY, cfg->history);
+                SetDlgCheckBox(hDlg, IDC_X_SIP, cfg->raiseSIP);
             }
             if (npage==2) {
                 SetDlgCheckBox(hDlg, IDC_X_VIBRA, cfg->vibra);
@@ -120,6 +121,7 @@ INT_PTR CALLBACK DlgProcConfig(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
                     GetDlgCheckBox(hDlg, IDC_X_COMPOSING, cfg->composing);
                     GetDlgCheckBox(hDlg, IDC_X_DELIVERY, cfg->delivered);
                     GetDlgCheckBox(hDlg, IDC_X_HISTORY, cfg->history);
+                    GetDlgCheckBox(hDlg, IDC_X_SIP, cfg->raiseSIP);
                 }
                 if (npage==2) {
                     GetDlgCheckBox(hDlg, IDC_X_VIBRA, cfg->vibra);

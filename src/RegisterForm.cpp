@@ -6,6 +6,7 @@
 #include "wmuser.h"
 #include "RegisterForm.h"
 #include "JabberStream.h"
+#include "XmppError.h"
 
 #include "utf8.hpp"
 #include "base64.h"
@@ -129,8 +130,9 @@ void RegisterForm::constructForm() {
 
 void RegisterForm::RegisterResultNotify(JabberDataBlockRef block) {
     if (block->getAttribute("type")=="error") {
+        XmppError::ref xe= XmppError::findInStanza(block);
         //todo: error handling
-        MessageBox(getHWnd(), L"Unhandled iq:register error", L"Register", MB_OK | MB_ICONEXCLAMATION );
+        MessageBox(getHWnd(), utf8::utf8_wchar(xe->toString()).c_str() , L"Registering error", MB_OK | MB_ICONEXCLAMATION );
         return;
     }
 
@@ -148,8 +150,8 @@ void RegisterForm::RegisterResultNotify(JabberDataBlockRef block) {
 }
 
 void RegisterForm::onSubmit( JabberDataBlockRef replyForm ) {
-    JabberDataBlockRef reply=JabberDataBlockRef(new JabberDataBlock(xdata->getTagName().c_str(),NULL));
-    reply->setAttribute("xmlns","jabber:x:data");
+    JabberDataBlockRef reply=JabberDataBlockRef(new JabberDataBlock("query",NULL));
+    reply->setAttribute("xmlns","jabber:iq:register");
     reply->addChild(replyForm);
 
     IqRegister *regListener=new IqRegister(jid, formRef.lock());

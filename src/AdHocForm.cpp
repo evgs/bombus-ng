@@ -6,6 +6,7 @@
 #include "wmuser.h"
 #include "AdHocForm.h"
 #include "JabberStream.h"
+#include "XmppError.h"
 
 #include "utf8.hpp"
 #include "base64.h"
@@ -94,8 +95,9 @@ AdHocForm::ref AdHocForm::createAdHocForm(HWND parent, const std::string &jid, c
 
 void AdHocForm::AdHocResultNotify(JabberDataBlockRef block) {
     if (block->getAttribute("type")=="error") {
+        XmppError::ref xe= XmppError::findInStanza(block);
         //todo: error handling
-        MessageBox(getHWnd(), L"Unhandled ad-hoc error", L"AdHoc", MB_OK | MB_ICONEXCLAMATION );
+        MessageBox(getHWnd(), utf8::utf8_wchar(xe->toString()).c_str() , L"Ad-hoc error", MB_OK | MB_ICONEXCLAMATION );
         return;
     }
 

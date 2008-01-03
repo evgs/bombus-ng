@@ -5,6 +5,7 @@
 
 #include "MucConfigForm.h"
 #include "JabberStream.h"
+#include "XmppError.h"
 
 #include "wmuser.h"
 #include "utf8.hpp"
@@ -93,8 +94,9 @@ MucConfigForm::ref MucConfigForm::createMucConfigForm(HWND parent, const std::st
 
 void MucConfigForm::MucConfigResultNotify(JabberDataBlockRef block) {
     if (block->getAttribute("type")=="error") {
+        XmppError::ref xe= XmppError::findInStanza(block);
         //todo: error handling
-        MessageBox(getHWnd(), L"Unhandled muc-config error", L"MucConfig", MB_OK | MB_ICONEXCLAMATION );
+        MessageBox(getHWnd(), utf8::utf8_wchar(xe->toString()).c_str() , L"MucConfig", MB_OK | MB_ICONEXCLAMATION );
         return;
     }
 

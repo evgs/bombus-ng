@@ -126,7 +126,8 @@ long WINAPI EditSubClassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) 
             PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPLETE, 0);
             return 0;
         }
-        PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPOSING, true);
+        if (wParam>=' ') 
+            PostMessage(GetParent(hWnd), WM_COMMAND, IDC_COMPOSING, true);
         break;
     case WM_SETFOCUS:
         if (Config::getInstance()->raiseSIP) SipShowIM(SIPF_ON);

@@ -121,7 +121,7 @@ JabberDataBlockRef XmppError::construct() const {
 }
 
 XmppError::ref XmppError::findInStanza(JabberDataBlockRef stanza) {
-    return decodeStreamError(stanza->getChildByName("error"));
+    return decodeStanzaError(stanza->getChildByName("error"));
 }
 
 XmppError::ref XmppError::decodeError(JabberDataBlockRef error, const char *ns) {
@@ -192,6 +192,9 @@ XmppError::ref XmppError::decodeError(JabberDataBlockRef error, const char *ns) 
     if (type=="cancel") xe->errorType=TYPE_CANCEL;
     if (type=="modify") xe->errorType=TYPE_MODIFY;
     if (type=="wait") xe->errorType=TYPE_WAIT;
+
+    JabberDataBlockRef txt=error->findChildNamespace("text", "urn:ietf:params:xml:ns:xmpp-stanzas");
+    if (txt) xe->text=txt->getText();
 
     return xe;
 }

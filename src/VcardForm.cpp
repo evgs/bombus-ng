@@ -397,13 +397,13 @@ int VcardForm::detectMime( char *photo ) {
         photo[3]==(char)'G')
         return 2; //"image/png";
 
-    if (photo[1]==(char)'G' &&
-        photo[2]==(char)'I' &&
-        photo[3]==(char)'F')
+    if (photo[0]==(char)'G' &&
+        photo[1]==(char)'I' &&
+        photo[2]==(char)'F')
         return 3; //"image/gif";
 
-    if (photo[1]==(char)'B' &&
-        photo[2]==(char)'M')
+    if (photo[0]==(char)'B' &&
+        photo[1]==(char)'M')
         return 4; //"image/x-ms-bmp";
     return 0;
 }

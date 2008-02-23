@@ -70,9 +70,31 @@ void XMLParser::parse( const char * buf, int size ) {
                     continue; 
                 }
                 tagname+=c;
+
+                if (c=='[') {
+                    if (tagname == "![CDATA[")
+                    state=CDATA;
+                    continue;
+                }
+
                 continue;
             }
 
+        case CDATA:
+            {
+                sbuf+=c;
+                if (c=='>') {
+                    int e3=sbuf.length()-3;
+                    if (e3 < 0) continue;
+                    if (sbuf[e3] != ']') continue;
+                    if (sbuf[e3+1] != ']') continue;
+                    //if (sbuf[e3] != '>') continue;
+                    sbuf.resize(e3);
+                    state=PLAIN_TEXT;
+                    continue;
+                }
+                continue;
+            }
         case ENDTAGNAME:
             {
                 if (c==' ') continue;

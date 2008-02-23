@@ -26,7 +26,8 @@ private:
         ENDTAGNAME,
         ATRNAME,
         ATRVALQS,
-        ATRVALQD
+        ATRVALQD,
+        CDATA
     };
     ParseState state;
 public:

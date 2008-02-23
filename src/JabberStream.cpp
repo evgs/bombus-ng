@@ -106,7 +106,7 @@ bool JabberStream::tagEnd(const std::string & tagname) {
 
 void JabberStream::plainTextEncountered(const std::string & body){
     if (xmlStack.empty()) return;
-	xmlStack.top()->_setText(body);
+	xmlStack.top()->setRawText(body);
 }
 
 #ifdef _WIN32_WCE

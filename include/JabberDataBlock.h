@@ -37,13 +37,14 @@ public:
 	void setAttribute(const char *name, const char * value);
 
     std::string getText() const; 
-    void _setText(const std::string &_text) { text=_text; }
+    //for parser purposes only;
+    void setRawText(const std::string &rawText){ if (text.empty()) text=rawText; else text+=rawText; }
     void setText(const std::string &_text);
 	void setText(const char *_text);
 
     JabberDataBlockRefList * getChilds() {return &childs;};
 	void addChild(JabberDataBlockRef child);
-    JabberDataBlockRef addChild(const char *_tagName, const char *_text);
+    JabberDataBlockRef addChild(const char *_tagName, const char *_text = NULL);
     JabberDataBlockRef addChildNS(const char *_tagName, const char *xmlns);
 
     JabberDataBlockRef getChildByName(const char * tagName) const;

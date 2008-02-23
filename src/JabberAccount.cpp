@@ -3,12 +3,14 @@
 #include "JabberAccount.h"
 
 JabberAccount::JabberAccount(){
+    port=5222;
     init();
 }
 void JabberAccount::init(){/*deprecated*/}
 
 JabberAccount::JabberAccount(const std::string &bareJid, const std::string &resource) {
     init();
+    port=5222;
 	setBareJid(bareJid);
 	setResource(resource);
 }

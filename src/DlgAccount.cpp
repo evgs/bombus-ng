@@ -131,6 +131,10 @@ INT_PTR CALLBACK DlgProcAccount(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
                 if (npage==1) {
                     GetDlgItemText(hDlg, IDC_E_HOSTIP, dlgAccountParam->hostNameIp); std::trim(dlgAccountParam->hostNameIp);
 
+                    BOOL succsessInt;
+                    dlgAccountParam->port=GetDlgItemInt(hDlg, IDC_E_PORT, &succsessInt, FALSE);
+                    if (!succsessInt) dlgAccountParam->port=5222; 
+
                     GetDlgCheckBox(hDlg, IDC_X_SSL, dlgAccountParam->useEncryption);
                     GetDlgCheckBox(hDlg, IDC_X_SSL_WARNINGS, dlgAccountParam->ignoreSslWarnings);
                     GetDlgCheckBox(hDlg, IDC_X_PLAIN, dlgAccountParam->plainTextPassword);

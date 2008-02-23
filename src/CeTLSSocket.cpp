@@ -81,7 +81,7 @@ int CeTLSSocket::SslValidate (
     X509Certificate* pCert = NULL;
 
     if (dwFlags & SSL_CERT_FLAG_ISSUER_UNKNOWN) {
-        //TODO: ask for accept/decline certificate
+        //TODO: parse Bombus-ng self-stored certificates
 
         //std::wstring url=utf8::utf8_wchar(s->url);
 

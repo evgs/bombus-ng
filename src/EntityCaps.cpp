@@ -70,7 +70,7 @@ const std::string & ClientCaps::getCapsHash() {
     MDRef hashAlg=MDRef(new SHA1());
     hashAlg->init();
 
-    hashAlg->updateASCII("client/handheld");
+    hashAlg->updateASCII("client/handheld//Bombus-ng");
     hashAlg->updateASCII("<");
 
     for (size_t i=0; i<features.size(); i++) {

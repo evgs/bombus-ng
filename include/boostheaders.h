@@ -2,13 +2,16 @@
 
 //  Configuring boost
 //  We will define boost options here rather in boost/config/user.hpp
-//  TODO: Theese boost settings are for boost v1.33.1.
-//  Boost v1.34.1 claims better WIN_CE support, 
-//  it need to be tested if we still need theese options
 
 // Tells the config system not to automatically select 
 // which libraries to link against.
 #define BOOST_ALL_NO_LIB
+
+#ifdef WINCE
+//  TODO: Theese boost settings are for boost v1.33.1.
+//  Boost v1.34.1 claims better WIN_CE support, 
+//  it need to be tested if we still need theese options
+
 
 // Use InterlocedIncrement and critical sections declarations from windows.h
 // rather than boost's own declarations
@@ -19,6 +22,8 @@
 
 // Disable STL locale usage for windows mobile
 #define BOOST_NO_STD_LOCALE
+
+#endif //WINCE
 
 
 #include <boost/assert.hpp>

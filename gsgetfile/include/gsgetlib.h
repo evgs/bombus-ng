@@ -7,6 +7,8 @@
 extern "C" {
 #endif
 
+#pragma comment(lib,"gsgetlib.lib")
+
 BOOL GetOpenFileNameEx(OPENFILENAME* pofn);
 BOOL GetSaveFileNameEx(OPENFILENAME* pofn);
 

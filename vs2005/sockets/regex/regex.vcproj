@@ -16,7 +16,7 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Pocket PC 2003 (ARMV4)"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\..\..\libs\debug"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
-				OutputFile="Debug/regex.lib"
+				OutputFile="regex.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -91,7 +91,7 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Pocket PC 2003 (ARMV4)"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="..\..\..\libs\release"
 			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="1"
@@ -137,7 +137,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
-				OutputFile="Release/regex.lib"
+				OutputFile="regex.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

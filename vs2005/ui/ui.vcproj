@@ -70,6 +70,7 @@
 				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib ..\sockets\regex\debug\regex.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\..\gsgetfile\lib;..\..\libs\debug\"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ui.pdb"
@@ -156,6 +157,7 @@
 				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib ..\sockets\regex\release\regex.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\gsgetfile\lib;..\..\libs\release\"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/ui.pdb"
@@ -273,10 +275,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\EntityCaps.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\gsgetfile\lib\gsgetlib.lib"
 				>
 			</File>
 			<File
@@ -461,10 +459,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\XmppError.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\sockets\zlib\pocket pc 2003 (armv4)\debug\zlib.lib"
 				>
 			</File>
 		</Filter>

@@ -9,6 +9,9 @@
  * especially for inflate(). If the memory is available, buffers sizes 
  * on the order of 128K or 256K bytes should be used.
  */ 
+
+#pragma comment(lib,"zlib.lib")
+
 #define CHUNK 16384
 
 CompressedSocket::CompressedSocket(ConnectionRef pack){

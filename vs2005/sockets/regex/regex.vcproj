@@ -63,7 +63,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
-				OutputFile="regex.lib"
+				OutputFile="$(OutDir)/regex.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -137,7 +137,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM"
-				OutputFile="regex.lib"
+				OutputFile="$(OutDir)/regex.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

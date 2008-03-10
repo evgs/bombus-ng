@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bombus-ng", "bombus-ng\bombus-ng.vcproj", "{D9BBD182-7248-4C77-A514-BE171FB7284F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui", "..\ui\ui.vcproj", "{33135B28-2E20-4442-983A-0CB80093CE42}"
+	ProjectSection(ProjectDependencies) = postProject
+		{13914220-839D-4620-929B-C9161192CB38} = {13914220-839D-4620-929B-C9161192CB38}
+		{21DD21D8-8876-44B7-AB81-FCDD6FB625C7} = {21DD21D8-8876-44B7-AB81-FCDD6FB625C7}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "zlib\zlib.vcproj", "{21DD21D8-8876-44B7-AB81-FCDD6FB625C7}"
 EndProject

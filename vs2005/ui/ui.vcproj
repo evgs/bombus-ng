@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib ..\sockets\regex\debug\regex.lib"
+				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="..\..\gsgetfile\lib;..\..\libs\debug\"
@@ -154,7 +154,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,4.20 /machine:ARM /ARMPADCODE"
-				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib ..\sockets\regex\release\regex.lib"
+				AdditionalDependencies="Ws2.lib Htmlview.lib cellcore.lib"
 				OutputFile="$(OutDir)/Bombus.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\gsgetfile\lib;..\..\libs\release\"

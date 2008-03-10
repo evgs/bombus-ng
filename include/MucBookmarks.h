@@ -4,7 +4,7 @@
 #include <vector>
 #include "JabberDataBlockListener.h"
 #include "ResourceContext.h"
-#include "boost/shared_ptr.hpp"
+#include "boostheaders.h"
 
 class MucBookmarkItem {
 public:

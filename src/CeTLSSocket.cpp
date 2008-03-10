@@ -2,7 +2,7 @@
 
 #include <CeTLSSocket.h>
 
-#include <boost/assert.hpp>
+#include "boostheaders.h"
 #include <string>
 #include "utf8.hpp"
 

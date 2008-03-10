@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/smart_ptr.hpp>
+#include "boostheaders.h"
 #include "XMLEventListener.h"
 #include "Socket.h"
 #include <exception>

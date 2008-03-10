@@ -1,7 +1,7 @@
 //#include "stdafx.h"
 
 #include "JabberDataBlock.h"
-#include <boost/assert.hpp>
+#include "boostheaders.h"
 
 #include "XMLParser.h"
 

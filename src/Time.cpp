@@ -1,11 +1,7 @@
 #include "TimeFunc.h"
 #include "stringutils.h"
 
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#pragma warning(disable : 4800)
-#include "boost/format.hpp"
-#pragma warning(pop)
+#include "boostheaders.h"
 
 PackedTime strtime::getCurrentUtc(){
     PackedTime result;

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "JabberDataBlock.h"
-#include <boost/shared_ptr.hpp>
+#include "boostheaders.h"
 
 
 class XmppError {

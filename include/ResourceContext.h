@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/smart_ptr.hpp>
+#include "boostheaders.h"
 #include "Log.h"
 #include "Presence.h"
 #include "jid.h"

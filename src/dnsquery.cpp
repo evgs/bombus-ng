@@ -1,8 +1,6 @@
 #include "dnsquery.h"
 #include <Iphlpapi.h>
-#include <boost/scoped_array.hpp>
-#include <boost/format.hpp>
-
+#include "boostheaders.h"
 using namespace dns;
 
 DnsSrvQuery::DnsSrvQuery() {
@@ -35,11 +33,11 @@ int DnsSrvQuery::PrepDnsName(const std::string & name, char *out){
         pos++;
     }
     //finalizing
-    int flen=(pos-l-1);
+    int flen=(int)(pos-l-1);
     if (flen>0) *l=(char)flen;
 
     *(pos++)=0;
-    return pos-out;
+    return (int)(pos-out);
 }
 
 typedef boost::scoped_array<char> FixedInfoPtr;
@@ -166,9 +164,9 @@ std::string ReadName(unsigned char* reader, unsigned char* buffer,int* count)
 bool DnsSrvQuery::doQuery(const std::string &hostname){
 
     char buf[65536],*qname,*reader;
-    int i , j , scount;
+    int i , scount;
 
-    sockaddr_in addr;
+    //sockaddr_in addr;
 
     sockaddr_in dest;
 
@@ -182,7 +180,7 @@ bool DnsSrvQuery::doQuery(const std::string &hostname){
     //Set the DNS structure to standard queries
     dns = (struct DNS_HEADER *)&buf;
 
-    dns->id = (unsigned short) htons(GetCurrentProcessId());
+    dns->id = htons( (unsigned short) GetCurrentProcessId());
     dns->qr = 0;      //This is a query
     dns->opcode = 0;  //This is a standard query
     dns->aa = 0;      //Not Authoritative
@@ -210,11 +208,11 @@ bool DnsSrvQuery::doQuery(const std::string &hostname){
 
     connect(sock, (sockaddr*) &dest, sizeof(dest));
 
-    int qlen=sizeof(DNS_HEADER) 
+    size_t qlen=sizeof(DNS_HEADER) 
         + (strlen((const char*)qname)+1) 
         + sizeof(QUESTION);
 
-    if (send(sock, (char*)buf, qlen, 0)==SOCKET_ERROR) {
+    if (send(sock, (char*)buf, (int)qlen, 0)==SOCKET_ERROR) {
         return false;
     }
 
@@ -240,7 +238,7 @@ bool DnsSrvQuery::doQuery(const std::string &hostname){
     //reading answers
     scount=0;
 
-    for(i=0;i<ntohs(dns->ans_count);i++) {
+    for(i=0; i<ntohs(dns->ans_count); i++) {
         const std::string & name=ReadName((unsigned char *)reader, (unsigned char *)buf, &scount);
         reader+=scount;
 

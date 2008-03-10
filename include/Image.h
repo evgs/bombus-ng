@@ -1,7 +1,7 @@
 #pragma once
 
 #include <windows.h>
-#include <boost/shared_ptr.hpp>
+#include "boostheaders.h"
 #include <string>
 #include <vector>
 

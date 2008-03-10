@@ -1,7 +1,7 @@
 #include "Sysinfo.h"
 
 #include <windows.h>
-#include <boost/format.hpp>
+#include "boostheaders.h"
 #include "utf8.hpp"
 
 const std::string sysinfo::getOsVersion() {

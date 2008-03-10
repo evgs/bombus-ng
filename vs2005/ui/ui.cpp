@@ -56,7 +56,7 @@
 #include "config.h"
 
 #include "dnsquery.h"
-#include "boost/format.hpp"
+#include "boostheaders.h"
 
 #define MAX_LOADSTRING 100
 

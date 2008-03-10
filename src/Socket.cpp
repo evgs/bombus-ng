@@ -13,8 +13,7 @@
 #include <connmgr.h>
 #endif
 
-#include <boost/assert.hpp>
-#include <boost/format.hpp>
+#include "boostheaders.h"
 #include <memory.h>
 
 static int wsCount=0;

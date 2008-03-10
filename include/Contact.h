@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <boost/smart_ptr.hpp>
+#include "boostheaders.h"
 #include <list>
 
 #include "Message.h"

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/shared_ptr.hpp>
+#include "boostheaders.h"
 #include "Contact.h"
 #include "Message.h"
 

@@ -1,6 +1,6 @@
 #include "Message.h"
 #include <utf8.hpp>
-#include <boost/regex.hpp>
+#include "boostheaders.h"
 #include "Image.h"
 
 boost::regex e1("((?:(?:ht|f)tps?://|www\\.)[^<\\s\\n]+)(?<![]\\.,:;!\\})<-])");

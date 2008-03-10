@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <Winsock2.h>
-#include <boost/shared_ptr.hpp>
+#include "boostheaders.h"
 
 #pragma comment(lib,"Iphlpapi.lib")
 
@@ -83,7 +83,7 @@ namespace dns {
 
         void setDnsHost(const std::string &dnsHost) { this->DNSHost=dnsHost; }
 
-        int getCount() const { return results.size(); }
+        size_t getCount() const { return results.size(); }
 
         bool doQuery(const std::string &hostname);
 

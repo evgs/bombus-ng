@@ -2,7 +2,7 @@
 #include <string>
 #include <map>
 #include <list>
-#include <boost/smart_ptr.hpp>
+#include "boostheaders.h"
 
 #include "basetypes.h"
 

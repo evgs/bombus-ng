@@ -2,7 +2,7 @@
 
 #include <string>
 #include <list>
-#include <boost/shared_ptr.hpp>
+#include "boostheaders.h"
 
 #include "TimeFunc.h"
 #include "OwnerDrawRect.h"

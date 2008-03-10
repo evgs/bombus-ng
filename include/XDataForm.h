@@ -3,7 +3,7 @@
 #include "HtmlView.h"
 #include "JabberDataBlock.h"
 #include "ResourceContext.h"
-#include <boost/shared_ptr.hpp>
+#include "boostheaders.h"
 
 class XDataForm : public HtmlView {
 protected:

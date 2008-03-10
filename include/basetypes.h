@@ -2,7 +2,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <boost/smart_ptr.hpp>
+#include "boostheaders.h"
 
 typedef std::map<std::string, std::string> StringMap;
 typedef std::map<std::string, std::wstring> StringWMap;

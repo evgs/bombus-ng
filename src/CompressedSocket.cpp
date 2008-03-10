@@ -1,7 +1,7 @@
 //#include "stdafx.h"
 
 #include "CompressedSocket.h"
-#include "boost/assert.hpp"
+#include "boostheaders.h"
 #include <stdio.h>
 /**
  * CHUNK is simply the buffer size for feeding data to and pulling data 

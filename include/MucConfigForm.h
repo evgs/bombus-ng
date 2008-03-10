@@ -3,7 +3,7 @@
 #include "XDataForm.h"
 #include "JabberDataBlock.h"
 #include "JabberDataBlockListener.h"
-#include <boost/shared_ptr.hpp>
+#include "boostheaders.h"
 
 class MucConfigForm : public XDataForm {
 protected:

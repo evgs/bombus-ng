@@ -11,7 +11,7 @@
 #include <utf8.hpp>
 
 #include <algorithm>
-#include <boost/format.hpp>
+#include "boostheaders.h"
 
 #include "Image.h"
 #include "JabberAccount.h"

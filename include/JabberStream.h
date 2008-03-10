@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Socket.h"
-#include <boost/smart_ptr.hpp>
+#include "boostheaders.h"
 #include <map>
 #include <stack>
 

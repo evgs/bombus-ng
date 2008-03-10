@@ -354,6 +354,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             mbi.hwndParent = hWnd;
             mbi.nToolBarId = IDR_MENU;
             mbi.hInstRes   = g_hInst;
+            mbi.dwFlags = SHCMBF_HMENU;
 
             cursorWait=LoadCursor(NULL, IDC_WAIT);
             //skin=ImgListRef(new ImgArray(TEXT("skin.png"), 8, 6));

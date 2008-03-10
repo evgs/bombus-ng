@@ -52,7 +52,7 @@ BEGIN
         MENUITEM "About",                       IDM_HELP_ABOUT
         MENUITEM "Exit",                        IDM_EXIT
     END
-    MENUITEM "Help",                        ID_HELP
+    //MENUITEM "Help",                        ID_HELP
     MENUITEM "Windows",                     IDS_WINDOWS
 END
 

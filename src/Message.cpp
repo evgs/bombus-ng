@@ -3,6 +3,8 @@
 #include "boostheaders.h"
 #include "Image.h"
 
+#pragma comment(lib,"regex.lib")
+
 boost::regex e1("((?:(?:ht|f)tps?://|www\\.)[^<\\s\\n]+)(?<![]\\.,:;!\\})<-])");
 
 extern ImgListRef skin;

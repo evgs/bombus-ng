@@ -31,6 +31,7 @@
 #define IDD_OPTIONS2                    116
 #define IDD_OPTIONS3                    117
 #define IDD_ACCNT3                      118
+#define IDD_OPTIONS4                    119
 #define IDI_BOMBUS                      130
 #define IDC_STATIC_2                    202
 #define IDC_STATIC_3                    203
@@ -81,6 +82,7 @@
 #define IDC_X_VIBRA                     1047
 #define IDC_X_DIALUP                    1048
 #define IDC_SIP1                        1049
+#define IDC_X_AUTOCONNECT               1050
 #define IDM_JABBER                      32775
 #define IDM_JABBER_STREAMINFO           32777
 #define IDM_WINDOWS_ROSTER              32782
@@ -111,7 +113,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32801
-#define _APS_NEXT_CONTROL_VALUE         1050
+#define _APS_NEXT_CONTROL_VALUE         1051
 #define _APS_NEXT_SYMED_VALUE           116
 #endif
 #endif

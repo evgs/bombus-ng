@@ -84,7 +84,7 @@ std::string appVersion;
 int tabHeight;
 
 int prepareAccount();
-int initJabber();
+int initJabber(ResourceContextRef rc);
 void streamShutdown();
 void Shell_NotifyIcon(bool show, HWND hwnd);
 
@@ -236,6 +236,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     Shell_NotifyIcon(true, hWnd);
     prepareAccount();
+
+    if (Config::getInstance()->connectOnStartup) {
+        rc->status=presence::ONLINE;
+        initJabber(rc);
+    }
+
 
     return TRUE;
 }
@@ -399,6 +405,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Initialize the shell activate info structure
             memset(&s_sai, 0, sizeof (s_sai));
             s_sai.cbSize = sizeof (s_sai);
+
             break;
         case WM_PAINT:
             hdc = BeginPaint(hWnd, &ps);
@@ -967,8 +974,11 @@ int prepareAccount(){
     //rc->account->useCompression=true;
     return 0;
 }
+
 //////////////////////////////////////////////////////////////
-int initJabber() {
+// TODO: refactoring: move into ResourceContext
+//////////////////////////////////////////////////////////////
+int initJabber(ResourceContextRef rc) {
     if (rc->jabberStream) return 1;
     rc->jabberStanzaDispatcherRT=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
     rc->jabberStanzaDispatcher2=JabberStanzaDispatcherRef(new JabberStanzaDispatcher(rc));
@@ -986,8 +996,10 @@ int initJabber() {
 
 	return 0;
 }
+//////////////////////////////////////////////////////////////
+// TODO: refactoring: move into ResourceContext
 //////////////////////////////////////////////////////////////////////////
-void streamShutdown(){
+void streamShutdown(ResourceContextRef rc){
     if (!rc->jabberStream) return;
     rc->jabberStream->sendXmppEndHeader();
 }

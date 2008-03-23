@@ -23,8 +23,8 @@ extern HINSTANCE	g_hInst;			// current instance
 extern RosterListView::ref rosterWnd;
 
 
-void streamShutdown();
-int initJabber();
+void streamShutdown(ResourceContextRef rc);
+int initJabber(ResourceContextRef rc);
 
 wchar_t *statusNames []= { 
     TEXT("Online"),         TEXT("Free for chat"),  TEXT("Away"), 
@@ -77,7 +77,7 @@ INT_PTR CALLBACK DlgStatus::dialogProc(HWND hDlg, UINT message, WPARAM wParam, L
 		{
 
             presence::PresenceIndex status=(presence::PresenceIndex) SendDlgItemMessage(hDlg, IDC_C_STATUS, CB_GETCURSEL, 0,0);
-            int priority=SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_GETPOS, 0, 0);
+            short priority=(short)SendDlgItemMessage(hDlg, IDC_SPIN_PRIORITY, UDM_GETPOS, 0, 0);
             std::string pmessage;
             GetDlgItemText(hDlg, IDC_E_STATUS, pmessage);
             
@@ -96,9 +96,9 @@ INT_PTR CALLBACK DlgStatus::dialogProc(HWND hDlg, UINT message, WPARAM wParam, L
                 rosterWnd->setIcon(p->rc->status);
                 p->rc->sendPresence();
                 if (status==presence::OFFLINE) {
-                    streamShutdown();
+                    streamShutdown(p->rc);
                 } else {
-                    initJabber();
+                    initJabber(p->rc);
                 }
             }
 

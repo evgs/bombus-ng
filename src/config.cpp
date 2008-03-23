@@ -51,5 +51,8 @@ void Config::serialize( Serialize &s ) {
 
     //SIP control
     s.streamBool(raiseSIP, false);
+
+    //Automatic connection
+    s.streamBool(connectOnStartup, false);
 }
 

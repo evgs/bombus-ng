@@ -26,6 +26,7 @@ public:
 
     bool raiseSIP;
 
+    bool connectOnStartup;
 
     void save();
 private:

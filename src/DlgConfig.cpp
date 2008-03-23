@@ -28,33 +28,42 @@ INT_PTR CALLBACK DlgProcConfigP2(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
 INT_PTR CALLBACK DlgProcConfigP3(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
     return DlgProcConfig(hDlg, message, wParam, lParam, 2);
 }
+INT_PTR CALLBACK DlgProcConfigP4(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+    return DlgProcConfig(hDlg, message, wParam, lParam, 3);
+}
 
 void DialogConfigMP(HINSTANCE g_hInst, HWND parent) {
 
-    PROPSHEETPAGE pages[3];
+    PROPSHEETPAGE pages[4];
     pages[0].dwSize=sizeof(PROPSHEETPAGE);
     pages[1].dwSize=sizeof(PROPSHEETPAGE);
     pages[2].dwSize=sizeof(PROPSHEETPAGE);
+    pages[3].dwSize=sizeof(PROPSHEETPAGE);
 
     pages[0].hInstance=g_hInst;
     pages[1].hInstance=g_hInst;
     pages[2].hInstance=g_hInst;
+    pages[3].hInstance=g_hInst;
 
     pages[0].dwFlags=PSP_DEFAULT;
     pages[1].dwFlags=PSP_DEFAULT;
     pages[2].dwFlags=PSP_DEFAULT;
+    pages[3].dwFlags=PSP_DEFAULT;
 
     pages[0].pszTemplate=(LPCTSTR)IDD_OPTIONS1;
     pages[1].pszTemplate=(LPCTSTR)IDD_OPTIONS2;
     pages[2].pszTemplate=(LPCTSTR)IDD_OPTIONS3;
+    pages[3].pszTemplate=(LPCTSTR)IDD_OPTIONS4;
 
     pages[0].pfnDlgProc=DlgProcConfigP1;
     pages[1].pfnDlgProc=DlgProcConfigP2;
     pages[2].pfnDlgProc=DlgProcConfigP3;
+    pages[3].pfnDlgProc=DlgProcConfigP4;
 
     pages[0].lParam=0;
     pages[1].lParam=1;
     pages[2].lParam=2;
+    pages[3].lParam=3;
 
     PROPSHEETHEADER psh;
     psh.dwSize=sizeof(PROPSHEETHEADER);
@@ -62,7 +71,7 @@ void DialogConfigMP(HINSTANCE g_hInst, HWND parent) {
     psh.hwndParent=parent;
     psh.hInstance=g_hInst;
     psh.pszCaption=L"Options";
-    psh.nPages=3;
+    psh.nPages=4;
     psh.nStartPage=0;
     psh.ppsp=pages;
 	psh.pfnCallback = PropSheetCallback;
@@ -101,6 +110,9 @@ INT_PTR CALLBACK DlgProcConfig(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
                 SetDlgCheckBox(hDlg, IDC_X_VIBRA, cfg->vibra);
                 SetDlgCheckBox(hDlg, IDC_X_SOUNDS, cfg->sounds);
             }
+            if (npage==3) {
+                SetDlgCheckBox(hDlg, IDC_X_AUTOCONNECT, cfg->connectOnStartup);
+            }
             //finally
         }
         return (INT_PTR)TRUE;
@@ -126,6 +138,9 @@ INT_PTR CALLBACK DlgProcConfig(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
                 if (npage==2) {
                     GetDlgCheckBox(hDlg, IDC_X_VIBRA, cfg->vibra);
                     GetDlgCheckBox(hDlg, IDC_X_SOUNDS, cfg->sounds);
+                }
+                if (npage==3) {
+                    GetDlgCheckBox(hDlg, IDC_X_AUTOCONNECT, cfg->connectOnStartup);
                 }
                 return TRUE;
             }

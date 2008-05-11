@@ -66,15 +66,17 @@ Socket::Socket(const long addr, const int port) {
 
 int Socket::read(char * buf, int len) {
     int sel=0;
-    do {
-        timeval t={200, 0};
+
+    //do {
+        timeval t={0, 200};
         fd_set fds;
         fds.fd_count=1;
         fds.fd_array[0]=sock;
 
         sel=select(0, &fds, NULL, NULL, &t);
         if (sel==SOCKET_ERROR) throwSocketError();
-    } while (!sel);
+    //} while (!sel);
+    if (sel==0) return 0;
 
 	int rb=recv(sock, buf, len, 0);
     if (rb==SOCKET_ERROR) throwSocketError();

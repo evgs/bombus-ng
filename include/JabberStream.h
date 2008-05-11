@@ -25,6 +25,7 @@ public:
 	void sendXmlVersion(void);
 	void sendXmppBeginHeader();
 	void sendXmppEndHeader(void);
+    void parseStream();
 
 	virtual void tagStart(const std::string & tagname, const StringMap &attr);
 	virtual bool tagEnd(const std::string & tagname);

@@ -30,6 +30,8 @@
 #include "ProcessMUC.h"
 #include "MucBookmarks.h"
 
+#include "Captcha.h"
+
 #include "DlgAbout.h"
 #include "DlgAccount.h"
 #include "DlgConfig.h"
@@ -110,14 +112,17 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_UI));
 
 	// Main message loop:
-    while (GetMessage(&msg, NULL, 0, 0)) {
-	//while (true) {
-    //    if (!PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {  Sleep(50); continue; }
-    //    if (msg.message==WM_QUIT) break;
+    //while (GetMessage(&msg, NULL, 0, 0)) {
+	while (true) {
+        if (rc) if (rc->jabberStream) rc->jabberStream->parseStream();
+
+        if (!PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {  Sleep(50); continue; }
+        if (msg.message==WM_QUIT) break;
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
 		}
+
 	}
     Shell_NotifyIcon(false, NULL);
     Config::getInstance()->save();
@@ -864,6 +869,7 @@ void JabberStreamEvents::loginSuccess(){
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new ProcessMuc(rc) ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new PresenceRecv() ));
+    rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new CaptchaListener() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new MessageRecv() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Version() ));
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new Ping() ));

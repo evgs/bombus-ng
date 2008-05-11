@@ -17,6 +17,8 @@ public:
 #endif
 
 protected:
+    virtual HBITMAP getImage(LPCTSTR url, DWORD cookie);
+
     virtual void onSubmit(JabberDataBlockRef replyForm);
 
     virtual void onHotSpot(LPCSTR url, LPCSTR param);
@@ -27,6 +29,8 @@ protected:
 
     JabberDataBlockRef xdata;
     std::string plainText;
+
+    ImageRef img;
 
     boost::weak_ptr<ResourceContext> rc;
 };

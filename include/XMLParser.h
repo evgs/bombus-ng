@@ -13,7 +13,6 @@ private:
 	ConnectionRef inStream;
 
 	char inbuf[XML_PREBUF_SZ];
-	int prebuffered;
 
     std::string sbuf;
     std::string tagname;

@@ -16,22 +16,32 @@ JabberStream::JabberStream(void){}
 void JabberStream::run(JabberStream * _stream){
 	Log::getInstance()->msg("Reader thread strated");
 
-	_stream->isRunning=true;
-
 	try {
         if (_stream->connection==NULL) {
             _stream->jabberListener->connect();
         }
         _stream->parser->bindStream( _stream->connection );
-		//_stream->parser-> parse();
-        _stream->parser-> parseStream();
-        _stream->jabberListener->endConversation(NULL);
 	} catch (std::exception ex) {
         _stream->jabberListener->endConversation(&ex);
+        _stream->isRunning=false;
+        Log::getInstance()->msg("Reader thread stopped");
+        _stream->rc->jabberStream=JabberStreamRef();
+        return;
 	}
-    Log::getInstance()->msg("Reader thread stopped");
-    _stream->rc->jabberStream=JabberStreamRef();
-    _stream->isRunning=false;
+
+    _stream->isRunning=true;
+}
+
+void JabberStream::parseStream() {
+    if (!isRunning) return;
+    try {
+        parser-> parseStream();
+    } catch (std::exception ex) {
+        jabberListener->endConversation(&ex);
+        isRunning=false;
+        Log::getInstance()->msg("Reader thread stopped");
+        rc->jabberStream=JabberStreamRef();
+    }
 }
 
 void JabberStream::tagStart(const std::string & tagname, const StringMap &attr) {

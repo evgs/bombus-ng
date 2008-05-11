@@ -1,5 +1,9 @@
 #include "XDataForm.h"
 #include "utf8.hpp"
+
+#include "base64.h"
+extern std::wstring appRootPath;
+
 //////////////////////////////////////////////////////////////////////////
 void XDataForm::onWmUserUpdate(){
     startHtml();
@@ -77,6 +81,11 @@ void XDataForm::onSubmit(JabberDataBlockRef replyForm) {
 #endif
 }
 
+HBITMAP XDataForm::getImage( LPCTSTR url, DWORD cookie ) {
+    //this->cookie=cookie;
+    if (img) return img->getHBmp();
+    return NULL;
+}
 
 void XDataForm::constructForm(){
     if (plainText.length()) {
@@ -110,8 +119,46 @@ void XDataForm::constructForm(){
         const std::string &var=field->getAttribute("var");
         const std::string &type=field->getAttribute("type");
         std::string label=field->getAttribute("label");
+
+        if (label.length()==0) label=var;
+
         if (required) label+=" *";
 
+        if (type=="") {
+            JabberDataBlockRef media=field->findChildNamespace("media", "urn:xmpp:tmp:media-element");
+            if (media) {
+                JabberDataBlockRef data=media->findChildNamespace("data", "urn:xmpp:tmp:data-element");
+                if (data) {
+                    std::wstring imgFile=appRootPath+L"ocr.png";
+
+                    const std::string &out=data->getText();
+
+                    int dstLen=base64::base64DecodeGetLength(out.length());
+                    char *dst=new char[dstLen];
+
+                    dstLen=base64::base64Decode2(dst, out.c_str(), out.length());
+
+                    HANDLE file=CreateFile(imgFile.c_str(), 
+                        GENERIC_WRITE, 
+                        FILE_SHARE_READ, NULL, 
+                        CREATE_ALWAYS,
+                        0, NULL);
+
+                    DWORD dwProcessed;
+                    if (file==INVALID_HANDLE_VALUE) {
+                        delete dst; continue;
+                    }
+                    WriteFile(file, dst, dstLen, &dwProcessed, NULL);
+                    CloseHandle(file);
+
+                    delete dst;
+
+                    img=ImageRef(new Image(imgFile.c_str()));
+
+                    addImg(imgFile.c_str());
+                }
+            }
+        }
         //hidden
         if (type=="hidden") continue;
 

@@ -8,7 +8,6 @@ std::string dbgbuf;
 
 XMLParser::XMLParser(XMLEventListener *eventListener){
 	this->eventListener=eventListener;
-	prebuffered=0;
     state=PLAIN_TEXT;
 }
 
@@ -125,10 +124,8 @@ void XMLParser::parse( const char * buf, int size ) {
 }
 
 void XMLParser::parseStream() {
-    while (true) {
-        prebuffered=inStream->read(inbuf, XML_PREBUF_SZ);
-        parse(inbuf, prebuffered);
-    }
+    int prebuffered = inStream->read(inbuf, XML_PREBUF_SZ);
+    parse(inbuf, prebuffered);
 }
 
 std::string XMLStringPrep(const std::string & data){

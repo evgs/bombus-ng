@@ -241,6 +241,7 @@ BOOL VcardForm::savePhoto( LPCTSTR path )
         path=filename;
     }
 
+
     HANDLE file=CreateFile(path, 
         GENERIC_WRITE, 
         FILE_SHARE_READ, NULL, 

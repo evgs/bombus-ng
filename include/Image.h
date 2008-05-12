@@ -12,6 +12,7 @@ public:
 
     virtual void drawImage(HDC hdc, int x, int y) const;
     HBITMAP getHBmp() {return bmp; }
+
 protected:
     HBITMAP bmp;
     //HBITMAP mask;

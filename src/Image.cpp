@@ -36,6 +36,7 @@ void Image::drawImage( HDC hdc, int x, int y ) const {
         bmp, 0, 0,  bm.bmWidth, bm.bmHeight, 
         transparentColor);
 }
+
 //////////////////////////////////////////////////////////////////////////
 void ImgArray::drawElement( HDC hdc, int index, int x, int y ) const {
 

@@ -11,7 +11,9 @@
 #include <utf8.hpp>
 #include <windows.h>
 
-JabberStream::JabberStream(void){}
+JabberStream::JabberStream(void){
+    isRunning=false;
+}
 
 void JabberStream::run(JabberStream * _stream){
 	Log::getInstance()->msg("Reader thread strated");
@@ -134,6 +136,8 @@ JabberStream::JabberStream(ResourceContextRef rc, JabberListenerRef listener){
 
 	this->rc=rc;
     this->jabberListener=listener;
+
+    isRunning=false;
 
 	HANDLE thread=CreateThread(NULL, 0, jabberStreamThread, this, 0, NULL);
     SetThreadPriority(thread, THREAD_PRIORITY_IDLE);

@@ -20,6 +20,7 @@ public:
 
     //todo: move to another namespace
     static void networkUp();
+    static void checkNetworkUp();
     //todo: move to another namespace
     static void initWinsocks();
     //todo: move to another namespace
@@ -31,10 +32,12 @@ protected:
 
 
     static void throwSocketError();
+    static void throwNetworkDown(DWORD status);
 
     long bytesSent;
     long bytesRecvd;
 
 private:
+    static HANDLE hconn;
 };
 

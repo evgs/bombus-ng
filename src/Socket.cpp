@@ -65,6 +65,8 @@ Socket::Socket(const long addr, const int port) {
 }
 
 int Socket::read(char * buf, int len) {
+    checkNetworkUp();
+
     int sel=0;
 
     //do {
@@ -137,17 +139,48 @@ void Socket::networkUp() {
     rq.dwPriority=CONNMGR_PRIORITY_HIPRIBKGND;
     rq.dwParams=CONNMGR_PARAM_GUIDDESTNET;
 
-    ConnMgrMapURL(L"http://jabber.org", &rq.guidDestNet, NULL);
+    ConnMgrMapURL(L"http://bombus-im.org", &rq.guidDestNet, NULL);
 
 
-    HANDLE hconn;
     DWORD status;
-    if (ConnMgrEstablishConnectionSync(&rq, &hconn, 60000, &status) != S_OK) {
-        throw std::exception(boost::str(boost::format("Network is down (%d)") % status).c_str());
+    if (ConnMgrEstablishConnectionSync(&rq, &hconn, 60000, &status) != S_OK) 
+        throwNetworkDown(status);
+
+#endif
+}
+
+void Socket::checkNetworkUp() {
+    if (hconn==INVALID_HANDLE_VALUE) return;
+#ifdef WINCE
+    DWORD result;
+    ConnMgrConnectionStatus(hconn, &result);
+    switch (result) {
+        case CONNMGR_STATUS_CONNECTED: return;
+
+        case CONNMGR_STATUS_DISCONNECTED:
+        case CONNMGR_STATUS_WAITINGFORPATH:
+        case CONNMGR_STATUS_WAITINGFORRESOURCE:
+        case CONNMGR_STATUS_WAITINGFORNETWORK:
+        case CONNMGR_STATUS_WAITINGFORPHONE:
+        case CONNMGR_STATUS_NOPATHTODESTINATION:
+        case CONNMGR_STATUS_CONNECTIONFAILED:
+        case CONNMGR_STATUS_CONNECTIONCANCELED:
+        case CONNMGR_STATUS_CONNECTIONDISABLED:
+
+            throwNetworkDown(result);
+
+        default: return;
     }
 #endif
 }
 
+const char * errorConnMgr(int code);
+
+void Socket::throwNetworkDown(DWORD status) {
+    boost::format err("Network is down: %s");
+    err % errorConnMgr(status);// % url;
+    throw std::exception(err.str().c_str());
+}
 
 const char * errorWSAText(int code) {
     static char buf[10];
@@ -215,3 +248,34 @@ const char * errorWSAText(int code) {
     sprintf(buf, "%d", code);
     return buf;
 };
+
+const char * errorConnMgr(int code) {
+    static char buf[10];
+    static struct { int no; const char *msg; } *msgp, msgs[] = {
+        { CONNMGR_STATUS_UNKNOWN, "Unknown connection status" },
+        { CONNMGR_STATUS_CONNECTED, "Connected" },
+        { CONNMGR_STATUS_DISCONNECTED, "Disconnected" },
+        { CONNMGR_STATUS_WAITINGFORPATH, "Network temporary unreachable" },
+        { CONNMGR_STATUS_WAITINGFORRESOURCE, "Resource limit" },
+        { CONNMGR_STATUS_WAITINGFORPHONE, "Voice call" },
+        { CONNMGR_STATUS_WAITINGFORNETWORK, "Network is in use" },
+        { CONNMGR_STATUS_NOPATHTODESTINATION, "No path for destination" },
+        { CONNMGR_STATUS_CONNECTIONFAILED, "Connection failed" },
+        { CONNMGR_STATUS_CONNECTIONCANCELED, "Connection canceled" },
+        { CONNMGR_STATUS_CONNECTIONDISABLED, "Connection disabled" },
+        { CONNMGR_STATUS_WAITINGCONNECTION, "Connecting..." },
+        { CONNMGR_STATUS_WAITINGCONNECTION, "Connecting..." },
+        { CONNMGR_STATUS_WAITINGCONNECTIONABORT, "Cancelling connection..." },
+        { CONNMGR_STATUS_WAITINGDISCONNECTION, "Disconnecting..." },
+        { 0, NULL }
+    };
+
+    for (msgp=msgs; msgp->msg; msgp++) {
+        if (code==msgp->no) return msgp->msg;
+    }
+    sprintf(buf, "%d", code);
+    return buf;
+};
+
+
+HANDLE Socket::hconn=INVALID_HANDLE_VALUE;

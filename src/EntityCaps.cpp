@@ -9,6 +9,7 @@
 #include "config.h"
 
 extern std::string appVersion;
+extern std::string appName;
 
 std::string EntityCaps::capsHash="";
 
@@ -28,9 +29,10 @@ ProcessResult EntityCaps::blockArrived(JabberDataBlockRef block, const ResourceC
     result.addChild(query);
 
     JabberDataBlockRef identity=query->addChild("identity",NULL);
-    identity->setAttribute("category","client");
-    identity->setAttribute("type","handheld");
-    identity->setAttribute("name","Bombus-ng");
+
+    identity->setAttribute("category", rc->myCaps->identityCategory.c_str());
+    identity->setAttribute("type", rc->myCaps->identityType.c_str());
+    identity->setAttribute("name", rc->myCaps->identityName.c_str());
 
     rc->myCaps->appendFeatures(query);
 
@@ -70,7 +72,11 @@ const std::string & ClientCaps::getCapsHash() {
     MDRef hashAlg=MDRef(new SHA1());
     hashAlg->init();
 
-    hashAlg->updateASCII("client/handheld//Bombus-ng");
+    hashAlg->updateASCII(identityCategory.c_str());
+    hashAlg->updateByte('/');
+    hashAlg->updateASCII(identityType.c_str());
+    hashAlg->updateASCII("//");
+    hashAlg->updateASCII(identityName.c_str());
     hashAlg->updateASCII("<");
 
     for (size_t i=0; i<features.size(); i++) {
@@ -105,8 +111,11 @@ ClientCaps::ClientCaps() {
 }
 
 MyCaps::MyCaps() {
+    identityName=appName+" "+appVersion;
+    identityCategory="client";
+    identityType="handheld";
     node="http://bombus-im.org/ng#";
-    node+=appVersion.c_str();
+    node+=identityName;
     alg="sha-1";
 
     addFeature("http://jabber.org/protocol/disco#info");

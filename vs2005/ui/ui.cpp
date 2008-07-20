@@ -82,6 +82,7 @@ SmileParser *smileParser;
 std::wstring appRootPath;
 std::wstring skinRootPath;
 std::string appVersion;
+std::string appName;
 
 int tabHeight;
 
@@ -210,6 +211,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     LoadString(g_hInst, IDS_VERSION, wbuf, sizeof(wbuf));
     appVersion=utf8::wchar_utf8(wbuf);
+    appName="Bombus-ng";
 
     if (!MyRegisterClass(hInstance, szWindowClass)) 	return FALSE;
 
@@ -557,7 +559,7 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
     result.setAttribute("id", block->getAttribute("id"));
     result.addChild(query);
 
-    query->addChild("name","Bombus-ng");
+    query->addChild("name",::appName.c_str());
     query->addChild("version",::appVersion.c_str());
     query->addChild("os",version.c_str());
 

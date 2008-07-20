@@ -35,6 +35,10 @@ public:
 
     void appendFeatures(JabberDataBlockRef result) const;
 
+    std::string identityCategory;
+    std::string identityType;
+    std::string identityName;
+
 protected:
     std::string node;
     std::string capsHash;

@@ -73,7 +73,7 @@ const std::string & ClientCaps::getCapsHash() {
     hashAlg->init();
 
     hashAlg->updateASCII(identityCategory.c_str());
-    hashAlg->updateByte('/');
+    hashAlg->updateASCII("/");
     hashAlg->updateASCII(identityType.c_str());
     hashAlg->updateASCII("//");
     hashAlg->updateASCII(identityName.c_str());
@@ -88,7 +88,6 @@ const std::string & ClientCaps::getCapsHash() {
     capsHash=hashAlg->getDigestBase64();
     return capsHash;
 }
-
 void ClientCaps::addFeature( const std::string feature ) {
     for (size_t i=0; i<features.size(); i++) {
         if (features[i]==feature) return;
@@ -111,11 +110,11 @@ ClientCaps::ClientCaps() {
 }
 
 MyCaps::MyCaps() {
-    identityName=appName+" "+appVersion;
+    identityName=appName;//+" "+appVersion;
     identityCategory="client";
     identityType="handheld";
-    node="http://bombus-im.org/ng#";
-    node+=identityName;
+    node="http://bombus-im.org/ng";
+    //node+=identityName;
     alg="sha-1";
 
     addFeature("http://jabber.org/protocol/disco#info");

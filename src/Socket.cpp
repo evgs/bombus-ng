@@ -139,7 +139,7 @@ void Socket::networkUp() {
     rq.dwPriority=CONNMGR_PRIORITY_HIPRIBKGND;
     rq.dwParams=CONNMGR_PARAM_GUIDDESTNET;
 
-    ConnMgrMapURL(L"http://bombus-im.org", &rq.guidDestNet, NULL);
+    ConnMgrMapURL(L"socket://bombus-im.org", &rq.guidDestNet, NULL);
 
 
     DWORD status;

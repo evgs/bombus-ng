@@ -15,7 +15,7 @@ ProcessResult HostFeatures::blockArrived( JabberDataBlockRef block, const Resour
         JabberDataBlockRef qry=block->findChildNamespace("query","http://jabber.org/protocol/disco#info");
         if (!qry) return LAST_BLOCK_PROCESSED;
 
-        Log::getInstance()->msg("Host features queried");
+        Log::getInstance()->msg("Host features queried", Log::info);
 
         JabberDataBlockRefList::iterator i=qry->getChilds()->begin();
         while (i!=qry->getChilds()->end()) {

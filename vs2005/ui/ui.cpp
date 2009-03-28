@@ -201,8 +201,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     wchar_t * skinRelPath;
     if (sysinfo::screenIsVGA()) {
-        skinRelPath=TEXT("vga\\");
-        tabHeight=34; //TODO: remove hardcode
+        skinRelPath=TEXT("vga48\\");
+        tabHeight=48+2; //TODO: remove hardcode
     } else {
         skinRelPath=TEXT("qvga\\");
         tabHeight=18; //TODO: remove hardcode
@@ -336,7 +336,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 				case IDM_JABBER_STREAMINFO:
                     Log::getInstance()->msg(
-						rc->jabberStream->connection->getStatistics().c_str()
+						rc->jabberStream->connection->getStatistics().c_str(), Log::info
 						);
 					break;
 
@@ -516,7 +516,7 @@ public:
 	virtual ProcessResult blockArrived(JabberDataBlockRef block, const ResourceContextRef rc);
 };
 ProcessResult GetRoster::blockArrived(JabberDataBlockRef block, const ResourceContextRef rc){
-	Log::getInstance()->msg("Roster arrived");
+	Log::getInstance()->msg("Roster arrived", Log::info);
 
     rc->roster->blockArrived(block, rc); // forwarding to dispatch roster stanza
     
@@ -548,7 +548,7 @@ ProcessResult Version::blockArrived(JabberDataBlockRef block, const ResourceCont
     if (!query) return BLOCK_REJECTED;
     if (query->getAttribute("xmlns")!="jabber:iq:version") return BLOCK_REJECTED;
 
-    Log::getInstance()->msg("version request ", block->getAttribute("from").c_str());
+	Log::getInstance()->msg("version request ", block->getAttribute("from").c_str(), Log::info);
 
     std::string version=sysinfo::getOsVersion();
 
@@ -581,7 +581,7 @@ ProcessResult Ping::blockArrived(JabberDataBlockRef block, const ResourceContext
     JabberDataBlockRef ping=block->findChildNamespace("ping","urn:xmpp:ping");
     if (!ping) return BLOCK_REJECTED;
 
-    Log::getInstance()->msg("Ping from ", block->getAttribute("from").c_str());
+    Log::getInstance()->msg("Ping from ", block->getAttribute("from").c_str(), Log::info);
 
     JabberDataBlock pong("iq");
     pong.setAttribute("to", block->getAttribute("from"));
@@ -767,7 +767,7 @@ ProcessResult MessageRecv::blockArrived(JabberDataBlockRef block, const Resource
 
     if (body.length() || subj.length() ) {
         //constructing message and raising message event
-        Log::getInstance()->msg("Message from ", from.c_str()); 
+        Log::getInstance()->msg("Message from ", from.c_str(), Log::info); 
 
         msg=Message::ref(new Message(body, nick, mucMessage, Message::INCOMING, Message::extractXDelay(block) ));
 
@@ -855,8 +855,8 @@ void JabberStreamEvents::beginConversation(JabberDataBlockRef streamHeader){
     }
 }
 void JabberStreamEvents::endConversation(const std::exception *ex){
-    if (ex!=NULL)  Log::getInstance()->msg(ex->what());
-    Log::getInstance()->msg("End Conversation");
+    if (ex!=NULL)  Log::getInstance()->msg(ex->what(), Log::error);
+    Log::getInstance()->msg("End Conversation", Log::info);
     rc->roster->setAllOffline();
     rc->roster->makeViewList();
     //tabs->
@@ -865,7 +865,7 @@ void JabberStreamEvents::endConversation(const std::exception *ex){
 }
 
 void JabberStreamEvents::loginSuccess(){
-    Log::getInstance()->msg("Login ok");
+    Log::getInstance()->msg("Login ok", Log::info);
 
     HostFeatures::discoverFeatures(rc);
     rc->jabberStanzaDispatcherRT->addListener( JabberDataBlockListenerRef( new GetRoster() ));
@@ -891,7 +891,7 @@ void JabberStreamEvents::loginSuccess(){
 }
 
 void JabberStreamEvents::loginFailed(const char * errMsg){
-    Log::getInstance()->msg("Login failed: ", errMsg);
+    Log::getInstance()->msg("Login failed: ", errMsg, Log::error);
     rc->jabberStream->sendXmppEndHeader();
     rosterWnd->setIcon(icons::ICON_ERROR_INDEX);
 }
@@ -901,7 +901,7 @@ bool JabberStreamEvents::connect(){
     Socket::initWinsocks();
 
     if (rc->account->networkUp) {
-        Log::getInstance()->msg("Raising up network");
+        Log::getInstance()->msg("Raising up network", Log::info);
         Socket::networkUp();
     }
 
@@ -909,7 +909,7 @@ bool JabberStreamEvents::connect(){
     int port=5222;
 
     if (rc->account->useSRV) {
-        Log::getInstance()->msg("Searching SRV for ", rc->account->getServer().c_str() );
+        Log::getInstance()->msg("Searching SRV for ", rc->account->getServer().c_str() , Log::info);
 
         dns::DnsSrvQuery d;
         int retries=3;
@@ -922,7 +922,7 @@ bool JabberStreamEvents::connect(){
                     host=a->target;
                     port=a->port;
 
-                    Log::getInstance()->msg(boost::str(boost::format("Using %s:%d") % host.c_str() % port));
+                    Log::getInstance()->msg(boost::str(boost::format("Using %s:%d") % host.c_str() % port), Log::info);
                     break;
                 }
             }
@@ -938,12 +938,12 @@ bool JabberStreamEvents::connect(){
         if (port==5222) port=5223;
     }
 
-    Log::getInstance()->msg("Resolving ", host.c_str());
+    Log::getInstance()->msg("Resolving ", host.c_str(), Log::info);
 
     long ip=Socket::resolveUrl(host);
 
     Log::getInstance()->msg(boost::str(boost::format("Connecting to %u.%u.%u.%u:%u") 
-        % (ip &0xff) % ((ip>>8) &0xff) % ((ip>>16) &0xff) % ((ip>>24)&0xff) % port));
+        % (ip &0xff) % ((ip>>8) &0xff) % ((ip>>16) &0xff) % ((ip>>24)&0xff) % port), Log::info);
 
     if (rc->account->useEncryption) {
         CeTLSSocket::ref tlsCon=CeTLSSocket::ref( new CeTLSSocket(ip, port));

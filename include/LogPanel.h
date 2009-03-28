@@ -18,5 +18,5 @@ public:
     static void bindLV(VirtualListView::ref odrLog); 
 
 private:
-    virtual void addLog(const wchar_t * msg);
+    virtual void addLog(const wchar_t * msg, int level);
 };

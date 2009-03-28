@@ -23,7 +23,8 @@ LogPanel::LogPanel(){}
 
 LogPanel::~LogPanel(){}
 
-void LogPanel::addLog(const wchar_t * msg) {
+void LogPanel::addLog(const wchar_t * msg, int level) {
+	if (level < this->level) return;
     //ListBox_AddString( logWnd->getListBoxHWnd(), msg);
     //ODRRef r=ODRRef(new IconTextElementContainer(std::wstring(msg), -1));
     ODRRef r=ODRRef(new LogMessage(msg));

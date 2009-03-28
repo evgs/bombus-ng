@@ -16,7 +16,7 @@ JabberStream::JabberStream(void){
 }
 
 void JabberStream::run(JabberStream * _stream){
-	Log::getInstance()->msg("Reader thread strated");
+	Log::getInstance()->msg("Reader thread strated", Log::debug);
 
 	try {
         if (_stream->connection==NULL) {
@@ -26,7 +26,7 @@ void JabberStream::run(JabberStream * _stream){
 	} catch (std::exception ex) {
         _stream->jabberListener->endConversation(&ex);
         _stream->isRunning=false;
-        Log::getInstance()->msg("Reader thread stopped");
+        Log::getInstance()->msg("Reader thread stopped", Log::debug);
         _stream->rc->jabberStream=JabberStreamRef();
         return;
 	}
@@ -41,7 +41,7 @@ void JabberStream::parseStream() {
     } catch (std::exception ex) {
         jabberListener->endConversation(&ex);
         isRunning=false;
-        Log::getInstance()->msg("Reader thread stopped");
+        Log::getInstance()->msg("Reader thread stopped", Log::debug);
         rc->jabberStream=JabberStreamRef();
     }
 }
@@ -85,6 +85,10 @@ bool JabberStream::tagEnd(const std::string & tagname) {
             err+=xe->toString();
             throw std::exception(err.c_str());
         }
+
+		if (Log::getInstance()->getLogLevel()>=Log::debug) {
+			Log::getInstance()->msg("xml.in: ", stanza->toXML()->c_str(), Log::debug );
+		}
 
 		JabberStanzaDispatcher * dispatcher= rc->jabberStanzaDispatcherRT.get();
 		if (dispatcher!=NULL) 
@@ -146,7 +150,7 @@ JabberStream::JabberStream(ResourceContextRef rc, JabberListenerRef listener){
 
 JabberStream::~JabberStream(void){
 
-	Log::getInstance()->msg("JabberStream destructor called");
+	Log::getInstance()->msg("JabberStream destructor called", Log::debug);
 }
 
 void JabberStream::sendStanza(JabberDataBlockRef stanza){
@@ -159,6 +163,11 @@ void JabberStream::sendStanza(JabberDataBlockRef stanza){
 }
 
 void JabberStream::sendStanza(JabberDataBlock &stanza){
+
+	if (Log::getInstance()->getLogLevel()>=Log::debug) {
+		Log::getInstance()->msg("xml.out: ", stanza.toXML()->c_str(), Log::debug );
+	}
+
     try {
 	    connection->write( stanza.toXML() );
     } catch (std::exception ex) {

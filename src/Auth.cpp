@@ -19,7 +19,7 @@ NonSASLAuth::NonSASLAuth(ResourceContextRef rc, JabberDataBlockRef streamHeader)
     this->rc=rc;
     streamId=streamHeader->getAttribute("id");
 
-	Log::getInstance()->msg("Non-SASL Login: handshake");
+	Log::getInstance()->msg("Non-SASL Login: handshake", Log::info);
 
 	JabberDataBlockRef login=loginStanza(true, false);
 
@@ -140,7 +140,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 
             //DIGEST-MD5 mechanism
             if (mechanisms->hasChildByValue("DIGEST-MD5")) {
-                Log::getInstance()->msg("DIGEST-MD5 authentication");
+                Log::getInstance()->msg("DIGEST-MD5 authentication", Log::info);
 
                 auth.setAttribute("mechanism", "DIGEST-MD5");
 
@@ -157,7 +157,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
                     return LAST_BLOCK_PROCESSED;
                 }
 
-				Log::getInstance()->msg("PLAIN-password authentication");
+				Log::getInstance()->msg("PLAIN-password authentication", Log::info);
 					
 				auth.setAttribute("mechanism", "PLAIN");
 
@@ -177,7 +177,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
 		// resource binding session
 		JabberDataBlockRef bindsess=block->getChildByName("bind");
 		if (bindsess.get()!=NULL) {
-			Log::getInstance()->msg("Binding resource");
+			Log::getInstance()->msg("Binding resource", Log::info);
 			JabberDataBlock bindIq("iq");
 			bindIq.setAttribute("type", "set");
 			bindIq.setAttribute("id", "bind");
@@ -217,7 +217,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
     }
 
     if (block->getTagName()=="proceed") {
-        Log::getInstance()->msg("Starting TLS connection");
+        Log::getInstance()->msg("Starting TLS connection", Log::info);
 #ifndef NOSTARTTLS
 
         CeTLSSocket::ref tlsSocket=boost::dynamic_pointer_cast<CeTLSSocket>(rc->jabberStream->connection);
@@ -230,7 +230,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
     }
 
     if (block->getTagName()=="compressed") {
-		Log::getInstance()->msg("Opening compressed stream");
+		Log::getInstance()->msg("Opening compressed stream", Log::info);
 
 #ifndef NOZLIB
 		// switching to compressed stream
@@ -261,7 +261,7 @@ ProcessResult SASLAuth::blockArrived(JabberDataBlockRef block, const ResourceCon
             JabberDataBlockRef resource=bind->getChildByName("jid");
             std::string res=resource->getText();
 
-			Log::getInstance()->msg("Resource: ", res.c_str());
+			Log::getInstance()->msg("Resource: ", res.c_str(), Log::info);
 
             rc->myJid.setJid(res);
 

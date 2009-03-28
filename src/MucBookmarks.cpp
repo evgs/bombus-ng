@@ -38,7 +38,7 @@ ProcessResult MucBookmarks::blockArrived( JabberDataBlockRef block, const Resour
         }
         std::stable_sort(bookmarks.begin(), bookmarks.end(), MucBookmarkItem::compare);
     }
-    Log::getInstance()->msg("Bookmarks received successfully");
+    Log::getInstance()->msg("Bookmarks received successfully", Log::info);
     return LAST_BLOCK_PROCESSED;
 }
 

@@ -63,7 +63,7 @@ INT_PTR CALLBACK DlgMucJoin::dialogProc(HWND hDlg, UINT message, WPARAM wParam, 
                     std::wstring bn=utf8::utf8_wchar(p->rc->bookmarks->get(i)->name);
                     SendDlgItemMessage(hDlg, IDC_C_BOOKMARK, CB_ADDSTRING, 0, (LPARAM) bn.c_str());
                 }
-                SendDlgItemMessage(hDlg, IDC_C_BOOKMARK, CB_SETCURSEL, p->rc->status, 0);
+                SendDlgItemMessage(hDlg, IDC_C_BOOKMARK, CB_SETCURSEL, 0, 0);
             }
 
             /*SetDlgItemText(hDlg, IDC_E_JID, dlgAccountParam->getBareJid());

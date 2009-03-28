@@ -44,11 +44,14 @@ void Serialize::streamBool( bool &data, bool defValue ) {
 }
 
 void Serialize::streamString( std::string &data, const char *defValue ) {
+	if (read) if (defValue) data=defValue;
     if (file == INVALID_HANDLE_VALUE) return;
-    if (read) if (defValue) data=defValue;
-    short len;
-    len=data.length();
-    streamShort(len);
+    
+	short len;
+    len=data.length(); 
+    streamShort(len, -1);
+	if (len<0) return;
+
     char *buf=new char[len+1];
 
 #pragma warning(push)
@@ -74,7 +77,9 @@ void Serialize::streamScrambledString( std::string &data ) {
     if (file == INVALID_HANDLE_VALUE) return;
     short len;
     len=data.length();
-    streamShort(len);
+    streamShort(len, -1);
+	if (len<0) return;
+
     char *buf=new char[len+1];
 
     short method=1; // if some stronger crypto method will be used here

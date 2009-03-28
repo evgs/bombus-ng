@@ -29,7 +29,7 @@ public:
 	void msg(const char * message, int level);
 	void msg(const char * message, const char * message2, int level);
 
-	void setLogLevel(int level);
+	void updateLoggingPolicy();
 
 	int getLogLevel();
 

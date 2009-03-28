@@ -28,6 +28,10 @@ public:
 
     bool connectOnStartup;
 
+	bool logFileEnable;
+	int logLevel;
+	std::string logFilePath;
+
     void save();
 private:
     void serialize(Serialize &s);

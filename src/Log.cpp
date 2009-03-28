@@ -1,14 +1,17 @@
 #include "Log.h"
+#include "config.h"
 
 #include "utf8.hpp"
 
 Log::Log() {
-	level=debug;
+	updateLoggingPolicy();
 }
 
 Log::~Log(){}
 
-void Log::addLog(const wchar_t * msg, int level) {}
+void Log::addLog(const wchar_t * msg, int level) {
+	if (level < this->level) return;
+}
 
 void Log::msg(const std::string &message, int level){
     addLog(utf8::utf8_wchar(message).c_str(), level);
@@ -38,8 +41,9 @@ void Log::setInstance( Log * log ) {
     instance=Log::ref(log);
 }
 
-void Log::setLogLevel(int level) {
-	this->level=level;
+void Log::updateLoggingPolicy() {
+	Config::ref cfg=Config::getInstance();
+	level=cfg->logLevel;
 }
 
 int Log::getLogLevel() {

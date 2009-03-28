@@ -1,4 +1,5 @@
 #include "config.h"
+#include "Log.h"
 
 #define CONFIG_FILE L"config\\preferences.bin"
 
@@ -12,6 +13,7 @@ Config::ref Config::getInstance() {
 }
 
 Config::Config(void){
+	logFileEnable=false; //reset after every restart
     Serialize s(CONFIG_FILE, Serialize::READ);
     serialize(s);
 }
@@ -54,5 +56,9 @@ void Config::serialize( Serialize &s ) {
 
     //Automatic connection
     s.streamBool(connectOnStartup, false);
+
+	//s.streamBool(logFileEnable, false);
+	s.streamString(logFilePath, ".\\log.txt");
+	s.streamInt(logLevel, Log::info);
 }
 
